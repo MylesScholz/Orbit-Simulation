@@ -1,4 +1,7 @@
 import java.util.Scanner;
+
+import javax.swing.JPanel;
+
 import java.awt.Graphics2D;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -10,7 +13,22 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 
 
-public class Test {
+public class Test extends JPanel {
+	
+	public void paint(Graphics g){
+		Graphics2D solarSystem = (Graphics2D)g;
+		solarSystem.setPaint(Color.BLACK); 
+		Shape drawLine = new Line2D.Float(20, 90, 55, 250);
+		Shape drawOval = new Ellipse2D.Float(50, 50, 55, 50);
+		solarSystem.draw(drawLine);
+		solarSystem.draw(drawOval);
+	}
+    @Override
+    public void paintComponent(Graphics g) {
+
+        super.paintComponent(g);
+        paint(g);
+    }
 	public void Input() {
 		Scanner scanner = new Scanner(System.in);
 		
@@ -31,13 +49,5 @@ public class Test {
 		
 	}
 }
-/*
-public void paint(Graphics g){
-	Graphics2D solarSystem = (Graphics2D)g;
-	solarSystem.setPaint(Color.BLACK); 
-	Shape drawLine = new Line2D.Float(20, 90, 55, 250);
-	Shape drawOval = new Ellipse2D.Float(120, 190, 155, 350)
-	solarSystem.draw(drawLine);
-	solarSystem.draw(drawEllipse);
-}
-*/
+
+

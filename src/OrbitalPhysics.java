@@ -1,16 +1,40 @@
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
+import java.util.Timer;
+
+import javax.swing.JFrame;
+
+import java.awt.Graphics2D;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 
 public class OrbitalPhysics {
 	static ArrayList<OrbitalBody> listOfBodies = new ArrayList();
 	static int gravConst = 1;
 	
+    private final int DELAY = 30;
+    private final int INITIAL_DELAY = 150;    
+    private Timer timer;
 	
 	public static void main(String [] args)
 	{
-		
-		
+		JFrame frame = new JFrame("Title");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		Test p = new Test();
+		frame.add(p);
+		frame.setSize(400, 400);
+		frame.setVisible(true);
 		
 		
 		OrbitalBody planet = new OrbitalBody();
@@ -37,6 +61,7 @@ public class OrbitalPhysics {
 			System.out.println("Y Position: " + planet.yPosition);
 			System.out.println("X Acceleration: " + planet.xAcceleration);
 			System.out.println("Y Acceleration: " + planet.yAcceleration);
+			
 		}
 	}
 
