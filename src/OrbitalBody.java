@@ -1,5 +1,5 @@
 
-public class OrbitalBodies {
+public class OrbitalBody {
 	
 	float mass;
 	
@@ -11,6 +11,12 @@ public class OrbitalBodies {
 	
 	float xAcceleration;
 	float yAcceleration;
+	
+	void setPosition(float newXPos, float newYPos){
+		xPosition = newXPos;
+		yPosition = newYPos;
+	}
+	
 	
 	
 	public void changePosition() {

@@ -11,7 +11,7 @@ public class OrbitalPhysics {
 		return velocity;
 	}
 	
-	private float iterateAcceleration(HashMap body) {
+	private float iterateAcceleration() {
 		
 		/*Cowell's Method*/
 		float acceleration = 0;
