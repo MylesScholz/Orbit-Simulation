@@ -52,7 +52,8 @@ public class OrbitalPhysics {
 			
 			for (int j=0; j < listOfBodies.size();j++){
 				if (j != i){
-					sumOfXAcc = gravConst * listOfBodies.get(j).mass * ;
+					sumOfXAcc = gravConst * listOfBodies.get(j).mass * (listOfBodies.get(j).posVect() - listOfBodies.get(i).posVect()) ;
+					
 				}
 			}
 			
@@ -73,15 +74,6 @@ public class OrbitalPhysics {
 		
 	}
 	
-	
-	private static float calculateBodyAcceleration() {
-		
-		/*Cowell's Method*/
-		float acceleration = 0;
-		
-		
-		return acceleration;
-	}
 	
 	
 }

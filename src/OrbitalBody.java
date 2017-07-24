@@ -44,7 +44,6 @@ public class OrbitalBody {
 	}
 	
 	
-	/* x or y velocity*/
 	void iterateVelocity(float time) {
 		xVelocity = xVelocity + xAcceleration * time;
 		yVelocity = yVelocity + yAcceleration * time;
@@ -54,4 +53,9 @@ public class OrbitalBody {
 		xPosition = xPosition + xVelocity * time;
 		yPosition = yPosition + yPosition * time;
 	}
+	float posVect() {
+		float distance = Math.sqrt(xPosition*xPosition + yPosition*yPosition);	
+		return distance;
+	}
+	
 }
