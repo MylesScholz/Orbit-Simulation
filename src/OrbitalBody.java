@@ -1,5 +1,9 @@
+import java.util.ArrayList;
+import java.util.List;
 
 public class OrbitalBody {
+	
+
 	
 	String name;
 	
@@ -13,6 +17,8 @@ public class OrbitalBody {
 	
 	float xAcceleration;
 	float yAcceleration;
+	
+
 	
 	void setName(String newName){
 		name = newName;
@@ -32,11 +38,20 @@ public class OrbitalBody {
 		xVelocity = newXVel;
 		yVelocity = newYVel;
 	}
-	
-	/* x or y velocity*/
-	private float iterateVelocity(float initVelocity, float acceleration, float time) {
-		float velocity = initVelocity + 1/2 * acceleration * time;
-		return velocity;
+	void setAcceleration(float newXAcc, float newYAcc){
+		xAcceleration = newXAcc;
+		yAcceleration = newYAcc;
 	}
 	
+	
+	/* x or y velocity*/
+	void iterateVelocity(float time) {
+		xVelocity = xVelocity + xAcceleration * time;
+		yVelocity = yVelocity + yAcceleration * time;
+	}
+	
+	void iteratePosition(float time) {
+		xPosition = xPosition + xVelocity * time;
+		yPosition = yPosition + yPosition * time;
+	}
 }
