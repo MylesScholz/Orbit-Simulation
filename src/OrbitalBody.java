@@ -45,16 +45,20 @@ public class OrbitalBody {
 	
 	
 	void iterateVelocity(float time) {
+		//System.out.println("INITIAL X VELOCITY: " + xVelocity);
+		//System.out.println("INITIAL Y VELOCITY: " + yVelocity);
 		xVelocity = xVelocity + xAcceleration * time;
 		yVelocity = yVelocity + yAcceleration * time;
+		//System.out.println("FINAL X VELOCITY: " + xVelocity);
+		//System.out.println("FINAL Y VELOCITY: " + yVelocity);
 	}
 	
 	void iteratePosition(float time) {
 		xPosition = xPosition + xVelocity * time;
-		yPosition = yPosition + yPosition * time;
+		yPosition = yPosition + yVelocity * time;
 	}
 	float posVect() {
-		float distance = Math.sqrt(xPosition*xPosition + yPosition*yPosition);	
+		float distance = (float) Math.sqrt(xPosition*xPosition + yPosition*yPosition);	
 		return distance;
 	}
 	

@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class OrbitalPhysics {
 	static ArrayList<OrbitalBody> listOfBodies = new ArrayList();
-	static int gravConst = 100;
+	static int gravConst = 1;
 	
 	
 	public static void main(String [] args)
@@ -17,26 +17,26 @@ public class OrbitalPhysics {
 		listOfBodies.add(planet);
 		
 		
-		planet.setName("planet");
+		planet.setName("PLANET~~~~~~~~~~~~~~~~~~~~~~~");
 		planet.setMass(1);
-		planet.setPosition(100,200);
-		
+		planet.setPosition(100,100);
+		planet.setVelocity(100,0);
 		
 		OrbitalBody sun = new OrbitalBody();
 		listOfBodies.add(sun);
 		
-		sun.setName("sun");
+		sun.setName("SUN===========================");
 		sun.setMass(10000);
 		sun.setPosition(0,0);
 		
-		System.out.println(sun.name);
-		System.out.println(sun.mass);
-		System.out.println(sun.xPosition);
-		
-		for (int x=0; x< 10; x++){
-			float deltaTime = (float) 0.001;
+		for (int x=0; x< 1500; x++){
+			float deltaTime = (float) 0.01;
 			iterateSimulation(deltaTime);
-			System.out.println(planet.xPosition);
+			System.out.println("PLANET~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			System.out.println("X Position: " + planet.xPosition);
+			System.out.println("Y Position: " + planet.yPosition);
+			System.out.println("X Acceleration: " + planet.xAcceleration);
+			System.out.println("Y Acceleration: " + planet.yAcceleration);
 		}
 	}
 
@@ -52,13 +52,18 @@ public class OrbitalPhysics {
 			
 			for (int j=0; j < listOfBodies.size();j++){
 				if (j != i){
-					sumOfXAcc = gravConst * listOfBodies.get(j).mass * (listOfBodies.get(j).posVect() - listOfBodies.get(i).posVect()) ;
-					
+					sumOfXAcc = (float) (gravConst * listOfBodies.get(j).mass * (listOfBodies.get(j).xPosition - listOfBodies.get(i).xPosition) / Math.pow(distBetweenOneDimension(listOfBodies.get(i).xPosition, listOfBodies.get(j).xPosition),3));
+					sumOfYAcc = (float) (gravConst * listOfBodies.get(j).mass * (listOfBodies.get(j).yPosition - listOfBodies.get(i).yPosition) / Math.pow(distBetweenOneDimension(listOfBodies.get(i).yPosition, listOfBodies.get(j).yPosition),3));
+					//sumOfXAcc *= -1;
+					//sumOfYAcc *= -1;
+					//System.out.println( listOfBodies.get(i).name);
+					//System.out.println("SumOfXAcc " + sumOfXAcc);
+					//System.out.println("SumOfYAcc " + sumOfYAcc);
 				}
 			}
 			
 			
-			listOfBodies.get(i).setAcceleration(newXAcc, newYAcc);
+			listOfBodies.get(i).setAcceleration(sumOfXAcc, sumOfYAcc);
 			
 			
 			/*2. Iterate velocities*/
@@ -74,6 +79,15 @@ public class OrbitalPhysics {
 		
 	}
 	
+	public static float distBetweenOneDimension(float bodyOnePos, float bodyTwoPos){
+		float distance = (float) Math.sqrt(Math.pow(bodyOnePos, 2) + Math.pow(bodyTwoPos, 2));
+		return distance;
+	}
+	
+	public static float distBetweenTwoBodies(float bodyOneX, float bodyOneY, float bodyTwoX, float bodyTwoY){
+		float distance = (float) Math.sqrt((bodyOneX - bodyTwoX)*(bodyOneX - bodyTwoX) + (bodyOneY - bodyTwoY)*(bodyOneY - bodyTwoY));
+		return distance;
+	}
 	
 	
 }
