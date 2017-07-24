@@ -4,6 +4,8 @@ import java.util.Map;
 
 public class OrbitalPhysics {
 	static ArrayList<OrbitalBody> listOfBodies = new ArrayList();
+	static int gravConst = 100;
+	
 	
 	public static void main(String [] args)
 	{
@@ -33,19 +35,28 @@ public class OrbitalPhysics {
 		
 		for (int x=0; x< 10; x++){
 			float deltaTime = (float) 0.001;
-			
-			
+			iterateSimulation(deltaTime);
+			System.out.println(planet.xPosition);
 		}
 	}
 
-	private void iterateSimulation(float deltaTime) {
+	private static void iterateSimulation(float deltaTime) {
 		
 		
 		for (int i=0; i < listOfBodies.size(); i++){
 			
 			/*1. Iterate net forces & acceleration for each body*/
-			float newXAcc = calculateBodyAcceleration();
-			float newYAcc = calculateBodyAcceleration();
+			
+			float sumOfXAcc = 0;
+			float sumOfYAcc = 0;
+			
+			for (int j=0; j < listOfBodies.size();j++){
+				if (j != i){
+					sumOfXAcc = gravConst * listOfBodies.get(j).mass * ;
+				}
+			}
+			
+			
 			listOfBodies.get(i).setAcceleration(newXAcc, newYAcc);
 			
 			
@@ -58,16 +69,12 @@ public class OrbitalPhysics {
 			
 		}
 		
-		
-		
-		
-		
-		
+	
 		
 	}
 	
 	
-	private float calculateBodyAcceleration() {
+	private static float calculateBodyAcceleration() {
 		
 		/*Cowell's Method*/
 		float acceleration = 0;
