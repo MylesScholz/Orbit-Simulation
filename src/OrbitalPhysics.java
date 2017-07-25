@@ -65,7 +65,6 @@ public class OrbitalPhysics {
                 System.out.println("Y Acceleration: " + planet.yAcceleration);
                 System.out.println("Distance to Sun: " + distBetweenTwoBodies(planet.xPosition, planet.yPosition, sun.xPosition, sun.yPosition));
             }
-			
 		}
 	}
 
