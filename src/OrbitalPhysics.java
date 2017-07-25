@@ -54,11 +54,15 @@ public class OrbitalPhysics {
 		sun.setMass(1000);
 		sun.setPosition(0,0);
 		
-		for (int x=0; x< 1000000000; x++){
-			float deltaTime = (float) 0.0000001;
+		float timeCounter = 0;
+		
+		for (int x=0; x< 10000000; x++){
+			float deltaTime = (float) 0.00001;
+			timeCounter += deltaTime;
 			iterateSimulation(deltaTime);
 			
-			if (x % 1000000 == 0){
+			if (x % 10000 == 0){
+				System.out.println("Time: " + timeCounter);
 				System.out.println(planet.xPosition);
 				
 			/*
