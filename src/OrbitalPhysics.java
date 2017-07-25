@@ -45,20 +45,23 @@ public class OrbitalPhysics {
 		planet.setName("PLANET~~~~~~~~~~~~~~~~~~~~~~~");
 		planet.setMass(1);
 		planet.setPosition(100,100);
-		planet.setVelocity((float) -8.41,0);
+		planet.setVelocity((float) -10,0);
 		
 		OrbitalBody sun = new OrbitalBody();
 		listOfBodies.add(sun);
 		
 		sun.setName("SUN===========================");
-		sun.setMass(10000);
+		sun.setMass(1000);
 		sun.setPosition(0,0);
 		
-		for (int x=0; x< 150000; x++){
-			float deltaTime = (float) 0.0001;
+		for (int x=0; x< 1000000000; x++){
+			float deltaTime = (float) 0.0000001;
 			iterateSimulation(deltaTime);
 			
-			if (x % 1000 == 0){
+			if (x % 1000000 == 0){
+				System.out.println(planet.xPosition);
+				
+			/*
 			System.out.println("PLANET~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 			System.out.println("X Position: " + planet.xPosition);
 			System.out.println("Y Position: " + planet.yPosition);
@@ -66,6 +69,7 @@ public class OrbitalPhysics {
 			System.out.println("Y Velocity: " + planet.yVelocity);
 			System.out.println("X Acceleration: " + planet.xAcceleration);
 			System.out.println("Y Acceleration: " + planet.yAcceleration);
+			*/
 			}
 		}
 	}
@@ -84,12 +88,15 @@ public class OrbitalPhysics {
 				if (j != i){
 					OrbitalBody currentBody = listOfBodies.get(i);
 					OrbitalBody pullingBody = listOfBodies.get(j);
-					sumOfXAcc = (float) (gravConst * pullingBody.mass * (pullingBody.xPosition - currentBody.xPosition) / Math.pow(distBetweenOneDimension(currentBody.xPosition, pullingBody.xPosition),3));
-					sumOfYAcc = (float) (gravConst * pullingBody.mass * (pullingBody.yPosition - currentBody.yPosition) / Math.pow(distBetweenOneDimension(currentBody.yPosition, pullingBody.yPosition),3));
-			
 					
+					//sumOfXAcc = (float) ((gravConst * pullingBody.mass * (pullingBody.xPosition - currentBody.xPosition) / Math.pow(distBetweenOneDimension(currentBody.xPosition, pullingBody.xPosition),3)));
 					
+					sumOfXAcc = (float) (-1.0 * gravConst * pullingBody.mass);
+					sumOfXAcc /= Math.pow((pullingBody.xPosition - currentBody.xPosition), 2);
 					
+					//sumOfYAcc = (float) ((gravConst * pullingBody.mass * (pullingBody.yPosition - currentBody.yPosition) / Math.pow(distBetweenOneDimension(currentBody.yPosition, pullingBody.yPosition),3)));
+					sumOfYAcc = (float) (-1.0 * gravConst * pullingBody.mass);
+					sumOfYAcc /= Math.pow((pullingBody.yPosition - currentBody.yPosition), 2);
 					
 					
 					
