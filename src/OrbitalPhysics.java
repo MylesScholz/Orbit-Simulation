@@ -44,7 +44,7 @@ public class OrbitalPhysics {
 		planet.setName("PLANET~~~~~~~~~~~~~~~~~~~~~~~");
 		planet.setMass(1);
 		planet.setPosition(100,100);
-		planet.setVelocity(100,0);
+		planet.setVelocity(1,-1);
 		
 		OrbitalBody sun = new OrbitalBody();
 		listOfBodies.add(sun);
@@ -106,7 +106,7 @@ public class OrbitalPhysics {
 	
 	public static float distBetweenOneDimension(float bodyOnePos, float bodyTwoPos){
 		float distance = (float) Math.sqrt(Math.pow(bodyOnePos, 2) + Math.pow(bodyTwoPos, 2));
-		return distance;
+		return distance;  
 	}
 	
 	public static float distBetweenTwoBodies(float bodyOneX, float bodyOneY, float bodyTwoX, float bodyTwoY){
