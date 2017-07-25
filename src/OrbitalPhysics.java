@@ -55,7 +55,7 @@ public class OrbitalPhysics {
 		sun.setPosition(0,0);
 		
 		for (int x=0; x< 1500; x++){
-            if (distBetweenTwoBodies(planet.xPosition, planet.yPosition,sun.xPosition,sun.yPosition) >= sun.radius + planet.radius) {
+            if (!checkCollision(planet, sun)) {
                 float deltaTime = (float) 0.01;
                 iterateSimulation(deltaTime);
                 System.out.println("PLANET~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
@@ -125,6 +125,12 @@ public class OrbitalPhysics {
 		float distance = (float) Math.sqrt((bodyOneX - bodyTwoX)*(bodyOneX - bodyTwoX) + (bodyOneY - bodyTwoY)*(bodyOneY - bodyTwoY));
 		return distance;
 	}
-	
-	
+
+    public static boolean checkCollision(OrbitalBody body1, OrbitalBody body2) {
+        if (distBetweenTwoBodies(body1.xPosition, body1.yPosition, body2.xPosition, body2.yPosition) <= body1.radius + body2.radius) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
