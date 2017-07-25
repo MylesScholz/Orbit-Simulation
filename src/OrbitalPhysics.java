@@ -67,7 +67,6 @@ public class OrbitalPhysics {
                 System.out.println("Distance: " + distBetweenTwoBodies(planet.xPosition, planet.yPosition, sun.xPosition, sun.yPosition));
                 System.out.println("Iteration: " + x);
             }
-			
 		}
 	}
 
