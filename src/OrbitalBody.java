@@ -66,4 +66,5 @@ public class OrbitalBody {
 		return distance;
 	}
 	
+	
 }
