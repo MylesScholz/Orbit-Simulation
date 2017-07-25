@@ -8,6 +8,8 @@ public class OrbitalBody {
 	String name;
 	
 	float mass;
+
+	float radius;
 	
 	float xPosition;
 	float yPosition;
@@ -28,6 +30,8 @@ public class OrbitalBody {
 	void setMass(float newMass){
 		mass = newMass;
 	}
+
+	void setRadius(float newRadius) { radius = newRadius; }
 	
 	void setPosition(float newXPos, float newYPos){
 		xPosition = newXPos;

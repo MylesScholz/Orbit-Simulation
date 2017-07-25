@@ -21,7 +21,7 @@ import java.awt.geom.Line2D;
 
 public class OrbitalPhysics {
 	static ArrayList<OrbitalBody> listOfBodies = new ArrayList();
-	static int gravConst = 1;
+	static int gravConst = 10;
 	
     private final int DELAY = 30;
     private final int INITIAL_DELAY = 150;    
@@ -29,7 +29,7 @@ public class OrbitalPhysics {
 	
 	public static void main(String [] args)
 	{
-		JFrame frame = new JFrame("Title");
+		JFrame frame = new JFrame("Orbit Simulation");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Test p = new Test();
 		frame.add(p);
@@ -41,26 +41,32 @@ public class OrbitalPhysics {
 		listOfBodies.add(planet);
 		
 		
-		planet.setName("PLANET~~~~~~~~~~~~~~~~~~~~~~~");
+		planet.setName("PLANET");
 		planet.setMass(1);
+		planet.setRadius(1);
 		planet.setPosition(100,100);
-		planet.setVelocity(100,0);
+		planet.setVelocity(-10, 10);
 		
 		OrbitalBody sun = new OrbitalBody();
 		listOfBodies.add(sun);
 		
-		sun.setName("SUN===========================");
+		sun.setName("SUN");
 		sun.setMass(10000);
+		sun.setRadius(10);
 		sun.setPosition(0,0);
 		
 		for (int x=0; x< 1500; x++){
-			float deltaTime = (float) 0.01;
-			iterateSimulation(deltaTime);
-			System.out.println("PLANET~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-			System.out.println("X Position: " + planet.xPosition);
-			System.out.println("Y Position: " + planet.yPosition);
-			System.out.println("X Acceleration: " + planet.xAcceleration);
-			System.out.println("Y Acceleration: " + planet.yAcceleration);
+            if (distBetweenTwoBodies(planet.xPosition, planet.yPosition,sun.xPosition,sun.yPosition) >= sun.radius + planet.radius) {
+                float deltaTime = (float) 0.01;
+                iterateSimulation(deltaTime);
+                System.out.println("PLANET~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                System.out.println("X Position: " + planet.xPosition);
+                System.out.println("Y Position: " + planet.yPosition);
+                System.out.println("X Acceleration: " + planet.xAcceleration);
+                System.out.println("Y Acceleration: " + planet.yAcceleration);
+                System.out.println("Distance: " + distBetweenTwoBodies(planet.xPosition, planet.yPosition, sun.xPosition, sun.yPosition));
+                System.out.println("Iteration: " + x);
+            }
 			
 		}
 	}
@@ -93,11 +99,9 @@ public class OrbitalPhysics {
 			
 			/*2. Iterate velocities*/
 			listOfBodies.get(i).iterateVelocity(deltaTime);
-			
+
 			/*3. Calculate new positions*/
 			listOfBodies.get(i).iteratePosition(deltaTime);
-			
-			
 		}
 		
 	
