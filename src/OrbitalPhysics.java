@@ -21,7 +21,7 @@ import java.awt.geom.Line2D;
 
 public class OrbitalPhysics {
 	static ArrayList<OrbitalBody> listOfBodies = new ArrayList();
-	static int gravConst = 1;
+	static int gravConst = 10;
 	
     private final int DELAY = 30;
     private final int INITIAL_DELAY = 150;    
@@ -29,14 +29,12 @@ public class OrbitalPhysics {
 	
 	public static void main(String [] args)
 	{
-	    /*
 		JFrame frame = new JFrame("Orbit Simulation");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Test p = new Test();
 		frame.add(p);
 		frame.setSize(400, 400);
 		frame.setVisible(true);
-		*/
 		
 		OrbitalBody planet = new OrbitalBody();
 		listOfBodies.add(planet);
@@ -46,29 +44,28 @@ public class OrbitalPhysics {
 		planet.setMass(1);
 		planet.setRadius(1);
 		planet.setPosition(100,100);
-		planet.setVelocity(-10, 10);
-
+		planet.setVelocity((float) -10,0);
+		
 		OrbitalBody sun = new OrbitalBody();
 		listOfBodies.add(sun);
-		
+
 		sun.setName("SUN");
-		sun.setMass(1000);
+		sun.setMass(10000);
 		sun.setRadius(10);
 		sun.setPosition(0,0);
 		
-		for (int x=0; x< 3000; x++){
+		for (int x=0; x< 1500; x++){
             if (!checkCollision(planet, sun)) {
                 float deltaTime = (float) 0.01;
                 iterateSimulation(deltaTime);
-                System.out.println("Name: " + planet.name + " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                System.out.println("PLANET~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
                 System.out.println("X Position: " + planet.xPosition);
                 System.out.println("Y Position: " + planet.yPosition);
-                System.out.println("X Velocity: " + planet.xVelocity);
-                System.out.println("Y Velocity: " + planet.yVelocity);
-                System.out.println("Distance to Sun: " + distBetweenTwoBodies(planet.xPosition, planet.yPosition, sun.xPosition, sun.yPosition));
+                System.out.println("X Acceleration: " + planet.xAcceleration);
+                System.out.println("Y Acceleration: " + planet.yAcceleration);
+                System.out.println("Distance: " + distBetweenTwoBodies(planet.xPosition, planet.yPosition, sun.xPosition, sun.yPosition));
                 System.out.println("Iteration: " + x);
             }
-			
 		}
 	}
 
@@ -84,10 +81,20 @@ public class OrbitalPhysics {
 			
 			for (int j=0; j < listOfBodies.size();j++){
 				if (j != i){
-					sumOfXAcc = (float) (gravConst * listOfBodies.get(j).mass * (listOfBodies.get(j).xPosition - listOfBodies.get(i).xPosition) / Math.pow(distBetweenOneDimension(listOfBodies.get(i).xPosition, listOfBodies.get(j).xPosition),3));
-					sumOfYAcc = (float) (gravConst * listOfBodies.get(j).mass * (listOfBodies.get(j).yPosition - listOfBodies.get(i).yPosition) / Math.pow(distBetweenOneDimension(listOfBodies.get(i).yPosition, listOfBodies.get(j).yPosition),3));
-					//sumOfXAcc *= -1;
-					//sumOfYAcc *= -1;
+					OrbitalBody currentBody = listOfBodies.get(i);
+					OrbitalBody pullingBody = listOfBodies.get(j);
+					
+					//sumOfXAcc = (float) ((gravConst * pullingBody.mass * (pullingBody.xPosition - currentBody.xPosition) / Math.pow(distBetweenOneDimension(currentBody.xPosition, pullingBody.xPosition),3)));
+					
+					sumOfXAcc = (float) (-1.0 * gravConst * pullingBody.mass);
+					sumOfXAcc /= Math.pow((pullingBody.xPosition - currentBody.xPosition), 2);
+					
+					//sumOfYAcc = (float) ((gravConst * pullingBody.mass * (pullingBody.yPosition - currentBody.yPosition) / Math.pow(distBetweenOneDimension(currentBody.yPosition, pullingBody.yPosition),3)));
+					sumOfYAcc = (float) (-1.0 * gravConst * pullingBody.mass);
+					sumOfYAcc /= Math.pow((pullingBody.yPosition - currentBody.yPosition), 2);
+					
+					
+					
 					//System.out.println( listOfBodies.get(i).name);
 					//System.out.println("SumOfXAcc " + sumOfXAcc);
 					//System.out.println("SumOfYAcc " + sumOfYAcc);
@@ -119,13 +126,11 @@ public class OrbitalPhysics {
 		return distance;
 	}
 
-	public static boolean checkCollision(OrbitalBody body1, OrbitalBody body2) {
+    public static boolean checkCollision(OrbitalBody body1, OrbitalBody body2) {
         if (distBetweenTwoBodies(body1.xPosition, body1.yPosition, body2.xPosition, body2.yPosition) <= body1.radius + body2.radius) {
             return true;
         } else {
             return false;
         }
     }
-	
-	
 }
