@@ -44,7 +44,7 @@ public class OrbitalPhysics {
 		planet.setName("PLANET~~~~~~~~~~~~~~~~~~~~~~~");
 		planet.setMass(1);
 		planet.setPosition(100,100);
-		planet.setVelocity(100,0);
+		planet.setVelocity(1,0);
 		
 		OrbitalBody sun = new OrbitalBody();
 		listOfBodies.add(sun);
@@ -54,7 +54,7 @@ public class OrbitalPhysics {
 		sun.setPosition(0,0);
 		
 		for (int x=0; x< 1500; x++){
-			float deltaTime = (float) 0.01;
+			float deltaTime = (float) 0.001;
 			iterateSimulation(deltaTime);
 			System.out.println("PLANET~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 			System.out.println("X Position: " + planet.xPosition);
