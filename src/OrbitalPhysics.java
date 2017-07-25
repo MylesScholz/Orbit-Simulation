@@ -29,13 +29,14 @@ public class OrbitalPhysics {
 	
 	public static void main(String [] args)
 	{
+		/*
 		JFrame frame = new JFrame("Title");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Test p = new Test();
 		frame.add(p);
 		frame.setSize(400, 400);
 		frame.setVisible(true);
-		
+		*/
 		
 		OrbitalBody planet = new OrbitalBody();
 		listOfBodies.add(planet);
@@ -44,7 +45,7 @@ public class OrbitalPhysics {
 		planet.setName("PLANET~~~~~~~~~~~~~~~~~~~~~~~");
 		planet.setMass(1);
 		planet.setPosition(100,100);
-		planet.setVelocity(1,0);
+		planet.setVelocity((float) -8.41,0);
 		
 		OrbitalBody sun = new OrbitalBody();
 		listOfBodies.add(sun);
@@ -53,15 +54,19 @@ public class OrbitalPhysics {
 		sun.setMass(10000);
 		sun.setPosition(0,0);
 		
-		for (int x=0; x< 1500; x++){
-			float deltaTime = (float) 0.001;
+		for (int x=0; x< 150000; x++){
+			float deltaTime = (float) 0.0001;
 			iterateSimulation(deltaTime);
+			
+			if (x % 1000 == 0){
 			System.out.println("PLANET~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 			System.out.println("X Position: " + planet.xPosition);
 			System.out.println("Y Position: " + planet.yPosition);
+			System.out.println("X Velocity: " + planet.xVelocity);
+			System.out.println("Y Velocity: " + planet.yVelocity);
 			System.out.println("X Acceleration: " + planet.xAcceleration);
 			System.out.println("Y Acceleration: " + planet.yAcceleration);
-			
+			}
 		}
 	}
 
@@ -77,10 +82,17 @@ public class OrbitalPhysics {
 			
 			for (int j=0; j < listOfBodies.size();j++){
 				if (j != i){
-					sumOfXAcc = (float) (gravConst * listOfBodies.get(j).mass * (listOfBodies.get(j).xPosition - listOfBodies.get(i).xPosition) / Math.pow(distBetweenOneDimension(listOfBodies.get(i).xPosition, listOfBodies.get(j).xPosition),3));
-					sumOfYAcc = (float) (gravConst * listOfBodies.get(j).mass * (listOfBodies.get(j).yPosition - listOfBodies.get(i).yPosition) / Math.pow(distBetweenOneDimension(listOfBodies.get(i).yPosition, listOfBodies.get(j).yPosition),3));
-					//sumOfXAcc *= -1;
-					//sumOfYAcc *= -1;
+					OrbitalBody currentBody = listOfBodies.get(i);
+					OrbitalBody pullingBody = listOfBodies.get(j);
+					sumOfXAcc = (float) (gravConst * pullingBody.mass * (pullingBody.xPosition - currentBody.xPosition) / Math.pow(distBetweenOneDimension(currentBody.xPosition, pullingBody.xPosition),3));
+					sumOfYAcc = (float) (gravConst * pullingBody.mass * (pullingBody.yPosition - currentBody.yPosition) / Math.pow(distBetweenOneDimension(currentBody.yPosition, pullingBody.yPosition),3));
+			
+					
+					
+					
+					
+					
+					
 					//System.out.println( listOfBodies.get(i).name);
 					//System.out.println("SumOfXAcc " + sumOfXAcc);
 					//System.out.println("SumOfYAcc " + sumOfYAcc);
