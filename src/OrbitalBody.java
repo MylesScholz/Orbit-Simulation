@@ -3,14 +3,15 @@ import java.util.List;
 
 public class OrbitalBody {
 	
-
-	
 	String name;
 	
 	float mass;
-	
+		
 	float xPosition;
 	float yPosition;
+	
+	float xOldPosition;
+	float yOldPosition;
 	
 	float xVelocity;
 	float yVelocity;
@@ -18,7 +19,21 @@ public class OrbitalBody {
 	float xAcceleration;
 	float yAcceleration;
 	
-
+	public float getXOldPosition(){
+		return xOldPosition;
+	}
+	
+	public float getYOldPosition(){
+		return yOldPosition;
+	}
+	
+	public float getXPosition(){
+		return xPosition;
+	}
+	
+	public float getYPosition(){
+		return yPosition;
+	}
 	
 	void setName(String newName){
 		name = newName;
@@ -54,6 +69,8 @@ public class OrbitalBody {
 	}
 	
 	void iteratePosition(float time) {
+		xOldPosition = xPosition;
+		yOldPosition = yPosition;
 		xPosition = xPosition + xVelocity * time;
 		yPosition = yPosition + yVelocity * time;
 	}

@@ -8,6 +8,7 @@ import java.util.Scanner;
 import java.util.Timer;
 
 import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 
 import java.awt.Graphics2D;
 import java.awt.BorderLayout;
@@ -19,7 +20,7 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 
-public class OrbitalPhysics {
+public class OrbitalPhysics{
 	static ArrayList<OrbitalBody> listOfBodies = new ArrayList();
 	static int gravConst = 1;
 	
@@ -28,23 +29,24 @@ public class OrbitalPhysics {
     private Timer timer;
 	
 	public static void main(String [] args)
-	{
-		JFrame frame = new JFrame("Title");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		Test p = new Test();
-		frame.add(p);
-		frame.setSize(400, 400);
+	{	
+		//frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+ 		JFrame frame = new JFrame("Oribital Simulation");
 		frame.setVisible(true);
-		
+		frame.setSize(1000, 1000);
+ 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		frame.setResizable(false);
+ 		Test p = new Test();
+		frame.add(p);
+		frame.setVisible(true);
 		
 		OrbitalBody planet = new OrbitalBody();
 		listOfBodies.add(planet);
 		
-		
 		planet.setName("PLANET~~~~~~~~~~~~~~~~~~~~~~~");
 		planet.setMass(1);
-		planet.setPosition(100,100);
-		planet.setVelocity(1,-1);
+		planet.setPosition(5,5);
+		planet.setVelocity(-5,5);
 		
 		OrbitalBody sun = new OrbitalBody();
 		listOfBodies.add(sun);
@@ -53,21 +55,33 @@ public class OrbitalPhysics {
 		sun.setMass(10000);
 		sun.setPosition(0,0);
 		
-		for (int x=0; x< 1500; x++){
-			float deltaTime = (float) 0.01;
-			iterateSimulation(deltaTime);
-			System.out.println("PLANET~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-			System.out.println("X Position: " + planet.xPosition);
-			System.out.println("Y Position: " + planet.yPosition);
-			System.out.println("X Acceleration: " + planet.xAcceleration);
-			System.out.println("Y Acceleration: " + planet.yAcceleration);
-			
-		}
+		p.passList(listOfBodies);
+		
+		Thread iterate = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				for (int x = 0; x < 10000; x ++){
+					float deltaTime = (float) 0.1;
+					iterateSimulation(deltaTime);
+					frame.repaint();
+					//p.paintImmediately(500,500,900,900);
+					System.out.println(x);
+					System.out.println("PLANET~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+					System.out.println("X Position: " + planet.xPosition);
+					System.out.println("Y Position: " + planet.yPosition);
+					System.out.println("X Position Old: " + planet.getXOldPosition());
+					System.out.println("Y Position Old: " + planet.getYOldPosition());
+					System.out.println("X Velocity: " + planet.xVelocity);
+					System.out.println("Y Velocity: " + planet.yVelocity);
+					System.out.println("X Acceleration: " + planet.xAcceleration);
+					System.out.println("Y Acceleration: " + planet.yAcceleration);
+				}
+			}
+		});
+		iterate.start();
 	}
 
 	private static void iterateSimulation(float deltaTime) {
-		
-		
 		for (int i=0; i < listOfBodies.size(); i++){
 			
 			/*1. Iterate net forces & acceleration for each body*/
@@ -112,7 +126,5 @@ public class OrbitalPhysics {
 	public static float distBetweenTwoBodies(float bodyOneX, float bodyOneY, float bodyTwoX, float bodyTwoY){
 		float distance = (float) Math.sqrt((bodyOneX - bodyTwoX)*(bodyOneX - bodyTwoX) + (bodyOneY - bodyTwoY)*(bodyOneY - bodyTwoY));
 		return distance;
+	}	
 	}
-	
-	
-}
