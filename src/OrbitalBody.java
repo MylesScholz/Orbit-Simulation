@@ -1,5 +1,3 @@
-import javax.vecmath.Vector3d;
-
 public class OrbitalBody {
 	
 	// 0 = Rectangular, 1 = Euler's, 2 = Range-Kutta
@@ -9,9 +7,9 @@ public class OrbitalBody {
 	float mass;
 	
 	// x = 0, y = 1, z = 2, stored as double
-	Vector3d posVect = new Vector3d();
-	Vector3d velVect = new Vector3d();
-	Vector3d accVect = new Vector3d();
+	Vector3 posVect = new Vector3();
+	Vector3 velVect = new Vector3();
+	Vector3 accVect = new Vector3();
 	
 	void setName(String newName){
 		name = newName;
@@ -56,13 +54,18 @@ public class OrbitalBody {
 		double[] currentVel = new double[3];
 		double[] currentAcc = new double[3];
 		
-		posVect.get(currentPos);
-		velVect.get(currentVel);
-		accVect.get(currentAcc);
+		currentPos = posVect.get();
+		currentVel = velVect.get();
+		currentAcc = accVect.get();
 		
 		//TODO change to integrator choice
 		
 		// Integrates Acceleration to Velocity
+		
+		if (this.name == "Planet #1") {
+			System.out.println(currentPos[0]);
+		}
+		
 		currentVel[0] = NumericalIntegration.integrateRect(currentVel[0], currentAcc[0], deltaTime);
 		currentVel[1] = NumericalIntegration.integrateRect(currentVel[1], currentAcc[1], deltaTime);
 		currentVel[2] = NumericalIntegration.integrateRect(currentVel[2], currentAcc[2], deltaTime);
@@ -75,6 +78,10 @@ public class OrbitalBody {
 		currentPos[1] = NumericalIntegration.integrateRect(currentPos[1], currentVel[1], deltaTime);
 		currentPos[2] = NumericalIntegration.integrateRect(currentPos[2], currentVel[2], deltaTime);		
 
+		if (this.name == "Planet #1") {
+			System.out.println(currentPos[0]);
+		}		
+		
 		posVect.set(currentPos);
 	
 		

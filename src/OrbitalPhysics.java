@@ -8,7 +8,6 @@ import java.util.Scanner;
 import java.util.Timer;
 
 import javax.swing.JFrame;
-import javax.vecmath.Vector3d;
 
 import java.awt.Graphics2D;
 import java.awt.BorderLayout;
@@ -88,7 +87,7 @@ public class OrbitalPhysics {
 		for (int i=0; i < listOfBodies.size(); i++){
 			
 			OrbitalBody currentBody = listOfBodies.get(i);
-			Vector3d sumOfAcc = new Vector3d();
+			Vector3 sumOfAcc = new Vector3();
 			
 			for (int j = 0; j < listOfBodies.size() ; j++){
 				
@@ -97,9 +96,8 @@ public class OrbitalPhysics {
 					OrbitalBody pullingBody = listOfBodies.get(j);
 									
 					if (perturbationCalculationMethod == 0){ // Cowell's Formulation
-						Vector3d calculatedAcc = cowellsFormulation(currentBody, pullingBody);
-						sumOfAcc.add(calculatedAcc);
-						//System.out.println("Calculated Acceleration " + calculatedAcc);
+						Vector3 calculatedAcc = cowellsFormulation(currentBody, pullingBody);
+						sumOfAcc.add(calculatedAcc);				
 					}
 					/*
 					else if {
@@ -117,21 +115,25 @@ public class OrbitalPhysics {
 		}	
 	}	
 	
-	static Vector3d cowellsFormulation(OrbitalBody currentBody, OrbitalBody pullingBody) {
+	static Vector3 cowellsFormulation(OrbitalBody currentBody, OrbitalBody pullingBody) {
 		
-		Vector3d currentPos = currentBody.posVect;
-		Vector3d pullingPos = pullingBody.posVect;
+		Vector3 currentPos = currentBody.posVect;
+		Vector3 pullingPos = pullingBody.posVect;
 		
-		Vector3d diffOfPosVect = new Vector3d();
+		Vector3 diffOfPosVect = new Vector3();
 		diffOfPosVect.add(pullingPos);	
 		currentPos.scale(-1);
 		diffOfPosVect.add(currentPos);
 		
-		Vector3d calculatedAcc = new Vector3d();
-		
+		Vector3 calculatedAcc = new Vector3();	
 		calculatedAcc.add(diffOfPosVect);
-		calculatedAcc.scale(gravConst * pullingBody.mass / Math.pow(diffOfPosVect.length(), 3));
-		
+
+		calculatedAcc.scale(gravConst * pullingBody.mass / Math.pow(diffOfPosVect.length(), 3));	
+		/*
+		if (currentBody.name == "Planet #1"){
+			System.out.println(calculatedAcc);
+		}
+		*/
 		return calculatedAcc;
 	
 	}

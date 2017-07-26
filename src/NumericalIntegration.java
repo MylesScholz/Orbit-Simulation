@@ -7,9 +7,9 @@ public class NumericalIntegration {
 	
 	// Rectangular Method
 	static double integrateRect(double initial, double slope, double delta) {
-		double result = initial + slope * delta;
+		initial += slope * delta;
 		//System.out.println("initial " + initial + " slope " + slope + " final " + result);
-		return result;
+		return initial;
 	}
 	
 	// Euler's Method
