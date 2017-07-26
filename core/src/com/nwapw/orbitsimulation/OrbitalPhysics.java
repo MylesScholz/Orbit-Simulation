@@ -1,3 +1,5 @@
+package com.nwapw.orbitsimulation;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -26,20 +28,15 @@ public class OrbitalPhysics {
 	final static int gravConst = 100;
 	final static int perturbationCalculationMethod = 0; // 0 = Cowell's Method
 	
-	final static float deltaTime = (float) 1;
+	final static float deltaTime = (float) 0.01;
 	final static int numOfIterations = 1000000;
 
-	static JFrame frame = new JFrame("Orbital Simulation");
-	static Test p = new Test();
 	
 	public static void main(String [] args)
 	{	
 		//frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
  		
-		frame.setVisible(true);
-		frame.setSize(1000, 600);
- 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		frame.setResizable(true);
+
  		
  		
 		OrbitalBody planet = new OrbitalBody();	
@@ -48,6 +45,7 @@ public class OrbitalPhysics {
 		planet.setMass(1);
 		planet.setPosition(100, 100, 100);
 		planet.setVelocity(200, 0, 0);
+
 		
 		OrbitalBody sun = new OrbitalBody();
 		listOfBodies.add(sun);
@@ -56,41 +54,20 @@ public class OrbitalPhysics {
 		sun.setPosition(0, 0, 0);
 		sun.setVelocity(0, 0, 0);
 		
-		p.passList(listOfBodies);
-		
-<<<<<<< HEAD
-=======
 
 		
->>>>>>> 10773e7935c6445d92bccad7d1fb6c475800fe5c
 		Thread iterate = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				double timeCounter = 0;
-<<<<<<< HEAD
-				for (int x = 0; x < 1000; x ++){
-					frame.repaint();
-=======
 				for (int x = 0; x < numOfIterations; x ++){
 					
 					
->>>>>>> 10773e7935c6445d92bccad7d1fb6c475800fe5c
 					
 					// DEBUG
 					if (x % numOfIterations/100 == 0){
-						frame.repaint(1000);
+						
 						//System.out.println(planet.posVect.getX());
-<<<<<<< HEAD
-						//System.out.println(x);
-						//System.out.println(planet.name);
-						//System.out.println("t: " + timeCounter);
-						System.out.println("px: " + planet.posVect.getX());
-						System.out.println("py: " + planet.posVect.getY());
-						System.out.println("pz: " + planet.posVect.getZ());
-						//System.out.println("v: " + planet.velVect.getX());
-						//System.out.println("a: " + planet.accVect.getX());
-						System.out.println("");
-=======
 						/*
 						System.out.println(planet.name);
 						System.out.println("t: " + timeCounter);
@@ -99,7 +76,6 @@ public class OrbitalPhysics {
 						System.out.println("a: " + planet.accVect.getX());
 						System.out.println("");
 						*/
->>>>>>> 10773e7935c6445d92bccad7d1fb6c475800fe5c
 					}	
 					
 					timeCounter += deltaTime;

@@ -1,3 +1,5 @@
+package com.nwapw.orbitsimulation;
+
 public class OrbitalBody {
 	
 	// 0 = Rectangular, 1 = Euler's, 2 = Range-Kutta
