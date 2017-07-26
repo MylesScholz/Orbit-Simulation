@@ -27,6 +27,11 @@ public class Vector3 {
 		this.y += otherVector.y;
 		this.z += otherVector.z;
 	}
+	void subtract(Vector3 otherVector){
+		this.x -= otherVector.x;
+		this.y -= otherVector.y;
+		this.z -= otherVector.z;
+	}
 	
 	void scale(double scalar){
 		this.x *= scalar;

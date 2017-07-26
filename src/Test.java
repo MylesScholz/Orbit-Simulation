@@ -35,7 +35,7 @@ public class Test extends JPanel {
 		solarSystem.fill(drawEllipse);
 		Shape drawLine;
 		for(int i = 0; i < listOfBodies.size(); i++) {
-			drawLine = new Line2D.Float(listOfBodies.get(i).getXOldPosition() + 500, listOfBodies.get(i).getYOldPosition() + 500, listOfBodies.get(i).getXPosition() + 500, listOfBodies.get(i).getYPosition() + 500);		
+			drawLine = new Line2D.Float(listOfBodies.get(i).getXOldPosition() + 500, listOfBodies.get(i).getYOldPosition() + 500, listOfBodies.get(i).posVect.getX() + 500, listOfBodies.get(i).getYPosition() + 500);		
 			rePaintList.add(drawLine);
 			for(int n = 0; n < rePaintList.size(); n++) {
 				solarSystem.draw(rePaintList.get(n));
