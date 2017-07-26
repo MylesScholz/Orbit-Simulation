@@ -8,6 +8,7 @@ import java.util.Scanner;
 import java.util.Timer;
 
 import javax.swing.JFrame;
+import javax.vecmath.Vector3d;
 
 import java.awt.Graphics2D;
 import java.awt.BorderLayout;
@@ -20,15 +21,15 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 
 public class OrbitalPhysics {
-	static ArrayList<OrbitalBody> listOfBodies = new ArrayList();
-	static int gravConst = 1;
 	
-    private final int DELAY = 30;
-    private final int INITIAL_DELAY = 150;    
-    private Timer timer;
+	static ArrayList<OrbitalBody> listOfBodies = new ArrayList();
+	final static int gravConst = 1;
+	final static int perturbationCalculationMethod = 0; // 0 = Cowell's Method
+	
 	
 	public static void main(String [] args)
 	{
+		
 		/*
 		JFrame frame = new JFrame("Title");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -38,104 +39,97 @@ public class OrbitalPhysics {
 		frame.setVisible(true);
 		*/
 		
-		OrbitalBody planet = new OrbitalBody();
+		OrbitalBody planet = new OrbitalBody();	
 		listOfBodies.add(planet);
-		
-		
-		planet.setName("PLANET~~~~~~~~~~~~~~~~~~~~~~~");
+		planet.setName("Planet #1");
 		planet.setMass(1);
-		planet.setPosition(100,100);
-		planet.setVelocity((float) -10,0);
+		planet.setPosition(50, 100, 75);
+		planet.setVelocity(-10, 0, 0);
 		
 		OrbitalBody sun = new OrbitalBody();
 		listOfBodies.add(sun);
-		
-		sun.setName("SUN===========================");
+		// Position and velocity vectors {0,0,0} by default
+		sun.setName("Sun");
 		sun.setMass(1000);
-		sun.setPosition(0,0);
+		
 		
 		float timeCounter = 0;
 		
-		for (int x=0; x< 10000000; x++){
-			float deltaTime = (float) 0.00001;
+		for (int x=0; x< 100000; x++){
+			
+			// DEBUG
+			if (x % 1000 == 0){
+				System.out.println("t: " + timeCounter);
+				System.out.println("p: " + planet.posVect);
+				System.out.println("v: " + planet.velVect);
+				System.out.println("a: " + planet.accVect);
+				System.out.println("");
+
+			}	
+			
+			float deltaTime = (float) 0.001;
 			timeCounter += deltaTime;
 			iterateSimulation(deltaTime);
-			
-			if (x % 10000 == 0){
-				System.out.println("Time: " + timeCounter);
-				System.out.println(planet.xPosition);
-				
-			/*
-			System.out.println("PLANET~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-			System.out.println("X Position: " + planet.xPosition);
-			System.out.println("Y Position: " + planet.yPosition);
-			System.out.println("X Velocity: " + planet.xVelocity);
-			System.out.println("Y Velocity: " + planet.yVelocity);
-			System.out.println("X Acceleration: " + planet.xAcceleration);
-			System.out.println("Y Acceleration: " + planet.yAcceleration);
-			*/
-			}
+						
+
 		}
 	}
 
-	private static void iterateSimulation(float deltaTime) {
+	
+	static void iterateSimulation(float deltaTime) {
+		
+		// 1. Calculate net force and acceleration from acting on each body.
+		
 		
 		
 		for (int i=0; i < listOfBodies.size(); i++){
 			
-			/*1. Iterate net forces & acceleration for each body*/
+			OrbitalBody currentBody = listOfBodies.get(i);
+			Vector3d sumOfAcc = new Vector3d();
 			
-			float sumOfXAcc = 0;
-			float sumOfYAcc = 0;
-			
-			for (int j=0; j < listOfBodies.size();j++){
+			for (int j = 0; j < listOfBodies.size() ; j++){
+				
 				if (j != i){
-					OrbitalBody currentBody = listOfBodies.get(i);
+					
 					OrbitalBody pullingBody = listOfBodies.get(j);
+									
+					if (perturbationCalculationMethod == 0){ // Cowell's Formulation
+						Vector3d calculatedAcc = cowellsFormulation(currentBody, pullingBody);
+						sumOfAcc.add(calculatedAcc);
+					}
+					/*
+					else if {
+						// TODO: Encke's Method, Variation of Parameters, etc.
+					}
+					*/
 					
-					//sumOfXAcc = (float) ((gravConst * pullingBody.mass * (pullingBody.xPosition - currentBody.xPosition) / Math.pow(distBetweenOneDimension(currentBody.xPosition, pullingBody.xPosition),3)));
-					
-					sumOfXAcc = (float) (-1.0 * gravConst * pullingBody.mass);
-					sumOfXAcc /= Math.pow((pullingBody.xPosition - currentBody.xPosition), 2);
-					//sumOfYAcc = (float) ((gravConst * pullingBody.mass * (pullingBody.yPosition - currentBody.yPosition) / Math.pow(distBetweenOneDimension(currentBody.yPosition, pullingBody.yPosition),3)));
-					
-					sumOfYAcc = (float) (-1.0 * gravConst * pullingBody.mass);
-					sumOfYAcc /= Math.pow((pullingBody.yPosition - currentBody.yPosition), 2);
-					
-					
-					
-					//System.out.println( listOfBodies.get(i).name);
-					//System.out.println("SumOfXAcc " + sumOfXAcc);
-					//System.out.println("SumOfYAcc " + sumOfYAcc);
 				}
 			}
 			
+			// 2. Iterate and integrate for velocity and then position.
+			listOfBodies.get(i).setAcceleration(sumOfAcc.getX(), sumOfAcc.getY(), sumOfAcc.getZ());			
+			currentBody.iterateVelThenPos(deltaTime);
 			
-			listOfBodies.get(i).setAcceleration(sumOfXAcc, sumOfYAcc);
-			
-			
-			/*2. Iterate velocities*/
-			listOfBodies.get(i).iterateVelocity(deltaTime);
-			
-			/*3. Calculate new positions*/
-			listOfBodies.get(i).iteratePosition(deltaTime);
-			
-			
-		}
+		}	
+	}	
+	
+	static Vector3d cowellsFormulation(OrbitalBody currentBody, OrbitalBody pullingBody) {
 		
-	
+		Vector3d currentPos = currentBody.posVect;
+		Vector3d pullingPos = pullingBody.posVect;
 		
-	}
+		Vector3d diffOfPosVect = new Vector3d();
+		diffOfPosVect.add(pullingPos);	
+		currentPos.scale(-1);
+		diffOfPosVect.add(currentPos);
+		
+		Vector3d calculatedAcc = new Vector3d();
+		
+		calculatedAcc.add(diffOfPosVect);
+		calculatedAcc.scale(gravConst * pullingBody.mass / Math.pow(diffOfPosVect.length(), 3));
+		
+		return calculatedAcc;
 	
-	public static float distBetweenOneDimension(float bodyOnePos, float bodyTwoPos){
-		float distance = (float) Math.sqrt(Math.pow(bodyOnePos, 2) + Math.pow(bodyTwoPos, 2));
-		return distance;
 	}
-	
-	public static float distBetweenTwoBodies(float bodyOneX, float bodyOneY, float bodyTwoX, float bodyTwoY){
-		float distance = (float) Math.sqrt((bodyOneX - bodyTwoX)*(bodyOneX - bodyTwoX) + (bodyOneY - bodyTwoY)*(bodyOneY - bodyTwoY));
-		return distance;
-	}
-	
 	
 }

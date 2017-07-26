@@ -1,77 +1,80 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
-
 import javax.vecmath.Vector3d;
 
 public class OrbitalBody {
 	
-	/* 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 */
+	// 0 = Rectangular, 1 = Euler's, 2 = Range-Kutta
+	static int integrationMethod = 0;
 	
 	String name;
 	float mass;
 	
-	//https://docs.oracle.com/cd/E17802_01/j2se/javase/technologies/desktop/java3d/forDevelopers/j3dapi/javax/vecmath/Vector3d.html
-	// Index 0 = x, 1 = y, 2 = z
+	// x = 0, y = 1, z = 2, stored as double
 	Vector3d posVect = new Vector3d();
 	Vector3d velVect = new Vector3d();
 	Vector3d accVect = new Vector3d();
 	
-
-	
-
-	
-
-	
 	void setName(String newName){
 		name = newName;
 	}
-
 	
 	void setMass(float newMass){
 		mass = newMass;
 	}
+	
+	
+	void setPosition(double x, double y, double z){
+		posVect.set(x,y,z);	
+	}	
+	
+	void setVelocity(double x, double y, double z){
+		velVect.set(x,y,z);
+	}
+	
+	void setAcceleration(double x, double y, double z){
+		accVect.set(x,y,z);
+	}
 
-	void setRadius(float newRadius) { radius = newRadius; }
-	
-	void setPosition(float newXPos, float newYPos){
-		xPosition = newXPos;
-		yPosition = newYPos;
+	void setBody(String newName, float newMass, double[] position, double[] velocity) {
+		name = newName;
+		mass = newMass;
+		posVect.set(position);	
+		velVect.set(velocity);	
 	}
 	
-	void setVelocity(float newXVel, float newYVel){
-		xVelocity = newXVel;
-		yVelocity = newYVel;
-	}
-	void setAcceleration(float newXAcc, float newYAcc){
-		xAcceleration = newXAcc;
-		yAcceleration = newYAcc;
-	}
-	
-	
-	void iterateVelocity(float time) {
-		//System.out.println("INITIAL X VELOCITY: " + xVelocity);
-		//System.out.println("INITIAL Y VELOCITY: " + yVelocity);
-		xVelocity = xVelocity + xAcceleration * time;
-		yVelocity = yVelocity + yAcceleration * time;
-		//System.out.println("FINAL X VELOCITY: " + xVelocity);
-		//System.out.println("FINAL Y VELOCITY: " + yVelocity);
+	// TODO create integrator choice picker
+	double integratorChoice(double value, double deltaTime) {
+		if (integrationMethod == 0){
+			//rectangular method
+		}
+		
+		
+		return value;
 	}
 	
-	void iteratePosition(float time) {
-		xPosition = xPosition + xVelocity * time;
-		yPosition = yPosition + yVelocity * time;
-	}
-	float posVect() {
-		float distance = (float) Math.sqrt(xPosition*xPosition + yPosition*yPosition);	
-		return distance;
+	void iterateVelThenPos(float deltaTime) {
+		double[] currentPos = new double[3];
+		double[] currentVel = new double[3];
+		double[] currentAcc = new double[3];
+		
+		posVect.get(currentPos);
+		velVect.get(currentVel);
+		accVect.get(currentAcc);
+		
+		//TODO change to integrator choice
+		
+		// Integrates Acceleration to Velocity
+		currentVel[0] = NumericalIntegration.integrateRect(currentVel[0], currentAcc[0], deltaTime);
+		currentVel[1] = NumericalIntegration.integrateRect(currentVel[1], currentAcc[1], deltaTime);
+		currentVel[2] = NumericalIntegration.integrateRect(currentVel[2], currentAcc[2], deltaTime);
+	
+		// Integrates Velocity to Position
+		currentPos[0] = NumericalIntegration.integrateRect(currentPos[0], currentVel[0], deltaTime);
+		currentPos[1] = NumericalIntegration.integrateRect(currentPos[1], currentVel[1], deltaTime);
+		currentPos[2] = NumericalIntegration.integrateRect(currentPos[2], currentVel[2], deltaTime);		
+		
+		posVect.set(currentPos);
+		velVect.set(currentVel);
+		
 	}
 	
 }
