@@ -26,7 +26,7 @@ public class OrbitalPhysics {
 	final static int gravConst = 100;
 	final static int perturbationCalculationMethod = 0; // 0 = Cowell's Method
 	
-	final static float deltaTime = (float) 0.01;
+	final static float deltaTime = (float) 1;
 	final static int numOfIterations = 1000000;
 
 	public static void main(String [] args)
@@ -45,7 +45,6 @@ public class OrbitalPhysics {
 		planet.setMass(1);
 		planet.setPosition(100, 100, 100);
 		planet.setVelocity(200, 0, 0);
-
 		
 		OrbitalBody sun = new OrbitalBody();
 		listOfBodies.add(sun);
@@ -54,29 +53,28 @@ public class OrbitalPhysics {
 		sun.setPosition(0, 0, 0);
 		sun.setVelocity(0, 0, 0);
 		
-
 		p.passList(listOfBodies);
-		
 		
 		Thread iterate = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				double timeCounter = 0;
-				for (int x = 0; x < 10000; x ++){
+				for (int x = 0; x < 1000; x ++){
 					frame.repaint();
 					
 					// DEBUG
 					if (x % numOfIterations/100 == 0){
 						
 						//System.out.println(planet.posVect.getX());
-						
-						System.out.println(planet.name);
-						System.out.println("t: " + timeCounter);
-						System.out.println("p: " + planet.posVect.getX());
-						System.out.println("v: " + planet.velVect.getX());
-						System.out.println("a: " + planet.accVect.getX());
+						//System.out.println(x);
+						//System.out.println(planet.name);
+						//System.out.println("t: " + timeCounter);
+						System.out.println("px: " + planet.posVect.getX());
+						System.out.println("py: " + planet.posVect.getY());
+						System.out.println("pz: " + planet.posVect.getZ());
+						//System.out.println("v: " + planet.velVect.getX());
+						//System.out.println("a: " + planet.accVect.getX());
 						System.out.println("");
-						
 					}	
 					
 					timeCounter += deltaTime;

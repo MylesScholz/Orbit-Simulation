@@ -24,7 +24,7 @@ public class Test extends JPanel {
 	
 	public void paint(Graphics g){
 		setVisible(true);
-		System.out.println("Paint");
+		System.out.println("Paint Real");
 		Graphics2D solarSystem = (Graphics2D)g;
 		solarSystem.setPaint(Color.BLACK); 
 		//Shape drawRectangle = new Rectangle2D.Float(500,500,900,900);
@@ -51,6 +51,7 @@ public class Test extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+		System.out.println("Paint");
         paint(g);
     }
 	public void Input() {
