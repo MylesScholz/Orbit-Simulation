@@ -20,14 +20,15 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 
-public class OrbitalPhysics{
+public class OrbitalPhysics {
+	
 	static ArrayList<OrbitalBody> listOfBodies = new ArrayList();
-	static int gravConst = 1;
+	final static int gravConst = 100;
+	final static int perturbationCalculationMethod = 0; // 0 = Cowell's Method
 	
-    private final int DELAY = 30;
-    private final int INITIAL_DELAY = 150;    
-    private Timer timer;
-	
+	final static float deltaTime = (float) 0.01;
+	final static int numOfIterations = 1000000;
+
 	public static void main(String [] args)
 	{	
 		//frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -37,24 +38,22 @@ public class OrbitalPhysics{
  		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.setResizable(false);
  		Test p = new Test();
-		frame.add(p);
-		frame.setVisible(true);
-		
-		OrbitalBody planet = new OrbitalBody();
+		OrbitalBody planet = new OrbitalBody();	
 		listOfBodies.add(planet);
-		
-		planet.setName("PLANET~~~~~~~~~~~~~~~~~~~~~~~");
+		planet.setName("Planet #1");
 		planet.setMass(1);
-		planet.setPosition(5,5);
-		planet.setVelocity(-5,5);
+		planet.setPosition(100, 100, 100);
+		planet.setVelocity(200, 0, 0);
+
 		
 		OrbitalBody sun = new OrbitalBody();
 		listOfBodies.add(sun);
-		
-		sun.setName("SUN===========================");
+		sun.setName("Sun");
 		sun.setMass(10000);
-		sun.setPosition(0,0);
+		sun.setPosition(0, 0, 0);
+		sun.setVelocity(0, 0, 0);
 		
+
 		p.passList(listOfBodies);
 		
 		Thread iterate = new Thread(new Runnable() {
@@ -82,49 +81,98 @@ public class OrbitalPhysics{
 	}
 
 	private static void iterateSimulation(float deltaTime) {
+
+		double timeCounter = 0;
+		for (int x = 0; x < numOfIterations; x++){
+			
+			// DEBUG
+			if (x % numOfIterations/100 == 0){
+				
+				System.out.println(planet.posVect.getX());
+				/*
+				System.out.println(planet.name);
+				System.out.println("t: " + timeCounter);
+				System.out.println("p: " + planet.posVect.getX());
+				System.out.println("v: " + planet.velVect.getX());
+				System.out.println("a: " + planet.accVect.getX());
+				System.out.println("");
+				*/
+			}	
+			
+			timeCounter += deltaTime;
+			iterateSimulation(deltaTime);				
+
+		}
+	}
+
+	
+	static void iterateSimulation(float deltaTime) {
+		
+		// 1. Calculate net force and acceleration from acting on each body.
+
 		for (int i=0; i < listOfBodies.size(); i++){
 			
-			/*1. Iterate net forces & acceleration for each body*/
+			OrbitalBody currentBody = listOfBodies.get(i);
+			Vector3 sumOfAcc = new Vector3();
 			
-			float sumOfXAcc = 0;
-			float sumOfYAcc = 0;
-			
-			for (int j=0; j < listOfBodies.size();j++){
+			for (int j = 0; j < listOfBodies.size() ; j++){
+				
 				if (j != i){
-					sumOfXAcc = (float) (gravConst * listOfBodies.get(j).mass * (listOfBodies.get(j).xPosition - listOfBodies.get(i).xPosition) / Math.pow(distBetweenOneDimension(listOfBodies.get(i).xPosition, listOfBodies.get(j).xPosition),3));
-					sumOfYAcc = (float) (gravConst * listOfBodies.get(j).mass * (listOfBodies.get(j).yPosition - listOfBodies.get(i).yPosition) / Math.pow(distBetweenOneDimension(listOfBodies.get(i).yPosition, listOfBodies.get(j).yPosition),3));
-					//sumOfXAcc *= -1;
-					//sumOfYAcc *= -1;
-					//System.out.println( listOfBodies.get(i).name);
-					//System.out.println("SumOfXAcc " + sumOfXAcc);
-					//System.out.println("SumOfYAcc " + sumOfYAcc);
+					OrbitalBody pullingBody = listOfBodies.get(j);
+									
+					if (perturbationCalculationMethod == 0){ // Cowell's Formulation
+						Vector3 calculatedAcc = cowellsFormulation(currentBody, pullingBody);
+						sumOfAcc.add(calculatedAcc);				
+					}
+					/*
+					else if {
+						// TODO: Encke's Method, Variation of Parameters, etc.
+					}
+					*/
 				}
 			}
 			
-			
-			listOfBodies.get(i).setAcceleration(sumOfXAcc, sumOfYAcc);
-			
-			
-			/*2. Iterate velocities*/
-			listOfBodies.get(i).iterateVelocity(deltaTime);
-			
-			/*3. Calculate new positions*/
-			listOfBodies.get(i).iteratePosition(deltaTime);
-			
-			
-		}
-		
-	
-		
-	}
-	
-	public static float distBetweenOneDimension(float bodyOnePos, float bodyTwoPos){
-		float distance = (float) Math.sqrt(Math.pow(bodyOnePos, 2) + Math.pow(bodyTwoPos, 2));
-		return distance;  
-	}
-	
-	public static float distBetweenTwoBodies(float bodyOneX, float bodyOneY, float bodyTwoX, float bodyTwoY){
-		float distance = (float) Math.sqrt((bodyOneX - bodyTwoX)*(bodyOneX - bodyTwoX) + (bodyOneY - bodyTwoY)*(bodyOneY - bodyTwoY));
-		return distance;
+			// 2. Iterate and integrate for velocity and then position.
+			currentBody.setAcceleration(sumOfAcc.getX(), sumOfAcc.getY(), sumOfAcc.getZ());			
+			currentBody.iterateVelThenPos(deltaTime);
+		}	
 	}	
-	}
+	
+	static Vector3 cowellsFormulation(OrbitalBody currentBody, OrbitalBody pullingBody) {
+		
+
+		Vector3 currentPos = currentBody.posVect;
+		Vector3 pullingPos = pullingBody.posVect;
+		
+		Vector3 diffOfPosVect = new Vector3();
+		diffOfPosVect.add(pullingPos);	
+		currentPos.scale(-1);
+		diffOfPosVect.add(currentPos);
+		
+		Vector3 calculatedAcc = new Vector3();	
+		calculatedAcc.add(diffOfPosVect);
+
+		calculatedAcc.scale(-1*gravConst * pullingBody.mass / Math.pow(diffOfPosVect.length(), 3));	
+		/*
+		if (currentBody.name == "Planet #1"){
+			System.out.println(calculatedAcc);
+		}
+		*/
+		return calculatedAcc;
+	
+	} 
+	/*
+    public static boolean checkCollision(OrbitalBody body1, OrbitalBody body2) {
+		Vector3d diffOfPosVect = new Vector3d();
+		diffOfPosVect = body1.posVect;
+        diffOfPosVect.sub(body2.posVect);
+
+        if (diffOfPosVect.length() <= body1.radius + body2.radius) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    */
+}
+
