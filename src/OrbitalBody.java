@@ -5,6 +5,8 @@ public class OrbitalBody {
 	
 	String name;
 	float mass;
+
+	float radius;
 	
 	// x = 0, y = 1, z = 2, stored as double
 	Vector3 posVect = new Vector3();
@@ -18,6 +20,8 @@ public class OrbitalBody {
 	void setMass(float newMass){
 		mass = newMass;
 	}
+
+	void setRadius(float newRadius) { radius = newRadius; }
 	
 	
 	void setPosition(double x, double y, double z){
@@ -86,5 +90,6 @@ public class OrbitalBody {
 	
 		
 	}
+	
 	
 }
