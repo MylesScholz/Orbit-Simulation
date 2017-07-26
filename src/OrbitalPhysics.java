@@ -22,11 +22,11 @@ import java.awt.geom.Line2D;
 public class OrbitalPhysics {
 	
 	static ArrayList<OrbitalBody> listOfBodies = new ArrayList();
-	final static int gravConst = 1;
+	final static int gravConst = 100;
 	final static int perturbationCalculationMethod = 0; // 0 = Cowell's Method
 	
 	final static float deltaTime = (float) 0.01;
-	final static int numOfIterations = 10000000;
+	final static int numOfIterations = 1000000;
 
 	public static void main(String [] args)
 	{
@@ -45,12 +45,12 @@ public class OrbitalPhysics {
 		planet.setName("Planet #1");
 		planet.setMass(1);
 		planet.setPosition(100, 100, 100);
-		planet.setVelocity(0, 0, 0);
+		planet.setVelocity(200, 0, 0);
 		
 		OrbitalBody sun = new OrbitalBody();
 		listOfBodies.add(sun);
 		sun.setName("Sun");
-		sun.setMass(1000);
+		sun.setMass(10000);
 		sun.setPosition(0, 0, 0);
 		sun.setVelocity(0, 0, 0);
 		
@@ -64,9 +64,9 @@ public class OrbitalPhysics {
 				/*
 				System.out.println(planet.name);
 				System.out.println("t: " + timeCounter);
-				System.out.println("p: " + planet.posVect);
-				System.out.println("v: " + planet.velVect);
-				System.out.println("a: " + planet.accVect);
+				System.out.println("p: " + planet.posVect.getX());
+				System.out.println("v: " + planet.velVect.getX());
+				System.out.println("a: " + planet.accVect.getX());
 				System.out.println("");
 				*/
 			}	
@@ -123,7 +123,7 @@ public class OrbitalPhysics {
 		Vector3 calculatedAcc = new Vector3();	
 		calculatedAcc.add(diffOfPosVect);
 
-		calculatedAcc.scale(gravConst * pullingBody.mass / Math.pow(diffOfPosVect.length(), 3));	
+		calculatedAcc.scale(-1*gravConst * pullingBody.mass / Math.pow(diffOfPosVect.length(), 3));	
 		/*
 		if (currentBody.name == "Planet #1"){
 			System.out.println(calculatedAcc);
@@ -131,7 +131,8 @@ public class OrbitalPhysics {
 		*/
 		return calculatedAcc;
 	
-	}
+	} 
+	/*
     public static boolean checkCollision(OrbitalBody body1, OrbitalBody body2) {
         if (distBetweenTwoBodies(body1.xPosition, body1.yPosition, body2.xPosition, body2.yPosition) <= body1.radius + body2.radius) {
             return true;
@@ -139,4 +140,5 @@ public class OrbitalPhysics {
             return false;
         }
     }
+    */
 }

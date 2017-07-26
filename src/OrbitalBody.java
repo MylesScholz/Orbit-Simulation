@@ -65,11 +65,11 @@ public class OrbitalBody {
 		//TODO change to integrator choice
 		
 		// Integrates Acceleration to Velocity
-		
+		/*
 		if (this.name == "Planet #1") {
-			System.out.println(currentPos[0]);
+			System.out.println("BEFORE " + currentPos[0]);
 		}
-		
+		*/
 		currentVel[0] = NumericalIntegration.integrateRect(currentVel[0], currentAcc[0], deltaTime);
 		currentVel[1] = NumericalIntegration.integrateRect(currentVel[1], currentAcc[1], deltaTime);
 		currentVel[2] = NumericalIntegration.integrateRect(currentVel[2], currentAcc[2], deltaTime);
@@ -82,11 +82,18 @@ public class OrbitalBody {
 		currentPos[1] = NumericalIntegration.integrateRect(currentPos[1], currentVel[1], deltaTime);
 		currentPos[2] = NumericalIntegration.integrateRect(currentPos[2], currentVel[2], deltaTime);		
 
-		if (this.name == "Planet #1") {
-			System.out.println(currentPos[0]);
-		}		
+		currentPos[0] *= -1;
+		currentPos[1] *= -1;
+		currentPos[2] *= -1;
 		
 		posVect.set(currentPos);
+		/*
+		if (this.name == "Planet #1") {
+			System.out.println("AFTER  " + currentPos[0]);
+			System.out.println("AFTER1 " + posVect.getX());
+		}		
+		*/
+		
 	
 		
 	}
