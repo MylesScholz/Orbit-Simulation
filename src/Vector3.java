@@ -16,6 +16,7 @@ public class Vector3 {
 		return z;
 	}	
 	
+	
 	double length() {
 		double length = Math.sqrt(x*x + y*y + z*z);		
 		return length;
@@ -37,16 +38,20 @@ public class Vector3 {
 		double[] values = {x, y, z};
 		return values;
 	}
+	
+	
 	void set(Vector3 newValues) {
 		this.x = newValues.x;
 		this.y = newValues.y;
 		this.z = newValues.z;
 	}
+	
 	void set(double[] newValues) {
 		this.x = newValues[0];
 		this.y = newValues[1];
 		this.z = newValues[2];
 	}
+	
 	void set(double x, double y, double z){
 		this.x = x;
 		this.y = y;
