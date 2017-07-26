@@ -31,64 +31,6 @@ public class OrbitalPhysics {
 	final static float deltaTime = (float) 0.01;
 	final static int numOfIterations = 1000000;
 
-	
-	public static void main(String [] args)
-	{	
-		//frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
- 		
-
- 		
- 		
-		OrbitalBody planet = new OrbitalBody();	
-		listOfBodies.add(planet);
-		planet.setName("Planet #1");
-		planet.setMass(1);
-		planet.setPosition(100, 100, 100);
-		planet.setVelocity(200, 0, 0);
-
-		
-		OrbitalBody sun = new OrbitalBody();
-		listOfBodies.add(sun);
-		sun.setName("Sun");
-		sun.setMass(10000);
-		sun.setPosition(0, 0, 0);
-		sun.setVelocity(0, 0, 0);
-		
-
-		
-		Thread iterate = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				double timeCounter = 0;
-				for (int x = 0; x < numOfIterations; x ++){
-					
-					
-					
-					// DEBUG
-					if (x % numOfIterations/100 == 0){
-						
-						//System.out.println(planet.posVect.getX());
-						/*
-						System.out.println(planet.name);
-						System.out.println("t: " + timeCounter);
-						System.out.println("p: " + planet.posVect.getX());
-						System.out.println("v: " + planet.velVect.getX());
-						System.out.println("a: " + planet.accVect.getX());
-						System.out.println("");
-						*/
-					}	
-					
-					timeCounter += deltaTime;
-					iterateSimulation(deltaTime);	
-					
-					
-
-				}
-				
-			}
-		});
-		iterate.start();
-	}
 
 	static void iterateSimulation(float deltaTime) {
 
@@ -106,7 +48,8 @@ public class OrbitalPhysics {
 									
 					if (perturbationCalculationMethod == 0){ // Cowell's Formulation
 						Vector3 calculatedAcc = cowellsFormulation(currentBody, pullingBody);
-						sumOfAcc.add(calculatedAcc);				
+						sumOfAcc.add(calculatedAcc);
+						System.out.println("CALCULATED ACC: " + calculatedAcc);
 					}
 					/*
 					else if {
@@ -144,7 +87,12 @@ public class OrbitalPhysics {
 		*/
 		return calculatedAcc;
 	
-	} 
+	}
+	static void passList(ArrayList<OrbitalBody> list) {
+		listOfBodies = list;
+	}
+	
+	
 	/*
     public static boolean checkCollision(OrbitalBody body1, OrbitalBody body2) {
 		Vector3d diffOfPosVect = new Vector3d();
