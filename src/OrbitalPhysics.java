@@ -57,40 +57,17 @@ public class OrbitalPhysics {
 		sun.setVelocity(0, 0, 0);
 		
 		p.passList(listOfBodies);
-		
-<<<<<<< HEAD
-=======
 
-		
->>>>>>> 10773e7935c6445d92bccad7d1fb6c475800fe5c
 		Thread iterate = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				double timeCounter = 0;
-<<<<<<< HEAD
-				for (int x = 0; x < 1000; x ++){
-					frame.repaint();
-=======
 				for (int x = 0; x < numOfIterations; x ++){
-					
-					
->>>>>>> 10773e7935c6445d92bccad7d1fb6c475800fe5c
-					
-					// DEBUG
 					if (x % numOfIterations/100 == 0){
 						frame.repaint(1000);
+						
+						// DEBUG
 						//System.out.println(planet.posVect.getX());
-<<<<<<< HEAD
-						//System.out.println(x);
-						//System.out.println(planet.name);
-						//System.out.println("t: " + timeCounter);
-						System.out.println("px: " + planet.posVect.getX());
-						System.out.println("py: " + planet.posVect.getY());
-						System.out.println("pz: " + planet.posVect.getZ());
-						//System.out.println("v: " + planet.velVect.getX());
-						//System.out.println("a: " + planet.accVect.getX());
-						System.out.println("");
-=======
 						/*
 						System.out.println(planet.name);
 						System.out.println("t: " + timeCounter);
@@ -99,7 +76,7 @@ public class OrbitalPhysics {
 						System.out.println("a: " + planet.accVect.getX());
 						System.out.println("");
 						*/
->>>>>>> 10773e7935c6445d92bccad7d1fb6c475800fe5c
+
 					}	
 					
 					timeCounter += deltaTime;

@@ -23,14 +23,6 @@ public class Test extends JPanel {
 	ArrayList<Shape> rePaintList = new ArrayList<>();
 	
 	public void paint(Graphics g){
-		
-		setVisible(true);
-<<<<<<< HEAD
-		System.out.println("Paint Real");
-=======
-		System.out.println("Paint");
-		
->>>>>>> 10773e7935c6445d92bccad7d1fb6c475800fe5c
 		Graphics2D solarSystem = (Graphics2D)g;
 		solarSystem.setPaint(Color.BLACK); 
 		
