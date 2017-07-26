@@ -22,22 +22,25 @@ import java.awt.geom.Line2D;
 
 public class OrbitalPhysics {
 	
-	static ArrayList<OrbitalBody> listOfBodies = new ArrayList();
+	static ArrayList<OrbitalBody> listOfBodies = new ArrayList<OrbitalBody>();
 	final static int gravConst = 100;
 	final static int perturbationCalculationMethod = 0; // 0 = Cowell's Method
 	
 	final static float deltaTime = (float) 0.01;
 	final static int numOfIterations = 1000000;
 
+	static JFrame frame = new JFrame("Orbital Simulation");
+	static Test p = new Test();
+	
 	public static void main(String [] args)
 	{	
 		//frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
- 		JFrame frame = new JFrame("Oribital Simulation");
+ 		
 		frame.setVisible(true);
-		frame.setSize(1000, 1000);
+		frame.setSize(1000, 600);
  		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		frame.setResizable(false);
- 		Test p = new Test();
+		frame.setResizable(true);
+ 		
  		
 		OrbitalBody planet = new OrbitalBody();	
 		listOfBodies.add(planet);
@@ -57,30 +60,34 @@ public class OrbitalPhysics {
 
 		p.passList(listOfBodies);
 		
+
 		
 		Thread iterate = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				double timeCounter = 0;
-				for (int x = 0; x < 10000; x ++){
-					frame.repaint();
+				for (int x = 0; x < numOfIterations; x ++){
+					
+					
 					
 					// DEBUG
 					if (x % numOfIterations/100 == 0){
-						
+						frame.repaint(1000);
 						//System.out.println(planet.posVect.getX());
-						
+						/*
 						System.out.println(planet.name);
 						System.out.println("t: " + timeCounter);
 						System.out.println("p: " + planet.posVect.getX());
 						System.out.println("v: " + planet.velVect.getX());
 						System.out.println("a: " + planet.accVect.getX());
 						System.out.println("");
-						
+						*/
 					}	
 					
 					timeCounter += deltaTime;
-					iterateSimulation(deltaTime);				
+					iterateSimulation(deltaTime);	
+					
+					
 
 				}
 				
@@ -90,7 +97,7 @@ public class OrbitalPhysics {
 	}
 
 	static void iterateSimulation(float deltaTime) {
-		
+
 		// 1. Calculate net force and acceleration from acting on each body.
 
 		for (int i=0; i < listOfBodies.size(); i++){

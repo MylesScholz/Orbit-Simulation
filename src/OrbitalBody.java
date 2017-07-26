@@ -25,17 +25,23 @@ public class OrbitalBody {
 		mass = newMass;
 	}
 
-	void setRadius(float newRadius) { radius = newRadius; }
+	void setRadius(float newRadius) { 
+		radius = newRadius;
+	}
+	
 	
 	public double getXOldPosition() {
 		return oldPosVect.getX();
 	}
+	
 	public double getYOldPosition() {
 		return oldPosVect.getY();
 	}
+	
 	public double getZOldPosition() {
 		return oldPosVect.getZ();
 	}
+	
 	
 	void setPosition(double x, double y, double z){
 		posVect.set(x,y,z);	

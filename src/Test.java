@@ -23,21 +23,30 @@ public class Test extends JPanel {
 	ArrayList<Shape> rePaintList = new ArrayList<>();
 	
 	public void paint(Graphics g){
+		
 		setVisible(true);
 		System.out.println("Paint");
+		
 		Graphics2D solarSystem = (Graphics2D)g;
 		solarSystem.setPaint(Color.BLACK); 
+		
 		//Shape drawRectangle = new Rectangle2D.Float(500,500,900,900);
 		//solarSystem.draw(drawRectangle);
 		//solarSystem.fill(drawRectangle);
+		
 		Shape drawEllipse = new Ellipse2D.Float(500, 500, 50, 50);
 		solarSystem.draw(drawEllipse);
 		solarSystem.fill(drawEllipse);
+		
 		Shape drawLine;
+		
 		for(int i = 0; i < listOfBodies.size(); i++) {
+			
 			drawLine = new Line2D.Double(listOfBodies.get(i).getXOldPosition() + 500, listOfBodies.get(i).getYOldPosition() + 500, listOfBodies.get(i).posVect.getX() + 500, listOfBodies.get(i).posVect.getY() + 500);		
 			rePaintList.add(drawLine);
+			
 			for(int n = 0; n < rePaintList.size(); n++) {
+				
 				solarSystem.draw(rePaintList.get(n));
 				setVisible(true);
 			}
@@ -50,9 +59,11 @@ public class Test extends JPanel {
 	
     @Override
     public void paintComponent(Graphics g) {
+    	
         super.paintComponent(g);
         paint(g);
     }
+    /*
 	public void Input() {
 		Scanner scanner = new Scanner(System.in);
 		
@@ -72,6 +83,7 @@ public class Test extends JPanel {
 		String mass = scanner.nextLine();
 		
 	}
+	*/
 }
 
 
