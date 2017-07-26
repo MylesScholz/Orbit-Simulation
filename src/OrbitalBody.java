@@ -13,6 +13,10 @@ public class OrbitalBody {
 	Vector3 velVect = new Vector3();
 	Vector3 accVect = new Vector3();
 	
+	Vector3 oldPosVect = new Vector3();
+	
+	
+	
 	void setName(String newName){
 		name = newName;
 	}
@@ -22,6 +26,16 @@ public class OrbitalBody {
 	}
 
 	void setRadius(float newRadius) { radius = newRadius; }
+	
+	public double getXOldPosition() {
+		return oldPosVect.getX();
+	}
+	public double getYOldPosition() {
+		return oldPosVect.getY();
+	}
+	public double getZOldPosition() {
+		return oldPosVect.getZ();
+	}
 	
 	void setPosition(double x, double y, double z){
 		posVect.set(x,y,z);	
