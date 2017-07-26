@@ -8,7 +8,6 @@ import java.util.Scanner;
 import java.util.Timer;
 
 import javax.swing.JFrame;
-import javax.vecmath.Vector3d;
 
 import java.awt.Graphics2D;
 import java.awt.BorderLayout;
@@ -23,11 +22,12 @@ import java.awt.geom.Line2D;
 public class OrbitalPhysics {
 	
 	static ArrayList<OrbitalBody> listOfBodies = new ArrayList();
-  
-	final static int gravConst = 1;
+	final static int gravConst = 100;
 	final static int perturbationCalculationMethod = 0; // 0 = Cowell's Method
 	
-	
+	final static float deltaTime = (float) 0.01;
+	final static int numOfIterations = 1000000;
+
 	public static void main(String [] args)
 	{
 	
@@ -44,33 +44,36 @@ public class OrbitalPhysics {
 		listOfBodies.add(planet);
 		planet.setName("Planet #1");
 		planet.setMass(1);
-		planet.setPosition(50, 100, 75);
-		planet.setVelocity(-10, 0, 0);
+		planet.setPosition(100, 100, 100);
+		planet.setVelocity(200, 0, 0);
 		
 		OrbitalBody sun = new OrbitalBody();
 		listOfBodies.add(sun);
-		// Position and velocity vectors {0,0,0} by default
 		sun.setName("Sun");
-		sun.setMass(1000);
+		sun.setMass(10000);
+		sun.setPosition(0, 0, 0);
+		sun.setVelocity(0, 0, 0);
 		
-		
-		float timeCounter = 0;
-		
-		for (int x=0; x< 100000; x++){
+		double timeCounter = 0;
+		for (int x = 0; x < numOfIterations; x++){
 			
 			// DEBUG
-			if (x % 1000 == 0){
+			if (x % numOfIterations/100 == 0){
+				
+				System.out.println(planet.posVect.getX());
+				/*
+				System.out.println(planet.name);
 				System.out.println("t: " + timeCounter);
-				System.out.println("p: " + planet.posVect);
-				System.out.println("v: " + planet.velVect);
-				System.out.println("a: " + planet.accVect);
+				System.out.println("p: " + planet.posVect.getX());
+				System.out.println("v: " + planet.velVect.getX());
+				System.out.println("a: " + planet.accVect.getX());
 				System.out.println("");
-
+				*/
 			}	
 			
-			float deltaTime = (float) 0.001;
 			timeCounter += deltaTime;
-			iterateSimulation(deltaTime);
+			iterateSimulation(deltaTime);				
+
 		}
 	}
 
@@ -79,12 +82,10 @@ public class OrbitalPhysics {
 		
 		// 1. Calculate net force and acceleration from acting on each body.
 		
-		
-		
 		for (int i=0; i < listOfBodies.size(); i++){
 			
 			OrbitalBody currentBody = listOfBodies.get(i);
-			Vector3d sumOfAcc = new Vector3d();
+			Vector3 sumOfAcc = new Vector3();
 			
 			for (int j = 0; j < listOfBodies.size() ; j++){
 				
@@ -92,8 +93,8 @@ public class OrbitalPhysics {
 					OrbitalBody pullingBody = listOfBodies.get(j);
 									
 					if (perturbationCalculationMethod == 0){ // Cowell's Formulation
-						Vector3d calculatedAcc = cowellsFormulation(currentBody, pullingBody);
-						sumOfAcc.add(calculatedAcc);
+						Vector3 calculatedAcc = cowellsFormulation(currentBody, pullingBody);
+						sumOfAcc.add(calculatedAcc);				
 					}
 					/*
 					else if {
@@ -104,29 +105,34 @@ public class OrbitalPhysics {
 			}
 			
 			// 2. Iterate and integrate for velocity and then position.
-			listOfBodies.get(i).setAcceleration(sumOfAcc.getX(), sumOfAcc.getY(), sumOfAcc.getZ());			
+			currentBody.setAcceleration(sumOfAcc.getX(), sumOfAcc.getY(), sumOfAcc.getZ());			
 			currentBody.iterateVelThenPos(deltaTime);
 		}	
 	}	
 	
-	static Vector3d cowellsFormulation(OrbitalBody currentBody, OrbitalBody pullingBody) {
+	static Vector3 cowellsFormulation(OrbitalBody currentBody, OrbitalBody pullingBody) {
 		
-		Vector3d currentPos = currentBody.posVect;
-		Vector3d pullingPos = pullingBody.posVect;
+		Vector3 currentPos = currentBody.posVect;
+		Vector3 pullingPos = pullingBody.posVect;
 		
-		Vector3d diffOfPosVect = new Vector3d();
+		Vector3 diffOfPosVect = new Vector3();
 		diffOfPosVect.add(pullingPos);	
 		currentPos.scale(-1);
 		diffOfPosVect.add(currentPos);
 		
-		Vector3d calculatedAcc = new Vector3d();
-		
+		Vector3 calculatedAcc = new Vector3();	
 		calculatedAcc.add(diffOfPosVect);
-		calculatedAcc.scale(gravConst * pullingBody.mass / Math.pow(diffOfPosVect.length(), 3));
-		
+
+		calculatedAcc.scale(-1*gravConst * pullingBody.mass / Math.pow(diffOfPosVect.length(), 3));	
+		/*
+		if (currentBody.name == "Planet #1"){
+			System.out.println(calculatedAcc);
+		}
+		*/
 		return calculatedAcc;
 	
-	}
+	} 
+	/*
     public static boolean checkCollision(OrbitalBody body1, OrbitalBody body2) {
 		Vector3d diffOfPosVect = new Vector3d();
 		diffOfPosVect = body1.posVect;
@@ -138,4 +144,5 @@ public class OrbitalPhysics {
             return false;
         }
     }
+    */
 }
