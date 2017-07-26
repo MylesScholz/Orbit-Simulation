@@ -128,7 +128,11 @@ public class OrbitalPhysics {
 	
 	}
     public static boolean checkCollision(OrbitalBody body1, OrbitalBody body2) {
-        if (distBetweenTwoBodies(body1.xPosition, body1.yPosition, body2.xPosition, body2.yPosition) <= body1.radius + body2.radius) {
+		Vector3d diffOfPosVect = new Vector3d();
+		diffOfPosVect = body1.posVect;
+        diffOfPosVect.sub(body2.posVect);
+
+        if (diffOfPosVect.length() <= body1.radius + body2.radius) {
             return true;
         } else {
             return false;
