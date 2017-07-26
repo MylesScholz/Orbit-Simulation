@@ -60,15 +60,15 @@ public class OrbitalPhysics {
 			// DEBUG
 			if (x % numOfIterations/100 == 0){
 				
-				System.out.println(planet.posVect.getX());
-				/*
+				//System.out.println(planet.posVect.getX());
+				
 				System.out.println(planet.name);
 				System.out.println("t: " + timeCounter);
 				System.out.println("p: " + planet.posVect.getX());
 				System.out.println("v: " + planet.velVect.getX());
 				System.out.println("a: " + planet.accVect.getX());
 				System.out.println("");
-				*/
+				
 			}	
 			
 			timeCounter += deltaTime;
