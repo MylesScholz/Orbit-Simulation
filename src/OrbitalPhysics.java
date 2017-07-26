@@ -57,56 +57,38 @@ public class OrbitalPhysics {
 
 		p.passList(listOfBodies);
 		
+		
 		Thread iterate = new Thread(new Runnable() {
 			@Override
 			public void run() {
+				double timeCounter = 0;
 				for (int x = 0; x < 10000; x ++){
-					float deltaTime = (float) 0.1;
-					iterateSimulation(deltaTime);
 					frame.repaint();
-					//p.paintImmediately(500,500,900,900);
-					System.out.println(x);
-					System.out.println("PLANET~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-					System.out.println("X Position: " + planet.xPosition);
-					System.out.println("Y Position: " + planet.yPosition);
-					System.out.println("X Position Old: " + planet.getXOldPosition());
-					System.out.println("Y Position Old: " + planet.getYOldPosition());
-					System.out.println("X Velocity: " + planet.xVelocity);
-					System.out.println("Y Velocity: " + planet.yVelocity);
-					System.out.println("X Acceleration: " + planet.xAcceleration);
-					System.out.println("Y Acceleration: " + planet.yAcceleration);
+					
+					// DEBUG
+					if (x % numOfIterations/100 == 0){
+						
+						//System.out.println(planet.posVect.getX());
+						
+						System.out.println(planet.name);
+						System.out.println("t: " + timeCounter);
+						System.out.println("p: " + planet.posVect.getX());
+						System.out.println("v: " + planet.velVect.getX());
+						System.out.println("a: " + planet.accVect.getX());
+						System.out.println("");
+						
+					}	
+					
+					timeCounter += deltaTime;
+					iterateSimulation(deltaTime);				
+
 				}
+				
 			}
 		});
 		iterate.start();
 	}
 
-	private static void iterateSimulation(float deltaTime) {
-
-		double timeCounter = 0;
-		for (int x = 0; x < numOfIterations; x++){
-			
-			// DEBUG
-			if (x % numOfIterations/100 == 0){
-				
-				System.out.println(planet.posVect.getX());
-				/*
-				System.out.println(planet.name);
-				System.out.println("t: " + timeCounter);
-				System.out.println("p: " + planet.posVect.getX());
-				System.out.println("v: " + planet.velVect.getX());
-				System.out.println("a: " + planet.accVect.getX());
-				System.out.println("");
-				*/
-			}	
-			
-			timeCounter += deltaTime;
-			iterateSimulation(deltaTime);				
-
-		}
-	}
-
-	
 	static void iterateSimulation(float deltaTime) {
 		
 		// 1. Calculate net force and acceleration from acting on each body.
