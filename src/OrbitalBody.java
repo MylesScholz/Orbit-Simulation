@@ -1,24 +1,32 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
+
+import javax.vecmath.Vector3d;
 
 public class OrbitalBody {
 	
-
+	/* 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 */
 	
 	String name;
-	
 	float mass;
+	
+	//https://docs.oracle.com/cd/E17802_01/j2se/javase/technologies/desktop/java3d/forDevelopers/j3dapi/javax/vecmath/Vector3d.html
+	// Index 0 = x, 1 = y, 2 = z
+	Vector3d posVect = new Vector3d();
+	Vector3d velVect = new Vector3d();
+	Vector3d accVect = new Vector3d();
+	
 
-	float radius;
 	
-	float xPosition;
-	float yPosition;
-	
-	float xVelocity;
-	float yVelocity;
-	
-	float xAcceleration;
-	float yAcceleration;
+
 	
 
 	
