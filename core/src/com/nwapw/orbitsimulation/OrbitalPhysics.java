@@ -49,7 +49,6 @@ public class OrbitalPhysics {
 					if (perturbationCalculationMethod == 0){ // Cowell's Formulation
 						Vector3 calculatedAcc = cowellsFormulation(currentBody, pullingBody);
 						sumOfAcc.add(calculatedAcc);
-						System.out.println("CALCULATED ACC: " + calculatedAcc);
 					}
 					/*
 					else if {

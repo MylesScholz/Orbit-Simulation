@@ -4,9 +4,13 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 
 public class RunSimulation extends ApplicationAdapter {
 	SpriteBatch batch;
@@ -17,6 +21,11 @@ public class RunSimulation extends ApplicationAdapter {
 	public static ArrayList<OrbitalBody> listOfBodies = new ArrayList<OrbitalBody>();
 	final static int gravConst = 100;
 	final static int perturbationCalculationMethod = 0; // 0 = Cowell's Method
+	
+	private OrthographicCamera cam;
+	
+	static final int WORLD_WIDTH = 100;
+	static final int WORLD_HEIGHT = 100;
 	
 	final static float deltaTime = (float) 0.01;
 	final static int numOfIterations = 1000000;
@@ -50,15 +59,31 @@ public class RunSimulation extends ApplicationAdapter {
 		sun.setVelocity(0, 0, 0);
 		
 
+		float w = Gdx.graphics.getWidth();
+		float h = Gdx.graphics.getHeight();
+
+		// Constructs a new OrthographicCamera, using the given viewport width and height
+		// Height is multiplied by aspect ratio.
+		cam = new OrthographicCamera(30, 30 * (h / w));
+
+		cam.position.set(1000, 1000, 1000);
+		cam.update();
+
+		batch = new SpriteBatch();
 		
 	}
 
 	@Override
 	public void render () {
+		
+		handleInput();
+		cam.update();
+		batch.setProjectionMatrix(cam.combined);
+
+		
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		
-		
+
 		float planetX = (float) planet.posVect.getX();
 		float planetY = (float) planet.posVect.getY();
 		
@@ -95,7 +120,35 @@ public class RunSimulation extends ApplicationAdapter {
 		iterationCounter += 1;
 		
 	}
-	
+	private void handleInput() {
+		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+			cam.zoom += 0.02;
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
+			cam.zoom -= 0.02;
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+			cam.translate(-3, 0, 0);
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+			cam.translate(3, 0, 0);
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+			cam.translate(0, -3, 0);
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+			cam.translate(0, 3, 0);
+		}
+
+
+		cam.zoom = MathUtils.clamp(cam.zoom, 0.1f, 100/cam.viewportWidth);
+
+		float effectiveViewportWidth = cam.viewportWidth * cam.zoom;
+		float effectiveViewportHeight = cam.viewportHeight * cam.zoom;
+
+		cam.position.x = MathUtils.clamp(cam.position.x, effectiveViewportWidth / 2f, 100 - effectiveViewportWidth / 2f);
+		cam.position.y = MathUtils.clamp(cam.position.y, effectiveViewportHeight / 2f, 100 - effectiveViewportHeight / 2f);
+	}
 	@Override
 	public void dispose () {
 		batch.dispose();
