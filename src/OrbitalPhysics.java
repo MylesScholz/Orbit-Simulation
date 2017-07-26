@@ -38,6 +38,7 @@ public class OrbitalPhysics {
  		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.setResizable(false);
  		Test p = new Test();
+ 		
 		OrbitalBody planet = new OrbitalBody();	
 		listOfBodies.add(planet);
 		planet.setName("Planet #1");
