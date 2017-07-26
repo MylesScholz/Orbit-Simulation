@@ -67,13 +67,16 @@ public class OrbitalBody {
 		currentVel[1] = NumericalIntegration.integrateRect(currentVel[1], currentAcc[1], deltaTime);
 		currentVel[2] = NumericalIntegration.integrateRect(currentVel[2], currentAcc[2], deltaTime);
 	
+		velVect.set(currentVel);
+	
 		// Integrates Velocity to Position
+		
 		currentPos[0] = NumericalIntegration.integrateRect(currentPos[0], currentVel[0], deltaTime);
 		currentPos[1] = NumericalIntegration.integrateRect(currentPos[1], currentVel[1], deltaTime);
 		currentPos[2] = NumericalIntegration.integrateRect(currentPos[2], currentVel[2], deltaTime);		
-		
+
 		posVect.set(currentPos);
-		velVect.set(currentVel);
+	
 		
 	}
 	

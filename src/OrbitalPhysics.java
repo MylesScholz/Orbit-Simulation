@@ -23,10 +23,13 @@ import java.awt.geom.Line2D;
 public class OrbitalPhysics {
 	
 	static ArrayList<OrbitalBody> listOfBodies = new ArrayList();
-	final static int gravConst = 1;
 	final static int perturbationCalculationMethod = 0; // 0 = Cowell's Method
 	
+	final static int gravConst = 1;
 	
+	final static float deltaTime = (float) 0.01;
+	final static int numOfIterations = 10000000;
+
 	public static void main(String [] args)
 	{
 		
@@ -43,34 +46,36 @@ public class OrbitalPhysics {
 		listOfBodies.add(planet);
 		planet.setName("Planet #1");
 		planet.setMass(1);
-		planet.setPosition(50, 100, 75);
-		planet.setVelocity(-10, 0, 0);
+		planet.setPosition(100, 100, 100);
+		planet.setVelocity(0, 0, 0);
 		
 		OrbitalBody sun = new OrbitalBody();
 		listOfBodies.add(sun);
-		// Position and velocity vectors {0,0,0} by default
 		sun.setName("Sun");
 		sun.setMass(1000);
+		sun.setPosition(0, 0, 0);
+		sun.setVelocity(0, 0, 0);
 		
-		
-		float timeCounter = 0;
-		
-		for (int x=0; x< 100000; x++){
+		double timeCounter = 0;
+		for (int x = 0; x < numOfIterations; x++){
 			
 			// DEBUG
-			if (x % 1000 == 0){
+			if (x % numOfIterations/100 == 0){
+				
+				System.out.println(planet.posVect.getX());
+				/*
+				System.out.println(planet.name);
 				System.out.println("t: " + timeCounter);
 				System.out.println("p: " + planet.posVect);
 				System.out.println("v: " + planet.velVect);
 				System.out.println("a: " + planet.accVect);
 				System.out.println("");
-
+				*/
 			}	
 			
-			float deltaTime = (float) 0.001;
 			timeCounter += deltaTime;
-			iterateSimulation(deltaTime);
-						
+			
+			iterateSimulation(deltaTime);				
 
 		}
 	}
@@ -79,8 +84,6 @@ public class OrbitalPhysics {
 	static void iterateSimulation(float deltaTime) {
 		
 		// 1. Calculate net force and acceleration from acting on each body.
-		
-		
 		
 		for (int i=0; i < listOfBodies.size(); i++){
 			
@@ -96,6 +99,7 @@ public class OrbitalPhysics {
 					if (perturbationCalculationMethod == 0){ // Cowell's Formulation
 						Vector3d calculatedAcc = cowellsFormulation(currentBody, pullingBody);
 						sumOfAcc.add(calculatedAcc);
+						//System.out.println("Calculated Acceleration " + calculatedAcc);
 					}
 					/*
 					else if {
@@ -107,7 +111,7 @@ public class OrbitalPhysics {
 			}
 			
 			// 2. Iterate and integrate for velocity and then position.
-			listOfBodies.get(i).setAcceleration(sumOfAcc.getX(), sumOfAcc.getY(), sumOfAcc.getZ());			
+			currentBody.setAcceleration(sumOfAcc.getX(), sumOfAcc.getY(), sumOfAcc.getZ());			
 			currentBody.iterateVelThenPos(deltaTime);
 			
 		}	
