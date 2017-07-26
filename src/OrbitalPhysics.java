@@ -8,6 +8,7 @@ import java.util.Scanner;
 import java.util.Timer;
 
 import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 
 import java.awt.Graphics2D;
 import java.awt.BorderLayout;
@@ -29,23 +30,21 @@ public class OrbitalPhysics {
 	final static int numOfIterations = 1000000;
 
 	public static void main(String [] args)
-	{
-	
-		/*
-		JFrame frame = new JFrame("Title");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		Test p = new Test();
-		frame.add(p);
-		frame.setSize(400, 400);
+	{	
+		//frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+ 		JFrame frame = new JFrame("Oribital Simulation");
 		frame.setVisible(true);
-		*/
-		
+		frame.setSize(1000, 1000);
+ 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		frame.setResizable(false);
+ 		Test p = new Test();
 		OrbitalBody planet = new OrbitalBody();	
 		listOfBodies.add(planet);
 		planet.setName("Planet #1");
 		planet.setMass(1);
 		planet.setPosition(100, 100, 100);
 		planet.setVelocity(200, 0, 0);
+
 		
 		OrbitalBody sun = new OrbitalBody();
 		listOfBodies.add(sun);
@@ -54,6 +53,35 @@ public class OrbitalPhysics {
 		sun.setPosition(0, 0, 0);
 		sun.setVelocity(0, 0, 0);
 		
+
+		p.passList(listOfBodies);
+		
+		Thread iterate = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				for (int x = 0; x < 10000; x ++){
+					float deltaTime = (float) 0.1;
+					iterateSimulation(deltaTime);
+					frame.repaint();
+					//p.paintImmediately(500,500,900,900);
+					System.out.println(x);
+					System.out.println("PLANET~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+					System.out.println("X Position: " + planet.xPosition);
+					System.out.println("Y Position: " + planet.yPosition);
+					System.out.println("X Position Old: " + planet.getXOldPosition());
+					System.out.println("Y Position Old: " + planet.getYOldPosition());
+					System.out.println("X Velocity: " + planet.xVelocity);
+					System.out.println("Y Velocity: " + planet.yVelocity);
+					System.out.println("X Acceleration: " + planet.xAcceleration);
+					System.out.println("Y Acceleration: " + planet.yAcceleration);
+				}
+			}
+		});
+		iterate.start();
+	}
+
+	private static void iterateSimulation(float deltaTime) {
+
 		double timeCounter = 0;
 		for (int x = 0; x < numOfIterations; x++){
 			
@@ -81,7 +109,7 @@ public class OrbitalPhysics {
 	static void iterateSimulation(float deltaTime) {
 		
 		// 1. Calculate net force and acceleration from acting on each body.
-		
+
 		for (int i=0; i < listOfBodies.size(); i++){
 			
 			OrbitalBody currentBody = listOfBodies.get(i);
@@ -112,6 +140,7 @@ public class OrbitalPhysics {
 	
 	static Vector3 cowellsFormulation(OrbitalBody currentBody, OrbitalBody pullingBody) {
 		
+
 		Vector3 currentPos = currentBody.posVect;
 		Vector3 pullingPos = pullingBody.posVect;
 		
@@ -146,3 +175,4 @@ public class OrbitalPhysics {
     }
     */
 }
+

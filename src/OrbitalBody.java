@@ -23,7 +23,6 @@ public class OrbitalBody {
 
 	void setRadius(float newRadius) { radius = newRadius; }
 	
-	
 	void setPosition(double x, double y, double z){
 		posVect.set(x,y,z);	
 	}	
@@ -94,8 +93,7 @@ public class OrbitalBody {
 		}		
 		*/
 		
-	
-		
+
 	}
 	
 	
