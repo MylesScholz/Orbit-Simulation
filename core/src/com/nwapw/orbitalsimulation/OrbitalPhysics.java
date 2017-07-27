@@ -24,8 +24,6 @@ import java.awt.geom.Line2D;
 
 public class OrbitalPhysics {
 	
-	
-	
 	static ArrayList<OrbitalBody> listOfBodies = new ArrayList<OrbitalBody>();
 	final static int gravConst = 100;
 	final static int perturbationCalculationMethod = 0; // 0 = Cowell's Method
@@ -34,6 +32,8 @@ public class OrbitalPhysics {
 	final static int numOfIterations = 1000000;
 	
 	static void iterateSimulation(float deltaTime) {
+
+        checkAllCollisions();
 
 		// 1. Calculate net force and acceleration from acting on each body.
 
@@ -93,16 +93,31 @@ public class OrbitalPhysics {
 	}
 	
 	
-	/*
+
     public static boolean checkCollision(OrbitalBody body1, OrbitalBody body2) {
-		Vector3d diffOfPosVect = new Vector3d();
-		diffOfPosVect = body1.posVect;
-        diffOfPosVect.sub(body2.posVect);
+		Vector3 diffOfPosVect = new Vector3();
+        diffOfPosVect.add(body1.posVect);
+        diffOfPosVect.add(body2.posVect);
         if (diffOfPosVect.length() <= body1.radius + body2.radius) {
             return true;
         } else {
             return false;
         }
     }
-    */
+
+    public static void checkAllCollisions() {
+        for (int i = 0; i < listOfBodies.size(); i++) {
+            for (int j = 0; j < listOfBodies.size(); j++) {
+                if (i != j && checkCollision(listOfBodies.get(i), listOfBodies.get(j))) {
+                    if (listOfBodies.get(i).mass <= listOfBodies.get(j).mass) {
+                        listOfBodies.remove(i);
+                    } else {
+                        listOfBodies.remove(j);
+                    }
+                }
+            }
+
+        }
+    }
+
 }
