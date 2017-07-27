@@ -27,22 +27,30 @@ public class RunSimulation extends ApplicationAdapter {
 	int iterationCounter = 0;
 	double timeCounter = 0;
 	
-	OrbitalBody planet = new OrbitalBody();	
+	boolean newPlanet = false;
+	int placedPositionX;
+	int placedPositionY;
+	
+	OrbitalBody placedPlanet = new OrbitalBody();
+	OrbitalBody planet = new OrbitalBody();
 	OrbitalBody sun = new OrbitalBody();
 	
 	SpriteBatch batch;
 	Texture img1;
 	Texture img2;
 	
+	static boolean leftClickDown;
+	static boolean leftClickUp;
+	
 	@Override
-	public void create () {
-		
+	public void create () {	
+		/*
 		listOfBodies.add(planet);
 		planet.setName("Planet #1");
 		planet.setMass(1);
 		planet.setPosition(100, 100, 100);
 		planet.setVelocity(200, 0, 0);
-		
+		*/
 		listOfBodies.add(sun);
 		sun.setName("Sun");
 		sun.setMass(100000);
@@ -62,15 +70,33 @@ public class RunSimulation extends ApplicationAdapter {
 		// Height is multiplied by aspect ratio.
 		
 		//cam = new OrthographicCamera(30, 30 * (h / w));
-
-		
 	}
 
+	public void place () {
+		
+		placedPositionX = Gdx.input.getX();
+		placedPositionY = Gdx.input.getY();
+		
+		if (Gdx.input.isButtonPressed(0) && newPlanet == false) {
+			System.out.println("Debug1");
+			listOfBodies.add(placedPlanet);
+			planet.setName("Placed Planet");
+			planet.setMass(1);			
+			planet.setPosition(placedPositionX, placedPositionY, 0);
+			newPlanet = true;
+		}
+		else if (!Gdx.input.isButtonPressed(0) && newPlanet == true) {
+			System.out.println("Debug2");
+			planet.setVelocity(Gdx.input.getX() - placedPositionX + 200, Gdx.input.getY() - placedPositionY + 00, 0);
+			newPlanet = false;
+		}
+	}
+	
 	@Override
 	public void render () {
-	
+		
 		Gdx.gl.glClearColor(0, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		//Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		float planetX = (float) planet.posVect.getX() + 200;
 		float planetY = (float) planet.posVect.getY() + 200;
@@ -91,17 +117,19 @@ public class RunSimulation extends ApplicationAdapter {
 
 		OrbitalPhysics.passList(listOfBodies);
 		
-		if (iterationCounter <= 10000){
+		if (iterationCounter <= numOfIterations){
 			timeCounter += deltaTime;
 			OrbitalPhysics.iterateSimulation(deltaTime);	
-			
+			place();
 			// DEBUG
-			if (iterationCounter % numOfIterations/100 == 0){
-				
+			if ((iterationCounter % 25) == 0){
+	
+				System.out.println(iterationCounter);
 				System.out.println("ppx: " + planet.posVect.getX());
 				System.out.println("spx: " + sun.posVect.getY());
 				System.out.println("dis: " + Vector3.distBetween(planet.posVect, sun.posVect));
 				System.out.println("");
+				
 				//System.out.println(planet.posVect.getX());
 				/*
 				System.out.println(planet.name);

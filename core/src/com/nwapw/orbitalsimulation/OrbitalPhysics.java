@@ -24,6 +24,8 @@ import java.awt.geom.Line2D;
 
 public class OrbitalPhysics {
 	
+	
+	
 	static ArrayList<OrbitalBody> listOfBodies = new ArrayList<OrbitalBody>();
 	final static int gravConst = 100;
 	final static int perturbationCalculationMethod = 0; // 0 = Cowell's Method
