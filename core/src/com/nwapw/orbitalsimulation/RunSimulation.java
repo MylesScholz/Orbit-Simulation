@@ -26,7 +26,7 @@ public class RunSimulation extends ApplicationAdapter {
 	
 	// Specifies time used to calculate numerical integration
 	// TODO Adaptive step-size control
-	final static float deltaTime = (float) 0.01;
+	final static float deltaTime = (float) 0.001;
 	
 	// The max number of iterations that the simulation runs
 	final static int numOfIterations = 10000000;
@@ -34,16 +34,14 @@ public class RunSimulation extends ApplicationAdapter {
 	// To debug
 	double timeCounter = 0;
 	int iterationCounter = 0;
+	int dataDivision = 1;
 	
 	// List of currently running bodies in the simulation
 	public static ArrayList<OrbitalBody> listOfBodies = new ArrayList<OrbitalBody>();
 	
-<<<<<<< HEAD
 	//boolean newPlanet = false;
 	//int placedPositionX;
 	//int placedPositionY;
-=======
->>>>>>> d89e8f10ab2e72841971bb786400c3ffa30be02b
 	
 	OrbitalBody planet = new OrbitalBody();	
 	OrbitalBody sun = new OrbitalBody();
@@ -54,20 +52,6 @@ public class RunSimulation extends ApplicationAdapter {
 	
 	private OrthographicCamera cam;
 	
-	
-<<<<<<< HEAD
-		listOfBodies.add(planet);
-		planet.setName("Planet #1");
-		planet.setMass(1000);
-		planet.setPosition(100, 100, 100);
-		planet.setVelocity(10, -10, 0);
-
-		listOfBodies.add(sun);
-		sun.setName("Sun");
-		sun.setMass(1000);
-		sun.setPosition(0, 0, 0);
-		sun.setVelocity(-10, 10, 0);
-=======
 	Texture textures;
 	
 	static ArrayList<Texture> availablePlanetTextures = new ArrayList<Texture>();
@@ -91,10 +75,7 @@ public class RunSimulation extends ApplicationAdapter {
 		LibGDXTools.bodyInitialize("Planet", 1, 100, 100, 200, 0, 20);
 		LibGDXTools.bodyInitialize("Sun", 100000, 0, 0, 0, 0, 100);
 		//LibGDXTools.bodyInitialize("Planet 2", 1, -100, -100, -200, 0);
-		
-		
->>>>>>> d89e8f10ab2e72841971bb786400c3ffa30be02b
-		
+			
 		batch = new SpriteBatch();
 		img1 = new Texture("planets/planet18.png");
 		img2 = new Texture("stars/mainsequence/star_orange01.png");
@@ -149,8 +130,7 @@ public class RunSimulation extends ApplicationAdapter {
 			OrbitalPhysics.iterateSimulation(deltaTime);	
 			
 			// DEBUG
-<<<<<<< HEAD
-			if ((iterationCounter % 1) == 0){
+			if ((iterationCounter % dataDivision) == 0){
 				
 				System.out.println(iterationCounter);
 				System.out.println("Planet Position X: " + planet.posVect.getX());
@@ -159,10 +139,6 @@ public class RunSimulation extends ApplicationAdapter {
 				System.out.println("");
 						
 				//System.out.println(planet.posVect.getX());
-=======
-			if (iterationCounter % numOfIterations/100 == 0){
-
->>>>>>> d89e8f10ab2e72841971bb786400c3ffa30be02b
 				/*
 				System.out.println(planet.name);
 				System.out.println(iterationCounter);
