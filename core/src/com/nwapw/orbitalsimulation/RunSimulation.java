@@ -27,9 +27,9 @@ public class RunSimulation extends ApplicationAdapter {
 	int iterationCounter = 0;
 	double timeCounter = 0;
 	
-	boolean newPlanet = false;
-	int placedPositionX;
-	int placedPositionY;
+	//boolean newPlanet = false;
+	//int placedPositionX;
+	//int placedPositionY;
 	
 	OrbitalBody placedPlanet = new OrbitalBody();
 	OrbitalBody planet = new OrbitalBody();
@@ -47,15 +47,15 @@ public class RunSimulation extends ApplicationAdapter {
 	
 		listOfBodies.add(planet);
 		planet.setName("Planet #1");
-		planet.setMass(1);
+		planet.setMass(1000);
 		planet.setPosition(100, 100, 100);
-		planet.setVelocity(200, 0, 0);
+		planet.setVelocity(10, -10, 0);
 
 		listOfBodies.add(sun);
 		sun.setName("Sun");
-		sun.setMass(100000);
+		sun.setMass(1000);
 		sun.setPosition(0, 0, 0);
-		sun.setVelocity(0, 0, 0);
+		sun.setVelocity(-10, 10, 0);
 		
 		batch = new SpriteBatch();
 		img1 = new Texture("planets/planet18.png");
@@ -122,21 +122,24 @@ public class RunSimulation extends ApplicationAdapter {
 			OrbitalPhysics.iterateSimulation(deltaTime);	
 			//place();
 			// DEBUG
-			if ((iterationCounter % 25) == 0){
-	
-				System.out.println(iterationCounter);
-				System.out.println("ppx: " + planet.posVect.getX());
-				System.out.println("spx: " + sun.posVect.getY());
-				System.out.println("dis: " + Vector3.distBetween(planet.posVect, sun.posVect));
-				System.out.println("");
+			if ((iterationCounter % 1) == 0){
 				
+				System.out.println(iterationCounter);
+				System.out.println("Planet Position X: " + planet.posVect.getX());
+				System.out.println("Sun Position Y: " + sun.posVect.getY());
+				System.out.println("Distance: " + Vector3.distBetween(planet.posVect, sun.posVect));
+				System.out.println("");
+						
 				//System.out.println(planet.posVect.getX());
 				/*
 				System.out.println(planet.name);
-				System.out.println("t: " + timeCounter);
-				System.out.println("p: " + planet.posVect.getX());
-				System.out.println("v: " + planet.velVect.getX());
-				System.out.println("a: " + planet.accVect.getX());
+				System.out.println(iterationCounter);
+				System.out.println("px: " + planet.posVect.getX());
+				System.out.println("py: " + planet.posVect.getY());
+				System.out.println("vx: " + planet.velVect.getX());
+				System.out.println("vy: " + planet.velVect.getY());
+				System.out.println("ax: " + planet.accVect.getX());
+				System.out.println("ay: " + planet.accVect.getY());
 				System.out.println("");
 				*/
 			}				

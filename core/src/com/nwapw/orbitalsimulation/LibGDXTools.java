@@ -79,13 +79,13 @@ public class LibGDXTools {
 		//TODO randomly select from available sprites
 		if (mass < 100){ // body is a "planet"		
 			
-			int listLength = RunSimulation.availablePlanetTextures.size();
-			int randTexture = random.nextInt(listLength);
+			//int listLength = RunSimulation.availablePlanetTextures.size();
+			//int randTexture = random.nextInt(listLength);
 			
-			newTexture = RunSimulation.availablePlanetTextures.get(randTexture);
-			RunSimulation.availablePlanetTextures.remove(randTexture);
+			//newTexture = RunSimulation.availablePlanetTextures.get(randTexture);
+			//RunSimulation.availablePlanetTextures.remove(randTexture);
 
-			//newTexture = new Texture("planets/planet18.png");
+			newTexture = new Texture("planets/planet18.png");
 		}
 		else if (mass < 150000){ // body is a "main sequence star"
 			newTexture = new Texture("stars/mainsequence/star_orange01.png");
