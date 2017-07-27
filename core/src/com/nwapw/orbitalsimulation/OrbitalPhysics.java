@@ -32,8 +32,7 @@ public class OrbitalPhysics {
 	
 	final static float deltaTime = (float) 0.01;
 	final static int numOfIterations = 1000000;
-
-
+	
 	static void iterateSimulation(float deltaTime) {
 
 		// 1. Calculate net force and acceleration from acting on each body.

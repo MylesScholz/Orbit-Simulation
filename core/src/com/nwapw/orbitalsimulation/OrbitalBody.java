@@ -19,8 +19,11 @@ public class OrbitalBody {
 	Vector3 accVect = new Vector3();
 	
 	Sprite sprite;
-	Texture texture;
 	
+	float spriteWidth = 10;
+	
+	Texture texture;
+
 	void setName(String newName){
 		this.name = newName;
 	}
@@ -33,14 +36,9 @@ public class OrbitalBody {
 		this.radius = newRadius;
 	}
 	
-	void setSprite(Sprite newSprite){
-		this.sprite = newSprite;
-	}
-	
 	void setTexture(Texture newTexture){
 		this.texture = newTexture;
-	}
-	
+	}	
 	
 	void setPosition(double x, double y, double z){
 		posVect.set(x,y,z);	
@@ -60,6 +58,10 @@ public class OrbitalBody {
 		posVect.set(position);	
 		velVect.set(velocity);	
 	}
+	void setSpriteWidth(float newSpriteWidth){
+		this.spriteWidth = newSpriteWidth;
+	}
+	
 	
 	// TODO create integrator choice picker
 	double integratorChoice(double value, double deltaTime) {
