@@ -77,12 +77,12 @@ public class RunSimulation extends ApplicationAdapter {
 		// INITIALIZE IN ORDER OF MASS SMALLEST TO LARGEST
 		// Name, Mass, posx, posy, velx, vely, spritewidth
 		
-		LibGDXTools.bodyInitialize("Pl2", 1, 70, 70, 30, 0, 10);
-		LibGDXTools.bodyInitialize("Pl1", 1, 90, 90, 40, 0, 10);	
-		LibGDXTools.bodyInitialize("Pl1", 1, 110, 110, 50, 0, 10);	
-		LibGDXTools.bodyInitialize("Pl1", 1, 130, 130, 60, 0, 10);	
-		LibGDXTools.bodyInitialize("Pl1", 1, 150, 150, 70, 0, 10);	
-		LibGDXTools.bodyInitialize("Sun", 10000, 0, 0, 0, 0, 50);
+		LibGDXTools.bodyInitialize("#1", 1, 70, 70, 30, 0, 10);
+		LibGDXTools.bodyInitialize("#2", 1, 90, 90, 40, 0, 10);	
+		LibGDXTools.bodyInitialize("#3", 1, 110, 110, 50, 0, 10);	
+		LibGDXTools.bodyInitialize("#4", 1, 130, 130, 60, 0, 10);	
+		LibGDXTools.bodyInitialize("#5", 1, 150, 150, 70, 0, 10);	
+		LibGDXTools.bodyInitialize("Star", 10000, 0, 0, 0, 0, 50);
 		
 
 		batch = new SpriteBatch();
@@ -108,10 +108,14 @@ public class RunSimulation extends ApplicationAdapter {
 		
 		font.draw(batch, "Orbital Simulation", 10, 20);
 		
+		font.draw(batch, "Perturbation: Cowell's", 155, 40);
+		font.draw(batch, "Numerical Intgration: Rect", 320, 40);
+		
+		
 		String printNumOfBodies = "Number of bodies: " + String.valueOf(listOfBodies.size());
 		String printDeltaTime = "dt: " + String.valueOf(deltaTime);
 		String printIterationStep = "step: " + String.valueOf(iterationCounter);
-		font.draw(batch, printNumOfBodies, 150, 20);
+		font.draw(batch, printNumOfBodies, 155, 20);
 		font.draw(batch, printDeltaTime, 300, 20);
 		font.draw(batch, printIterationStep, 360, 20);
 		
@@ -119,9 +123,11 @@ public class RunSimulation extends ApplicationAdapter {
 
 			OrbitalBody renderBody = listOfBodies.get(i);
 
-			float spriteX = (float) renderBody.posVect.getX() + 200;
-			float spriteY = (float) renderBody.posVect.getY() + 200;
-					
+			float spriteX = (float) renderBody.posVect.getX() + 300;
+			float spriteY = (float) renderBody.posVect.getY() + 250;
+			
+			font.draw(batch, renderBody.name, spriteX + 10, spriteY);
+			
 			float spriteWidth = renderBody.spriteWidth;
 
 			Texture spriteTexture = renderBody.texture;
