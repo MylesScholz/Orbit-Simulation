@@ -43,6 +43,8 @@ public class OrbitalPhysics {
 			OrbitalBody currentBody = listOfBodies.get(i);
 			Vector3 sumOfAcc = new Vector3();
 
+			listOfBodies.get(i).mostPullingBodyAcc = 0;
+			
 			for (int j = 0; j < listOfBodies.size() ; j++){
 				
 				if (j != i){
@@ -51,6 +53,11 @@ public class OrbitalPhysics {
 
 					if (perturbationCalculationMethod == 0){ // Cowell's Formulation
 						Vector3 calculatedAcc = cowellsFormulation(currentBody, pullingBody);
+						
+						if (calculatedAcc.length() >= listOfBodies.get(i).mostPullingBodyAcc){
+							listOfBodies.get(i).mostPullingBodyAcc = calculatedAcc.length();
+							listOfBodies.get(i).mostPullingBodyName = listOfBodies.get(j).name;
+						}
 						
 						
 						sumOfAcc.add(calculatedAcc);
@@ -116,7 +123,8 @@ public class OrbitalPhysics {
 			
 		}
 
-		//System.out.println("COW>CalcAcc: " + calculatedAcc.print());
+		
+		
 		return calculatedAcc;
 	
 	}

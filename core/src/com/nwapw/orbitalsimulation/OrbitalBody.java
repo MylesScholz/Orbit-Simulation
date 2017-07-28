@@ -10,12 +10,16 @@ public class OrbitalBody {
 	
 	String name;
 	
+	String mostPullingBodyName;
+	double mostPullingBodyAcc;
+	
 	float mass;
 	float radius;
 	
 	static double[] currentPos = new double[3];
 	double[] currentVel = new double[3];
 	double[] currentAcc = new double[3];
+	
 	
 	// x = 0, y = 1, z = 2, stored as double
 	Vector3 posVect = new Vector3();

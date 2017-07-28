@@ -43,6 +43,7 @@ public class RunSimulation extends ApplicationAdapter {
 	// Prevents overpressing keys
 	int clickDuration = 0;
 	int nDuration = 0;
+	int pDuration = 0;
 	
 	int placedPlanetCounter = 0;
 	int placedSunCounter = 0;
@@ -80,6 +81,7 @@ public class RunSimulation extends ApplicationAdapter {
 	
 	BitmapFont font;
 	
+	Boolean pauseState = false;
 	
 	@Override
 	public void create () {
@@ -114,14 +116,15 @@ public class RunSimulation extends ApplicationAdapter {
 		// INITIALIZE IN ORDER OF MASS SMALLEST TO LARGEST
 		// Name, Mass, posx, posy, velx, vely, spritewidth
 		
-       
+       /*
 		LibGDXTools.bodyInitialize("#1", 1, 5, 70, 70, 30, -30, 10);
 		LibGDXTools.bodyInitialize("#2", 1, 5, 90, 90, 50, -50, 10);
 		LibGDXTools.bodyInitialize("#3", 1, 5, 110, 110, 50, -50, 10);
 		LibGDXTools.bodyInitialize("#4", 1, 5, 130, 130, 60, -60, 10);
 		LibGDXTools.bodyInitialize("#5", 1, 5, 150, 150, 70, -70, 10);
-		LibGDXTools.bodyInitialize("Star", 10000, 25, 0.001, 0.001, 0.001, 0.001, 40);
-		
+		*/
+		LibGDXTools.bodyInitialize("Star 1", 10000, 25, -200, 0, 0.001, 0.001, 40);
+		LibGDXTools.bodyInitialize("Star 2", 10000, 25, 200, 0, 0.001, 0.001, 40);
 		
 		batch = new SpriteBatch();
 
@@ -204,6 +207,8 @@ public class RunSimulation extends ApplicationAdapter {
 		else {
 			nDuration = 0;
 		}
+
+		
 		
 		if(Gdx.input.isKeyPressed(Input.Keys.S)){
 			listOfBodies.get(n).posVect.set(100, 100, 100);
@@ -223,6 +228,22 @@ public class RunSimulation extends ApplicationAdapter {
 			clickDuration = 0;
 		}
 		
+		if(Gdx.input.isKeyPressed(Input.Keys.P)){				
+
+			if (pDuration < 1){
+				if (pauseState == false){
+					pauseState = true;
+				}
+				else {
+					pauseState = false;
+				}
+				
+			}
+			pDuration++;
+	    }
+		else {
+			pDuration = 0;
+		}	
         if(Gdx.input.isKeyPressed(Input.Keys.UP)){
         	listOfBodies.get(n).velVect.y += 3;
         }
@@ -252,9 +273,12 @@ public class RunSimulation extends ApplicationAdapter {
 		
 		font.draw(batch, "Orbital Simulation", 10, 20);
 		
-		font.draw(batch, "(n) focus  (d) delete (s) set pos/vel to [100, 100]  (arrow keys) vel  (0) vel = 0", 155, 40);
+		font.draw(batch, "(p) pause (n) focus  (d) delete (s) set pos/vel (arrow keys) vel  (0) vel = 0", 155, 40);
 		
-		String printPosVelAcc = "Pos: " + listOfBodies.get(n).posVect.print() + "  Vel: " + listOfBodies.get(n).velVect.print() + "  Acc: " + listOfBodies.get(n).accVect.print();
+		String printPosVelAcc = "Most Pull: " + listOfBodies.get(n).mostPullingBodyName + 
+				"      Pos: " + listOfBodies.get(n).posVect.print() + 
+				"  Vel: " + listOfBodies.get(n).velVect.print() + 
+				"  Acc: " + listOfBodies.get(n).accVect.print();
 		font.draw(batch, printPosVelAcc, 155, 60);
 		
 		String printNumOfBodies = "Number of bodies: " + String.valueOf(listOfBodies.size());
@@ -290,19 +314,21 @@ public class RunSimulation extends ApplicationAdapter {
 		batch.end();	
 
 		OrbitalPhysics.passList(listOfBodies);
+		System.out.println(pauseState);
+		if (pauseState == false){
+			if (iterationCounter <= numOfIterations){
+				timeCounter += deltaTime;
+				OrbitalPhysics.iterateSimulation(deltaTime);	
+				place();
+				// DEBUG
+				if ((iterationCounter % dataDivision) == 0){
+							
+	
+				}				
+			}	
+			iterationCounter += 1;
+		}
 		
-		if (iterationCounter <= numOfIterations){
-			timeCounter += deltaTime;
-			OrbitalPhysics.iterateSimulation(deltaTime);	
-			place();
-			// DEBUG
-			if ((iterationCounter % dataDivision) == 0){
-						
-
-			}				
-		}	
-		
-		iterationCounter += 1;
 		
 	}
 
