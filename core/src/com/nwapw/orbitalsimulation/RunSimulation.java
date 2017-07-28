@@ -83,14 +83,16 @@ public class RunSimulation extends ApplicationAdapter {
 		}	
 
 		// INITIALIZE IN ORDER OF MASS SMALLEST TO LARGEST
-		// Name, Mass, radius posx, posy, velx, vely, spritewidth
+		// Name, Mass, posx, posy, velx, vely, spritewidth
 		
-		LibGDXTools.bodyInitialize("#1", 1, 5, 70, 70, 30, 0, 10);
-		LibGDXTools.bodyInitialize("#2", 1, 5, 90, 90, 50, 0, 10);	
-		LibGDXTools.bodyInitialize("#3", 1, 5, 110, 110, 50, 0, 10);	
-		LibGDXTools.bodyInitialize("#4", 1, 5, 130, 130, 60, 0, 10);	
-		LibGDXTools.bodyInitialize("#5", 1, 5, 150, 150, 70, 0, 10);	
-		LibGDXTools.bodyInitialize("Star", 10000, 25, 0, 0, 0, 0, 50);
+		
+		LibGDXTools.bodyInitialize("#1", 1, 70, 70, 30, 0, 10);
+		LibGDXTools.bodyInitialize("#2", 1, 90, 90, 50, 0, 10);	
+		LibGDXTools.bodyInitialize("#3", 1, 110, 110, 50, 0, 10);	
+		LibGDXTools.bodyInitialize("#4", 1, 130, 130, 60, 0, 10);	
+		LibGDXTools.bodyInitialize("#5", 1, 150, 150, 70, 0, 10);	
+		LibGDXTools.bodyInitialize("Star", 10000, 0, 0, 0, 0, 50);
+		
 
 		batch = new SpriteBatch();
 
@@ -146,7 +148,6 @@ public class RunSimulation extends ApplicationAdapter {
 		}
 		
 		if(Gdx.input.isKeyPressed(Input.Keys.S)){
-			listOfBodies.get(n).velVect.set(0,0,0);
 			listOfBodies.get(n).posVect.set(100, 100, 100);
 	    }
 		
@@ -173,7 +174,7 @@ public class RunSimulation extends ApplicationAdapter {
 		
 		font.draw(batch, "Orbital Simulation", 10, 20);
 		
-		font.draw(batch, "(n) focus  (s) set pos/vel to 100, 100  (arrow keys) vel  (0) vel = 0", 155, 40);
+		font.draw(batch, "(n) focus  (s) set pos/vel to [100, 100]  (arrow keys) vel  (0) vel = 0", 155, 40);
 
 		
 		

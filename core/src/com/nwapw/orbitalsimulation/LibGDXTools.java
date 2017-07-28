@@ -3,7 +3,7 @@ package com.nwapw.orbitalsimulation;
 import java.util.ArrayList;
 import java.util.Random;
 
-import javax.swing.plaf.synth.SynthSeparatorUI;
+//import javax.swing.plaf.synth.SynthSeparatorUI;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -29,15 +29,12 @@ public class LibGDXTools {
 		
 		return body;
 	}	
-	static OrbitalBody bodyInitialize(String name, float mass, float radius, double posX, double posY, double velX, double velY){
+	static OrbitalBody bodyInitialize(String name, float mass, double posX, double posY, double velX, double velY){
 		OrbitalBody body = new OrbitalBody();
 		
 		body.setName(name);
 		body.setMass(mass);
-
-		body.setRadius(radius);
 		
-
 		body.posVect.x = posX;
 		body.posVect.y = posY;
 		
@@ -50,14 +47,13 @@ public class LibGDXTools {
 		return body;
 	}	
 	
-	static OrbitalBody bodyInitialize(String name, float mass, float radius, double posX, double posY, double velX, double velY, float spriteWidth){
+	static OrbitalBody bodyInitialize(String name, float mass, double posX, double posY, double velX, double velY, float spriteWidth){
 		
 		OrbitalBody body = new OrbitalBody();
 		
 		body.setName(name);
 		body.setMass(mass);
-		body.setRadius(radius);
-
+		
 		body.posVect.x = posX;
 		body.posVect.y = posY;
 		

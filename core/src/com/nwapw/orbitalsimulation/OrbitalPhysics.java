@@ -85,10 +85,11 @@ public class OrbitalPhysics {
 
 		Vector3 diffOfPosVect = new Vector3();
 		diffOfPosVect.add(pullingPos);	
-	
+		
 		if (!(RunSimulation.listOfBodies.size() % 2 == 0)) {
 			currentPos.scale(-1);
 		}
+		
 		diffOfPosVect.add(currentPos);
 		
 		Vector3 calculatedAcc = new Vector3();	
