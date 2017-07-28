@@ -5,6 +5,7 @@ import java.util.Random;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -36,6 +37,11 @@ public class RunSimulation extends ApplicationAdapter {
 	double timeCounter = 0;
 	int iterationCounter = 0;
 	int dataDivision = 1000;
+	
+	// Cycle through focus
+	int n = 0;
+	// Prevents overpressing keys
+	int nDuration = 0;
 	
 	// List of currently running bodies in the simulation
 	public static ArrayList<OrbitalBody> listOfBodies = new ArrayList<OrbitalBody>();
@@ -79,8 +85,9 @@ public class RunSimulation extends ApplicationAdapter {
 		// INITIALIZE IN ORDER OF MASS SMALLEST TO LARGEST
 		// Name, Mass, posx, posy, velx, vely, spritewidth
 		
+		
 		LibGDXTools.bodyInitialize("#1", 1, 70, 70, 30, 0, 10);
-		LibGDXTools.bodyInitialize("#2", 1, 90, 90, 40, 0, 10);	
+		LibGDXTools.bodyInitialize("#2", 1, 90, 90, 50, 0, 10);	
 		LibGDXTools.bodyInitialize("#3", 1, 110, 110, 50, 0, 10);	
 		LibGDXTools.bodyInitialize("#4", 1, 130, 130, 60, 0, 10);	
 		LibGDXTools.bodyInitialize("#5", 1, 150, 150, 70, 0, 10);	
@@ -122,22 +129,63 @@ public class RunSimulation extends ApplicationAdapter {
 	
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+		
+		int listLength = listOfBodies.size();
+
+		if(Gdx.input.isKeyPressed(Input.Keys.N)){
+			n++;
+			n = n % listLength;
+			nDuration++;
+			if (nDuration > 1 && n != 0){
+				n--;
+			}
+			
+			System.out.println("n: " + n);
+	    }
+		else {
+			nDuration = 0;
+		}
+		
+		if(Gdx.input.isKeyPressed(Input.Keys.S)){
+			listOfBodies.get(n).posVect.set(100, 100, 100);
+	    }
+		
+        if(Gdx.input.isKeyPressed(Input.Keys.UP)){
+        	listOfBodies.get(n).velVect.y -= 5;
+        }
+        
+        if(Gdx.input.isKeyPressed(Input.Keys.DOWN)){
+        	listOfBodies.get(n).velVect.y += 5;
+        }
+        
+        if(Gdx.input.isKeyPressed(Input.Keys.LEFT)){
+        	listOfBodies.get(n).velVect.x += 5;
+        }
+        
+        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
+        	listOfBodies.get(n).velVect.x -= 5;
+        }
+        if(Gdx.input.isKeyPressed(Input.Keys.NUM_0)){
+        	listOfBodies.get(n).posVect.set(0,0,0);
+        }
 		
 		batch.begin();
 		
 		font.draw(batch, "Orbital Simulation", 10, 20);
 		
-		font.draw(batch, "Perturbation: Cowell's", 155, 40);
-		font.draw(batch, "Numerical Intgration: Rect", 320, 40);
+		font.draw(batch, "(n) focus  (s) set pos/vel to [100, 100]  (arrow keys) vel  (0) vel = 0", 155, 40);
+
 		
 		
 		String printNumOfBodies = "Number of bodies: " + String.valueOf(listOfBodies.size());
 		String printDeltaTime = "dt: " + String.valueOf(deltaTime);
 		String printIterationStep = "step: " + String.valueOf(iterationCounter);
+		String printFocusPlanet = "focus: " + listOfBodies.get(n).name;
 		font.draw(batch, printNumOfBodies, 155, 20);
 		font.draw(batch, printDeltaTime, 300, 20);
 		font.draw(batch, printIterationStep, 360, 20);
-		
+		font.draw(batch, printFocusPlanet, 440, 20);
 		for (int i = 0; i < listOfBodies.size(); i++) {
 
 			OrbitalBody renderBody = listOfBodies.get(i);
