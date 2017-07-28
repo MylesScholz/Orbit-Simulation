@@ -12,7 +12,7 @@ public class LibGDXTools {
 	
 	static Random random = new Random();
 	
-	static OrbitalBody bodyInitialize(String name, float mass){
+	static OrbitalBody bodyInitialize(String name, float mass, float radius){
 		
 		OrbitalBody body = new OrbitalBody();	
 		
@@ -35,7 +35,7 @@ public class LibGDXTools {
 		body.setName(name);
 		body.setMass(mass);
 		body.setRadius(radius);
-		
+
 		body.posVect.x = posX;
 		body.posVect.y = posY;
 		
