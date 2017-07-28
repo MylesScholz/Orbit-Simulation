@@ -29,7 +29,7 @@ public class RunSimulation extends ApplicationAdapter {
 	final static float deltaTime = (float) 0.01;
 	
 	// The max number of iterations that the simulation runs
-	final static int numOfIterations = 10000000;
+	final static int numOfIterations = 100000000;
 	
 	// To debug
 	double timeCounter = 0;
@@ -52,6 +52,9 @@ public class RunSimulation extends ApplicationAdapter {
 	Texture textures;
 	static ArrayList<Texture> availablePlanetTextures = new ArrayList<Texture>();
 	
+	
+	static ArrayList<Texture> runningTextures = new ArrayList<Texture>();
+	
 	@Override
 	public void create () {
 		
@@ -67,12 +70,15 @@ public class RunSimulation extends ApplicationAdapter {
 			availablePlanetTextures.add(textures);
 		}	
 
+		// INITIALIZE IN ORDER OF MASS SMALLEST TO LARGEST
+		// Name, Mass, posx, posy, velx, vely, spritewidth
 		
-		LibGDXTools.bodyInitialize("Pl1", 1, 100, 100, 50, 0, 10);
-		LibGDXTools.bodyInitialize("Pl2", 10, -50, 0, 0, -200, 10);
-
+		LibGDXTools.bodyInitialize("Pl2", 10, 70, 70, 30, 0, 10);
+		LibGDXTools.bodyInitialize("Pl1", 10, 90, 90, 40, 0, 10);	
+		LibGDXTools.bodyInitialize("Pl1", 10, 110, 110, 50, 0, 10);	
+		LibGDXTools.bodyInitialize("Pl1", 10, 130, 130, 60, 0, 10);	
+		LibGDXTools.bodyInitialize("Pl1", 10, 150, 150, 70, 0, 10);	
 		LibGDXTools.bodyInitialize("Sun", 10000, 0, 0, 0, 0, 50);
-		
 		
 
 		batch = new SpriteBatch();
@@ -91,8 +97,8 @@ public class RunSimulation extends ApplicationAdapter {
 	@Override
 	public void render () {
 	
-		Gdx.gl.glClearColor(0, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		//Gdx.gl.glClearColor(0, 0, 0, 1);
+		//Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		batch.begin();
 		
@@ -100,8 +106,8 @@ public class RunSimulation extends ApplicationAdapter {
 
 			OrbitalBody renderBody = listOfBodies.get(i);
 
-			float spriteX = (float) renderBody.posVect.getX()*2 + 200;
-			float spriteY = (float) renderBody.posVect.getY()*2 + 200;
+			float spriteX = (float) renderBody.posVect.getX() + 200;
+			float spriteY = (float) renderBody.posVect.getY() + 200;
 					
 			float spriteWidth = renderBody.spriteWidth;
 
@@ -145,6 +151,10 @@ public class RunSimulation extends ApplicationAdapter {
 	@Override
 	public void dispose () {
 		batch.dispose();
-
+		
+		for (int i = 0; i < runningTextures.size(); i++){
+			runningTextures.get(i).dispose();
+		}
+		
 	}
 }

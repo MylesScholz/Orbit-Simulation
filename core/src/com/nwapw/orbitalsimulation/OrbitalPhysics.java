@@ -42,7 +42,7 @@ public class OrbitalPhysics {
 			
 			OrbitalBody currentBody = listOfBodies.get(i);
 			Vector3 sumOfAcc = new Vector3();
-			
+
 			for (int j = 0; j < listOfBodies.size() ; j++){
 				
 				if (j != i){
@@ -52,9 +52,10 @@ public class OrbitalPhysics {
 					if (perturbationCalculationMethod == 0){ // Cowell's Formulation
 						Vector3 calculatedAcc = cowellsFormulation(currentBody, pullingBody);
 						
-
-						sumOfAcc.add(calculatedAcc);
 						
+						sumOfAcc.add(calculatedAcc);
+						//System.out.println("sum of acc: " + sumOfAcc.print());
+						//System.out.println("");
 					}
 					/*
 					else if {
@@ -69,6 +70,10 @@ public class OrbitalPhysics {
 			currentBody.setAcceleration(sumOfAcc.getX(), sumOfAcc.getY(), sumOfAcc.getZ());			
 			currentBody.iterateVelThenPos(deltaTime);
 			
+			//System.out.println(currentBody.posVect.print());
+			//System.out.println(currentBody.velVect.print());
+			//System.out.println(currentBody.accVect.print());
+			//System.out.println("");
 		}	
 	}	
 	
@@ -83,24 +88,31 @@ public class OrbitalPhysics {
 		currentPos.scale(-1);
 		diffOfPosVect.add(currentPos);
 		
-		//System.out.println(currentBody.name + " < " + pullingBody.name);
-		//System.out.println(diffOfPosVect.length());
-		
 		Vector3 calculatedAcc = new Vector3();	
 		calculatedAcc.add(diffOfPosVect);
 
 		calculatedAcc.scale(-1*gravConst * pullingBody.mass / Math.pow(diffOfPosVect.length(), 3));	
-
-		Double testNum = (Double) calculatedAcc.x;
-		Boolean testBool = testNum.isNaN();
 		
-		/*
-		if (testBool == true) {
-			calculatedAcc.set(0,0,0);;
-		}	
-		*/
+		double[] nanCheckList = calculatedAcc.get();
 
-		
+		for (int n = 0; n < 3; n++){
+			Double testNum = (double) nanCheckList[n];
+			Boolean testBool = testNum.isNaN();
+			if (testBool == true) {
+				if (n == 0){
+					calculatedAcc.x = 0;
+				}
+				if (n == 1){
+					calculatedAcc.y = 0;
+				}
+				if (n == 2){
+					calculatedAcc.z = 0;
+				}
+			}	
+			
+		}
+
+		//System.out.println("COW>CalcAcc: " + calculatedAcc.print());
 		return calculatedAcc;
 	
 	}
