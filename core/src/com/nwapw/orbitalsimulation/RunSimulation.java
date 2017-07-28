@@ -184,6 +184,8 @@ public class RunSimulation extends ApplicationAdapter {
 	@Override
 	public void render () {
 	
+		
+		
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -240,6 +242,12 @@ public class RunSimulation extends ApplicationAdapter {
         	listOfBodies.get(n).velVect.set(0,0,0);
         }
 		
+        
+        if (listOfBodies.size() == 0){
+			LibGDXTools.bodyInitialize("Star", 10000, 25, 0.001, 0.001, 0.001, 0.001, 40);
+		}
+        
+        
 		batch.begin();
 		
 		font.draw(batch, "Orbital Simulation", 10, 20);
