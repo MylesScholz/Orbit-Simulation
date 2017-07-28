@@ -44,15 +44,22 @@ public class RunSimulation extends ApplicationAdapter {
 	int nDuration = 0;
 	
 	int placedPlanetCounter = 0;
+	int placedSunCounter = 0;
 	
 	// List of currently running bodies in the simulation
 	public static ArrayList<OrbitalBody> listOfBodies = new ArrayList<OrbitalBody>();
 	
 	boolean newPlanet = false;
-	int clickPositionX;
-	int clickPositionY;
-	int unclickPositionX;
-	int unclickPositionY;
+	boolean newSun = false;
+	int clickLeftPositionX;
+	int clickLeftPositionY;
+	int unclickLeftPositionX;
+	int unclickLeftPositionY;
+	int clickRightPositionX;
+	int clickRightPositionY;
+	int unclickRightPositionX;
+	int unclickRightPositionY;
+	
 	
 	OrbitalBody planet = new OrbitalBody();	
 	OrbitalBody sun = new OrbitalBody();
@@ -126,27 +133,48 @@ public class RunSimulation extends ApplicationAdapter {
 	}
 	
 	public void place () {		
+		
 		if (Gdx.input.isButtonPressed(0) && newPlanet == false) {
-			clickPositionX = Gdx.input.getX();
-			clickPositionY = Gdx.input.getY();
+			clickLeftPositionX = Gdx.input.getX();
+			clickLeftPositionY = Gdx.input.getY();
 			newPlanet = true;
 		}
+		
 		else if (!Gdx.input.isButtonPressed(0) && newPlanet == true) {
 			
-			unclickPositionX = Gdx.input.getX();
-			unclickPositionY = Gdx.input.getY();
+			unclickLeftPositionX = Gdx.input.getX();
+			unclickLeftPositionY = Gdx.input.getY();
 			
-			int randomMass = 1 + (int)(Math.random() * 50);
+			int randomMass = 1 + (int)(Math.random() * 4);
 			int randomRadius = randomMass * 5;
 			
 			String planetName = "New Planet " + placedPlanetCounter;	
 			placedPlanetCounter++;
 			
-			LibGDXTools.bodyInitialize(planetName, randomMass, randomRadius, clickPositionX - 300, (clickPositionY - 250) * -1, unclickPositionX - clickPositionX, (unclickPositionY - clickPositionY) * -1);
-			
-			//OrbitalBody.evenBodyBug();
-			
+			LibGDXTools.bodyInitialize(planetName, randomMass, randomRadius, clickLeftPositionX - 300, -(clickLeftPositionY - 250), unclickLeftPositionX - clickLeftPositionX, -(unclickLeftPositionY - clickLeftPositionY), 10);
 			newPlanet = false;
+		}
+		
+		if (Gdx.input.isButtonPressed(1) && newSun == false) {
+			clickRightPositionX = Gdx.input.getX();
+			clickRightPositionY = Gdx.input.getY();
+			newSun = true;
+		}
+		
+		else if (!Gdx.input.isButtonPressed(1) && newSun == true) {
+			
+			unclickRightPositionX = Gdx.input.getX();
+			unclickRightPositionY = Gdx.input.getY();
+			
+			int randomMass = 10000 + (int)(Math.random() * 40000);
+			int randomRadius = randomMass / 400;
+			
+			String sunName = "New Sun " + placedSunCounter;	
+			placedSunCounter++;
+			
+			LibGDXTools.bodyInitialize(sunName, randomMass, randomRadius, clickRightPositionX - 300, -(clickRightPositionY - 250), unclickRightPositionX - clickRightPositionX, -(unclickRightPositionY - clickRightPositionY), 50);
+			
+			newSun = false;
 		}
 	}
 	
