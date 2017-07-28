@@ -68,6 +68,7 @@ public class RunSimulation extends ApplicationAdapter {
 	
 	BitmapFont font;
 	
+	
 	@Override
 	public void create () {
 		
@@ -111,19 +112,25 @@ public class RunSimulation extends ApplicationAdapter {
 	
 	public void place () {		
 		if (Gdx.input.isButtonPressed(0) && newPlanet == false) {
-			System.out.println("Click");
 			clickPositionX = Gdx.input.getX();
 			clickPositionY = Gdx.input.getY();
 			newPlanet = true;
 		}
 		else if (!Gdx.input.isButtonPressed(0) && newPlanet == true) {
-			System.out.println("Unclick");
+			
 			unclickPositionX = Gdx.input.getX();
 			unclickPositionY = Gdx.input.getY();
+			
+			int randomMass = 1 + (int)(Math.random() * 50);
+			int randomRadius = randomMass * 5;
+			
 			String planetName = "New Planet " + placedPlanetCounter;	
 			placedPlanetCounter++;
-			LibGDXTools.bodyInitialize(planetName, 1, 5, clickPositionX - 300, (clickPositionY - 250) * -1, unclickPositionX - clickPositionX, (unclickPositionY - clickPositionY) * -1);
+			
+			LibGDXTools.bodyInitialize(planetName, randomMass, randomRadius, clickPositionX - 300, (clickPositionY - 250) * -1, unclickPositionX - clickPositionX, (unclickPositionY - clickPositionY) * -1);
+			
 			//OrbitalBody.evenBodyBug();
+			
 			newPlanet = false;
 		}
 	}
@@ -153,6 +160,7 @@ public class RunSimulation extends ApplicationAdapter {
 		
 		if(Gdx.input.isKeyPressed(Input.Keys.S)){
 			listOfBodies.get(n).posVect.set(100, 100, 100);
+			listOfBodies.get(n).velVect.set(0, 0, 0);
 	    }
 		
         if(Gdx.input.isKeyPressed(Input.Keys.UP)){
