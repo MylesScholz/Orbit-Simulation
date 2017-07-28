@@ -49,8 +49,10 @@ public class RunSimulation extends ApplicationAdapter {
 	// List of currently running bodies in the simulation
 	public static ArrayList<OrbitalBody> listOfBodies = new ArrayList<OrbitalBody>();
 	
+	// Booleans for mouse input edge detection
 	boolean newPlanet = false;
 	boolean newSun = false;
+	// Mouse position variables for new bodies
 	int clickLeftPositionX;
 	int clickLeftPositionY;
 	int unclickLeftPositionX;
@@ -151,7 +153,7 @@ public class RunSimulation extends ApplicationAdapter {
 			String planetName = "New Planet " + placedPlanetCounter;	
 			placedPlanetCounter++;
 			
-			LibGDXTools.bodyInitialize(planetName, randomMass, randomRadius, clickLeftPositionX - 300, -(clickLeftPositionY - 250), unclickLeftPositionX - clickLeftPositionX, -(unclickLeftPositionY - clickLeftPositionY), 10);
+			LibGDXTools.bodyInitialize(planetName, randomMass, randomRadius, clickLeftPositionX - 300, -(clickLeftPositionY - 250), unclickLeftPositionX - clickLeftPositionX, -(unclickLeftPositionY - clickLeftPositionY), randomRadius * 2);
 			newPlanet = false;
 		}
 		
@@ -167,13 +169,12 @@ public class RunSimulation extends ApplicationAdapter {
 			unclickRightPositionY = Gdx.input.getY();
 			
 			int randomMass = 10000 + (int)(Math.random() * 40000);
-			int randomRadius = randomMass / 400;
+			int randomRadius = randomMass / 800;
 			
 			String sunName = "New Sun " + placedSunCounter;	
 			placedSunCounter++;
 			
-			LibGDXTools.bodyInitialize(sunName, randomMass, randomRadius, clickRightPositionX - 300, -(clickRightPositionY - 250), unclickRightPositionX - clickRightPositionX, -(unclickRightPositionY - clickRightPositionY), 50);
-			
+			LibGDXTools.bodyInitialize(sunName, randomMass, randomRadius, clickRightPositionX - 300, -(clickRightPositionY - 250), unclickRightPositionX - clickRightPositionX, -(unclickRightPositionY - clickRightPositionY), randomRadius * 2);
 			newSun = false;
 		}
 	}
