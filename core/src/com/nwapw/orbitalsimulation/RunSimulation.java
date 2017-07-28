@@ -116,15 +116,15 @@ public class RunSimulation extends ApplicationAdapter {
 		// INITIALIZE IN ORDER OF MASS SMALLEST TO LARGEST
 		// Name, Mass, posx, posy, velx, vely, spritewidth
 		
-       /*
-		LibGDXTools.bodyInitialize("#1", 1, 5, 70, 70, 30, -30, 10);
-		LibGDXTools.bodyInitialize("#2", 1, 5, 90, 90, 50, -50, 10);
+       
+		//LibGDXTools.bodyInitialize("#1", 1, 5, 70, 70, 30, -30, 10);
+		//LibGDXTools.bodyInitialize("#2", 1, 5, 90, 90, 50, -50, 10);
 		LibGDXTools.bodyInitialize("#3", 1, 5, 110, 110, 50, -50, 10);
-		LibGDXTools.bodyInitialize("#4", 1, 5, 130, 130, 60, -60, 10);
-		LibGDXTools.bodyInitialize("#5", 1, 5, 150, 150, 70, -70, 10);
-		*/
+		//LibGDXTools.bodyInitialize("#4", 1, 5, 130, 130, 60, -60, 10);
+		//LibGDXTools.bodyInitialize("#5", 1, 5, 150, 150, 70, -70, 10);
+		
 		LibGDXTools.bodyInitialize("Star 1", 10000, 25, -200, 0, 0.001, 0.001, 40);
-		LibGDXTools.bodyInitialize("Star 2", 10000, 25, 200, 0, 0.001, 0.001, 40);
+		//LibGDXTools.bodyInitialize("Star 2", 10000, 25, 200, 0, 0.001, 0.001, 40);
 		
 		batch = new SpriteBatch();
 
@@ -134,7 +134,9 @@ public class RunSimulation extends ApplicationAdapter {
 		// Constructs a new OrthographicCamera, using the given viewport width and height
 		// Height is multiplied by aspect ratio.
 		
-		//cam = new OrthographicCamera(30, 30 * (h / w));
+		cam = new OrthographicCamera(30, 30 * (h / w));
+
+		cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
 
 		
 	}
@@ -191,8 +193,9 @@ public class RunSimulation extends ApplicationAdapter {
 		
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
 		
+
+
 		int listLength = listOfBodies.size();
 
 		if(Gdx.input.isKeyPressed(Input.Keys.N)){
@@ -271,26 +274,7 @@ public class RunSimulation extends ApplicationAdapter {
         
 		batch.begin();
 		
-		font.draw(batch, "Orbital Simulation", 10, 20);
-		
-		font.draw(batch, "(p) pause (n) focus  (d) delete (s) set pos/vel (arrow keys) vel  (0) vel = 0", 155, 40);
-		
-		String printPosVelAcc = "Most Pull: " + listOfBodies.get(n).mostPullingBodyName + 
-				"      Pos: " + listOfBodies.get(n).posVect.print() + 
-				"  Vel: " + listOfBodies.get(n).velVect.print() + 
-				"  Acc: " + listOfBodies.get(n).accVect.print();
-		font.draw(batch, printPosVelAcc, 155, 60);
-		
-		String printNumOfBodies = "Number of bodies: " + String.valueOf(listOfBodies.size());
-		String printDeltaTime = "dt: " + String.valueOf(deltaTime);
-		String printIterationStep = "step: " + String.valueOf(iterationCounter);
-		String printFocusPlanet = "focus: " + listOfBodies.get(n).name;
-		
-		font.draw(batch, printNumOfBodies, 155, 20);
-		font.draw(batch, printDeltaTime, 300, 20);
-		font.draw(batch, printIterationStep, 360, 20);
-		font.draw(batch, printFocusPlanet, 440, 20);
-		
+
 		
 		for (int i = 0; i < listOfBodies.size(); i++) {
 
@@ -298,8 +282,8 @@ public class RunSimulation extends ApplicationAdapter {
 
             float spriteWidth = renderBody.spriteWidth;
 
-			float spriteX = (float) renderBody.posVect.getX() + 300 - (spriteWidth / 2);
-			float spriteY = (float) renderBody.posVect.getY() + 250 - (spriteWidth / 2);
+			float spriteX = (float) renderBody.posVect.getX() - (spriteWidth / 2);
+			float spriteY = (float) renderBody.posVect.getY() - (spriteWidth / 2);
 			
 			font.draw(batch, renderBody.name, spriteX + 10, spriteY);
 
@@ -308,13 +292,42 @@ public class RunSimulation extends ApplicationAdapter {
 
 			
 		}
-		//cam.update();
-		//batch.setProjectionMatrix(cam.combined);
+		
+		float camX = (float) listOfBodies.get(n).posVect.getX();
+		float camY = (float) listOfBodies.get(n).posVect.getY();
+		cam.position.set(camX, camY, 0);
+		cam.update();
+		batch.setProjectionMatrix(cam.combined);
+		
+		float frameX = camX - 300;
+		float frameY = camY - 300;
+		
+		font.draw(batch, "Orbital Simulation", frameX + 15, frameY + 20);
+		
+		font.draw(batch, "(p) pause (n) focus  (d) delete (s) set pos/vel (arrow keys) vel  (0) vel = 0", frameX + 155, frameY + 40);
+		
+		String printPosVelAcc = "Most Pull: " + listOfBodies.get(n).mostPullingBodyName + 
+				"      Pos: " + listOfBodies.get(n).posVect.print() + 
+				"  Vel: " + listOfBodies.get(n).velVect.print() + 
+				"  Acc: " + listOfBodies.get(n).accVect.print();
+		font.draw(batch, printPosVelAcc, frameX + 15, frameY + 60);
+		
+		String printNumOfBodies = "Number of bodies: " + String.valueOf(listOfBodies.size());
+		String printDeltaTime = "dt: " + String.valueOf(deltaTime);
+		String printIterationStep = "step: " + String.valueOf(iterationCounter);
+		String printFocusPlanet = "focus: " + listOfBodies.get(n).name;
+		
+		font.draw(batch, printNumOfBodies, frameX + 155, frameY + 20);
+		font.draw(batch, printDeltaTime, frameX + 300, frameY + 20);
+		font.draw(batch, printIterationStep, frameX + 360, frameY + 20);
+		font.draw(batch, printFocusPlanet, frameX + 440, frameY + 20);
+		
+		
 		
 		batch.end();	
 
 		OrbitalPhysics.passList(listOfBodies);
-		System.out.println(pauseState);
+
 		if (pauseState == false){
 			if (iterationCounter <= numOfIterations){
 				timeCounter += deltaTime;
@@ -331,7 +344,11 @@ public class RunSimulation extends ApplicationAdapter {
 		
 		
 	}
-
+	public void resize(int width, int height) {
+		cam.viewportWidth = 1000f;
+		cam.viewportHeight = 1000f * height/width;
+		cam.update();
+	}
 	@Override
 	public void dispose () {
 		batch.dispose();
