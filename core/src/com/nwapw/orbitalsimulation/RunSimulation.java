@@ -46,9 +46,11 @@ public class RunSimulation extends ApplicationAdapter {
 	// List of currently running bodies in the simulation
 	public static ArrayList<OrbitalBody> listOfBodies = new ArrayList<OrbitalBody>();
 	
-	//boolean newPlanet = false;
-	//int placedPositionX;
-	//int placedPositionY;
+	boolean newPlanet = false;
+	int clickPositionX;
+	int clickPositionY;
+	int unclickPositionX;
+	int unclickPositionY;
 	
 	OrbitalBody planet = new OrbitalBody();	
 	OrbitalBody sun = new OrbitalBody();
@@ -109,7 +111,24 @@ public class RunSimulation extends ApplicationAdapter {
 
 		
 	}
-
+	
+	public void place () {		
+		if (Gdx.input.isButtonPressed(0) && newPlanet == false) {
+			System.out.println("Click");
+			clickPositionX = Gdx.input.getX();
+			clickPositionY = Gdx.input.getY();
+			newPlanet = true;
+		}
+		else if (!Gdx.input.isButtonPressed(0) && newPlanet == true) {
+			System.out.println("Unclick");
+			unclickPositionX = Gdx.input.getX();
+			unclickPositionY = Gdx.input.getY();
+			LibGDXTools.bodyInitialize("Placed Planet", 1, clickPositionX - 300, (clickPositionY - 250) * -1, unclickPositionX - clickPositionX, (unclickPositionY - clickPositionY) * -1, 10);
+			//OrbitalBody.evenBodyBug();
+			newPlanet = false;
+		}
+	}
+	
 	@Override
 	public void render () {
 	
@@ -198,7 +217,7 @@ public class RunSimulation extends ApplicationAdapter {
 		if (iterationCounter <= numOfIterations){
 			timeCounter += deltaTime;
 			OrbitalPhysics.iterateSimulation(deltaTime);	
-			
+			place();
 			// DEBUG
 			if ((iterationCounter % dataDivision) == 0){
 						

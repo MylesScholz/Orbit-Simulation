@@ -13,6 +13,10 @@ public class OrbitalBody {
 	float mass;
 	float radius;
 	
+	static double[] currentPos = new double[3];
+	double[] currentVel = new double[3];
+	double[] currentAcc = new double[3];
+	
 	// x = 0, y = 1, z = 2, stored as double
 	Vector3 posVect = new Vector3();
 	Vector3 velVect = new Vector3();
@@ -74,10 +78,6 @@ public class OrbitalBody {
 	}
 	
 	void iterateVelThenPos(float deltaTime) {
-		double[] currentPos = new double[3];
-		double[] currentVel = new double[3];
-		double[] currentAcc = new double[3];
-		
 		currentPos = posVect.get();
 		currentVel = velVect.get();
 		currentAcc = accVect.get();
@@ -109,16 +109,24 @@ public class OrbitalBody {
 			currentPos[2] *= -1;
 		}
 		*/
-		posVect.set(currentPos);
+		//evenBodyBug();
+
 		/*
 		if (this.name == "Planet #1") {
 			System.out.println("AFTER  " + currentPos[0]);
 			System.out.println("AFTER1 " + posVect.getX());
-		}		
+		}		 
 		*/
 		
 
 	}
 	
-	
+	//public static void evenBodyBug () {
+	//	if (RunSimulation.listOfBodies.size() % 2 == 0){		
+	//		System.out.println("Even Body Bug");
+	//		currentPos[0] *= -1;
+	//		currentPos[1] *= -1;
+	//		currentPos[2] *= -1;
+	//	}
+	//}
 }
