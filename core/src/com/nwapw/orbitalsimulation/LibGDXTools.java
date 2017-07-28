@@ -3,6 +3,8 @@ package com.nwapw.orbitalsimulation;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javax.swing.plaf.synth.SynthSeparatorUI;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
@@ -28,7 +30,6 @@ public class LibGDXTools {
 		return body;
 	}	
 	static OrbitalBody bodyInitialize(String name, float mass, double posX, double posY, double velX, double velY){
-		
 		OrbitalBody body = new OrbitalBody();
 		
 		body.setName(name);
@@ -94,8 +95,6 @@ public class LibGDXTools {
 			newTexture = new Texture("stars/giant/star_blue_giant01.png");
 		}
 		return newTexture;
-
-		
 	}
 	
 	static float spriteWidthCalculator(double mass){

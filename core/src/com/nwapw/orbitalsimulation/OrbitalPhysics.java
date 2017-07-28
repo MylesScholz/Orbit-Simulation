@@ -34,6 +34,7 @@ public class OrbitalPhysics {
 	static void iterateSimulation(float deltaTime) {
 
 		// 1. Calculate net force and acceleration from acting on each body.
+		
 
 		for (int i=0; i < listOfBodies.size(); i++){
 			
@@ -43,11 +44,15 @@ public class OrbitalPhysics {
 			for (int j = 0; j < listOfBodies.size() ; j++){
 				
 				if (j != i){
+					
 					OrbitalBody pullingBody = listOfBodies.get(j);
-									
+
 					if (perturbationCalculationMethod == 0){ // Cowell's Formulation
 						Vector3 calculatedAcc = cowellsFormulation(currentBody, pullingBody);
+						
+
 						sumOfAcc.add(calculatedAcc);
+						
 					}
 					/*
 					else if {
@@ -58,8 +63,10 @@ public class OrbitalPhysics {
 			}
 			
 			// 2. Iterate and integrate for velocity and then position.
+
 			currentBody.setAcceleration(sumOfAcc.getX(), sumOfAcc.getY(), sumOfAcc.getZ());			
 			currentBody.iterateVelThenPos(deltaTime);
+			
 		}	
 	}	
 	
@@ -68,21 +75,29 @@ public class OrbitalPhysics {
 
 		Vector3 currentPos = currentBody.posVect;
 		Vector3 pullingPos = pullingBody.posVect;
-		
+
 		Vector3 diffOfPosVect = new Vector3();
 		diffOfPosVect.add(pullingPos);	
 		currentPos.scale(-1);
 		diffOfPosVect.add(currentPos);
 		
+		//System.out.println(currentBody.name + " < " + pullingBody.name);
+		//System.out.println(diffOfPosVect.length());
+		
 		Vector3 calculatedAcc = new Vector3();	
 		calculatedAcc.add(diffOfPosVect);
 
 		calculatedAcc.scale(-1*gravConst * pullingBody.mass / Math.pow(diffOfPosVect.length(), 3));	
-		/*
-		if (currentBody.name == "Planet #1"){
-			System.out.println(calculatedAcc);
-		}
-		*/
+
+		Double testNum = (Double) calculatedAcc.x;
+		Boolean testBool = testNum.isNaN();
+				
+		if (testBool == true) {
+			calculatedAcc.set(0,0,0);;
+		}	
+		
+
+		
 		return calculatedAcc;
 	
 	}
@@ -90,17 +105,4 @@ public class OrbitalPhysics {
 		listOfBodies = list;
 	}
 	
-	
-	/*
-    public static boolean checkCollision(OrbitalBody body1, OrbitalBody body2) {
-		Vector3d diffOfPosVect = new Vector3d();
-		diffOfPosVect = body1.posVect;
-        diffOfPosVect.sub(body2.posVect);
-        if (diffOfPosVect.length() <= body1.radius + body2.radius) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    */
 }

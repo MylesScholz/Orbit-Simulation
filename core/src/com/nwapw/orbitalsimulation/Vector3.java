@@ -68,5 +68,9 @@ public class Vector3 {
 		vectorOne.subtract(vectorTwo);
 		return vectorOne.length();
 	}
+	String print() {
+		String print = x + " / " + y + " / " + z;
+		return print;
+	}
 	
 }

@@ -43,14 +43,9 @@ public class RunSimulation extends ApplicationAdapter {
 	OrbitalBody sun = new OrbitalBody();
 	
 	SpriteBatch batch;
-	Texture img1;
-	Texture img2;
-	
 	private OrthographicCamera cam;
 	
-	
 	Texture textures;
-	
 	static ArrayList<Texture> availablePlanetTextures = new ArrayList<Texture>();
 	
 	@Override
@@ -67,18 +62,12 @@ public class RunSimulation extends ApplicationAdapter {
 			textures = new Texture(planetFileName);
 			availablePlanetTextures.add(textures);
 		}	
-		
-		
-		LibGDXTools.bodyInitialize("Planet", 1, 100, 100, 200, 0, 20);
+
+		LibGDXTools.bodyInitialize("Pl1", 1, 100, 100, 200, 0, 20);
 		LibGDXTools.bodyInitialize("Sun", 100000, 0, 0, 0, 0, 100);
-		//LibGDXTools.bodyInitialize("Planet 2", 1, -100, -100, -200, 0);
-		
-		
-		
+		//LibGDXTools.bodyInitialize("Pl2", 10, -50, 0, 0, -200, 10);
+
 		batch = new SpriteBatch();
-		img1 = new Texture("planets/planet18.png");
-		img2 = new Texture("stars/mainsequence/star_orange01.png");
-		
 
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
@@ -100,31 +89,26 @@ public class RunSimulation extends ApplicationAdapter {
 		batch.begin();
 		
 		for (int i = 0; i < listOfBodies.size(); i++) {
-			
+
 			OrbitalBody renderBody = listOfBodies.get(i);
-			
+
 			float spriteX = (float) renderBody.posVect.getX()*2 + 200;
 			float spriteY = (float) renderBody.posVect.getY()*2 + 200;
-			
+					
 			float spriteWidth = renderBody.spriteWidth;
-			//System.out.println(renderBody.name + " " + spriteWidth);
+
 			Texture spriteTexture = renderBody.texture;
-			
 			batch.draw(spriteTexture, spriteX, spriteY, spriteWidth, spriteWidth);
 			
 		}
-				
 		//cam.update();
 		//batch.setProjectionMatrix(cam.combined);
-		
-		//batch.draw(img1, planetX, planetY, 10, 10);
-		//batch.draw(img2, sunX, sunY, 50, 50);
 		
 		batch.end();	
 
 		OrbitalPhysics.passList(listOfBodies);
 		
-		if (iterationCounter <= 10000){
+		if (iterationCounter <= numOfIterations){
 			timeCounter += deltaTime;
 			OrbitalPhysics.iterateSimulation(deltaTime);	
 			
@@ -149,7 +133,6 @@ public class RunSimulation extends ApplicationAdapter {
 	@Override
 	public void dispose () {
 		batch.dispose();
-		img1.dispose();
-		img2.dispose();
+
 	}
 }
