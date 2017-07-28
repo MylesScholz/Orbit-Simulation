@@ -29,11 +29,12 @@ public class LibGDXTools {
 		
 		return body;
 	}	
-	static OrbitalBody bodyInitialize(String name, float mass, double posX, double posY, double velX, double velY){
+	static OrbitalBody bodyInitialize(String name, float mass, float radius, double posX, double posY, double velX, double velY){
 		OrbitalBody body = new OrbitalBody();
 		
 		body.setName(name);
 		body.setMass(mass);
+		body.setRadius(radius);
 		
 		body.posVect.x = posX;
 		body.posVect.y = posY;
@@ -47,13 +48,14 @@ public class LibGDXTools {
 		return body;
 	}	
 	
-	static OrbitalBody bodyInitialize(String name, float mass, double posX, double posY, double velX, double velY, float spriteWidth){
+	static OrbitalBody bodyInitialize(String name, float mass, float radius, double posX, double posY, double velX, double velY, float spriteWidth){
 		
 		OrbitalBody body = new OrbitalBody();
 		
 		body.setName(name);
 		body.setMass(mass);
-		
+		body.setRadius(radius);
+
 		body.posVect.x = posX;
 		body.posVect.y = posY;
 		
@@ -84,12 +86,16 @@ public class LibGDXTools {
 			int randTexture = random.nextInt(listLength);
 			
 			newTexture = RunSimulation.availablePlanetTextures.get(randTexture);
-			RunSimulation.availablePlanetTextures.remove(randTexture);
+			//RunSimulation.availablePlanetTextures.remove(randTexture);
 			
 			//newTexture = new Texture("planets/planet18.png");
 		}
 		else if (mass < 150000){ // body is a "main sequence star"
-			newTexture = new Texture("stars/mainsequence/star_orange01.png");
+            int listLength = RunSimulation.availableStarTextures.size();
+            int randTexture = random.nextInt(listLength);
+
+            newTexture = RunSimulation.availableStarTextures.get(randTexture);
+            //RunSimulation.availablePlanetTextures.remove(randTexture);
 		}
 		else { // body is a "giant" star
 			newTexture = new Texture("stars/giant/star_blue_giant01.png");
