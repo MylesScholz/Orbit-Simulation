@@ -33,6 +33,8 @@ public class OrbitalPhysics {
 	
 	static void iterateSimulation(float deltaTime) {
 
+        checkAllCollisions();
+
 		// 1. Calculate net force and acceleration from acting on each body.
 		
 
@@ -91,11 +93,12 @@ public class OrbitalPhysics {
 
 		Double testNum = (Double) calculatedAcc.x;
 		Boolean testBool = testNum.isNaN();
-				
+		
+		/*
 		if (testBool == true) {
 			calculatedAcc.set(0,0,0);;
 		}	
-		
+		*/
 
 		
 		return calculatedAcc;
@@ -105,4 +108,29 @@ public class OrbitalPhysics {
 		listOfBodies = list;
 	}
 	
+    public static boolean checkCollision(OrbitalBody body1, OrbitalBody body2) {
+		Vector3 diffOfPosVect = new Vector3();
+        diffOfPosVect.add(body1.posVect);
+        diffOfPosVect.add(body2.posVect);
+        if (diffOfPosVect.length() <= body1.radius + body2.radius) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static void checkAllCollisions() {
+        for (int i = 0; i < listOfBodies.size(); i++) {
+            for (int j = 0; j < listOfBodies.size(); j++) {
+                if (i != j && checkCollision(listOfBodies.get(i), listOfBodies.get(j))) {
+                    if (listOfBodies.get(i).mass <= listOfBodies.get(j).mass) {
+                        listOfBodies.remove(i);
+                    } else {
+                        listOfBodies.remove(j);
+                    }
+                }
+            }
+
+        }
+    }
 }

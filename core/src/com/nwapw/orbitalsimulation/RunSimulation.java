@@ -34,10 +34,14 @@ public class RunSimulation extends ApplicationAdapter {
 	// To debug
 	double timeCounter = 0;
 	int iterationCounter = 0;
+	int dataDivision = 1000;
 	
 	// List of currently running bodies in the simulation
 	public static ArrayList<OrbitalBody> listOfBodies = new ArrayList<OrbitalBody>();
 	
+	//boolean newPlanet = false;
+	//int placedPositionX;
+	//int placedPositionY;
 	
 	OrbitalBody planet = new OrbitalBody();	
 	OrbitalBody sun = new OrbitalBody();
@@ -63,9 +67,13 @@ public class RunSimulation extends ApplicationAdapter {
 			availablePlanetTextures.add(textures);
 		}	
 
-		LibGDXTools.bodyInitialize("Pl1", 1, 100, 100, 200, 0, 20);
-		LibGDXTools.bodyInitialize("Sun", 100000, 0, 0, 0, 0, 100);
-		//LibGDXTools.bodyInitialize("Pl2", 10, -50, 0, 0, -200, 10);
+		
+		LibGDXTools.bodyInitialize("Pl1", 1, 100, 100, 50, 0, 10);
+		LibGDXTools.bodyInitialize("Pl2", 10, -50, 0, 0, -200, 10);
+
+		LibGDXTools.bodyInitialize("Sun", 10000, 0, 0, 0, 0, 50);
+		
+		
 
 		batch = new SpriteBatch();
 
@@ -113,14 +121,18 @@ public class RunSimulation extends ApplicationAdapter {
 			OrbitalPhysics.iterateSimulation(deltaTime);	
 			
 			// DEBUG
-			if (iterationCounter % numOfIterations/100 == 0){
-
+			if ((iterationCounter % dataDivision) == 0){
+						
+				//System.out.println(planet.posVect.getX());
 				/*
 				System.out.println(planet.name);
-				System.out.println("t: " + timeCounter);
-				System.out.println("p: " + planet.posVect.getX());
-				System.out.println("v: " + planet.velVect.getX());
-				System.out.println("a: " + planet.accVect.getX());
+				System.out.println(iterationCounter);
+				System.out.println("px: " + planet.posVect.getX());
+				System.out.println("py: " + planet.posVect.getY());
+				System.out.println("vx: " + planet.velVect.getX());
+				System.out.println("vy: " + planet.velVect.getY());
+				System.out.println("ax: " + planet.accVect.getX());
+				System.out.println("ay: " + planet.accVect.getY());
 				System.out.println("");
 				*/
 			}				

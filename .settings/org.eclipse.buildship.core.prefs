@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+connection.gradle.distribution=GRADLE_DISTRIBUTION(WRAPPER)
+connection.project.dir=
+eclipse.preferences.version=1
+=======
 connection.arguments=
 connection.gradle.distribution=GRADLE_DISTRIBUTION(WRAPPER)
 connection.java.home=null
@@ -6,3 +11,4 @@ connection.project.dir=
 derived.resources=.gradle,build
 eclipse.preferences.version=1
 project.path=\:
+>>>>>>> 4bc68aba807b606322ea52a29af5653dd24b0539
