@@ -105,12 +105,12 @@ public class RunSimulation extends ApplicationAdapter {
 		// Name, Mass, posx, posy, velx, vely, spritewidth
 		
 		
-		LibGDXTools.bodyInitialize("#1", 1, 5, 70, 70, 30, 0, 10);
-		LibGDXTools.bodyInitialize("#2", 1, 5, 90, 90, 50, 0, 10);
-		LibGDXTools.bodyInitialize("#3", 1, 5, 110, 110, 50, 0, 10);
-		LibGDXTools.bodyInitialize("#4", 1, 5, 130, 130, 60, 0, 10);
-		LibGDXTools.bodyInitialize("#5", 1, 5, 150, 150, 70, 0, 10);
-		LibGDXTools.bodyInitialize("Star", 10000, 25, 0, 0, 0, 0, 50);
+		LibGDXTools.bodyInitialize("#1", 1, 5, 70, 70, 30, -30, 10);
+		LibGDXTools.bodyInitialize("#2", 1, 5, 90, 90, 50, -50, 10);
+		LibGDXTools.bodyInitialize("#3", 1, 5, 110, 110, 50, -50, 10);
+		LibGDXTools.bodyInitialize("#4", 1, 5, 130, 130, 60, -60, 10);
+		LibGDXTools.bodyInitialize("#5", 1, 5, 150, 150, 70, -70, 10);
+		LibGDXTools.bodyInitialize("Star", 10000, 25, 0, 0, 0, 0, 40);
 
 		batch = new SpriteBatch();
 

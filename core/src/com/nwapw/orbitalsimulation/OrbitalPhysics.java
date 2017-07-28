@@ -136,17 +136,20 @@ public class OrbitalPhysics {
     }
 
     public static void checkAllCollisions() {
-        for (int i = 0; i < listOfBodies.size(); i++) {
+        
+    	for (int i = 0; i < listOfBodies.size(); i++) {
             for (int j = 0; j < listOfBodies.size(); j++) {
                 if (i != j && checkCollision(listOfBodies.get(i), listOfBodies.get(j))) {
                     if (listOfBodies.get(i).mass <= listOfBodies.get(j).mass) {
-                        listOfBodies.remove(i);
+                      //  listOfBodies.remove(i);
                     } else {
-                        listOfBodies.remove(j);
+                      //  listOfBodies.remove(j);
                     }
                 }
             }
 
         }
+        
+        
     }
 }
