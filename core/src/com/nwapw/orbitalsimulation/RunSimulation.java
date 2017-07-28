@@ -8,13 +8,14 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 
 public class RunSimulation extends ApplicationAdapter {
 		
-	// The force of gravity, affects how bodies accelerate
+	// Constant for the force of gravity, affects how much bodies accelerate
 	final static int gravConst = 100; 
 
 	// TODO Switches methods of calculating perturbations
@@ -55,9 +56,12 @@ public class RunSimulation extends ApplicationAdapter {
 	
 	static ArrayList<Texture> runningTextures = new ArrayList<Texture>();
 	
+	BitmapFont font;
+	
 	@Override
 	public void create () {
 		
+		font = new BitmapFont();
 		for (int i = 1; i < 8; i++){
 			String planetFileName = "planets/planet" + i + ".png";
 			textures = new Texture(planetFileName);
@@ -73,11 +77,11 @@ public class RunSimulation extends ApplicationAdapter {
 		// INITIALIZE IN ORDER OF MASS SMALLEST TO LARGEST
 		// Name, Mass, posx, posy, velx, vely, spritewidth
 		
-		LibGDXTools.bodyInitialize("Pl2", 10, 70, 70, 30, 0, 10);
-		LibGDXTools.bodyInitialize("Pl1", 10, 90, 90, 40, 0, 10);	
-		LibGDXTools.bodyInitialize("Pl1", 10, 110, 110, 50, 0, 10);	
-		LibGDXTools.bodyInitialize("Pl1", 10, 130, 130, 60, 0, 10);	
-		LibGDXTools.bodyInitialize("Pl1", 10, 150, 150, 70, 0, 10);	
+		LibGDXTools.bodyInitialize("Pl2", 1, 70, 70, 30, 0, 10);
+		LibGDXTools.bodyInitialize("Pl1", 1, 90, 90, 40, 0, 10);	
+		LibGDXTools.bodyInitialize("Pl1", 1, 110, 110, 50, 0, 10);	
+		LibGDXTools.bodyInitialize("Pl1", 1, 130, 130, 60, 0, 10);	
+		LibGDXTools.bodyInitialize("Pl1", 1, 150, 150, 70, 0, 10);	
 		LibGDXTools.bodyInitialize("Sun", 10000, 0, 0, 0, 0, 50);
 		
 
@@ -97,10 +101,19 @@ public class RunSimulation extends ApplicationAdapter {
 	@Override
 	public void render () {
 	
-		//Gdx.gl.glClearColor(0, 0, 0, 1);
-		//Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		Gdx.gl.glClearColor(0, 0, 0, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		batch.begin();
+		
+		font.draw(batch, "Orbital Simulation", 10, 20);
+		
+		String printNumOfBodies = "Number of bodies: " + String.valueOf(listOfBodies.size());
+		String printDeltaTime = "dt: " + String.valueOf(deltaTime);
+		String printIterationStep = "step: " + String.valueOf(iterationCounter);
+		font.draw(batch, printNumOfBodies, 150, 20);
+		font.draw(batch, printDeltaTime, 300, 20);
+		font.draw(batch, printIterationStep, 360, 20);
 		
 		for (int i = 0; i < listOfBodies.size(); i++) {
 
