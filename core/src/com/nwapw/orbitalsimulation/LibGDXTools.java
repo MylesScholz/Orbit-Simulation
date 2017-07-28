@@ -34,7 +34,10 @@ public class LibGDXTools {
 		
 		body.setName(name);
 		body.setMass(mass);
-		body.setRadius(radius);		
+
+		body.setRadius(radius);
+		
+
 		body.posVect.x = posX;
 		body.posVect.y = posY;
 		
@@ -54,6 +57,7 @@ public class LibGDXTools {
 		body.setName(name);
 		body.setMass(mass);
 		body.setRadius(radius);
+
 		body.posVect.x = posX;
 		body.posVect.y = posY;
 		
