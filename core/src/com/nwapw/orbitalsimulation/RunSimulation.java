@@ -40,14 +40,14 @@ public class RunSimulation extends ApplicationAdapter {
 	
 	// Cycle through focus
 	int n = 0;
-	// Prevents overpressing keys
-	int nDuration = 0;
 	
 	int placedPlanetCounter = 0;
 	int placedSunCounter = 0;
 	
 	// List of currently running bodies in the simulation
 	public static ArrayList<OrbitalBody> listOfBodies = new ArrayList<OrbitalBody>();
+	
+	boolean focusShift;
 	
 	// Booleans for mouse input edge detection
 	boolean newPlanet = false;
@@ -136,13 +136,13 @@ public class RunSimulation extends ApplicationAdapter {
 	
 	public void place () {		
 		
-		if (Gdx.input.isButtonPressed(0) && newPlanet == false) {
+		if (Gdx.input.isButtonPressed(0) && !newPlanet) {
 			clickLeftPositionX = Gdx.input.getX();
 			clickLeftPositionY = Gdx.input.getY();
 			newPlanet = true;
 		}
 		
-		else if (!Gdx.input.isButtonPressed(0) && newPlanet == true) {
+		else if (!Gdx.input.isButtonPressed(0) && newPlanet) {
 			
 			unclickLeftPositionX = Gdx.input.getX();
 			unclickLeftPositionY = Gdx.input.getY();
@@ -157,13 +157,13 @@ public class RunSimulation extends ApplicationAdapter {
 			newPlanet = false;
 		}
 		
-		if (Gdx.input.isButtonPressed(1) && newSun == false) {
+		if (Gdx.input.isButtonPressed(1) && !newSun) {
 			clickRightPositionX = Gdx.input.getX();
 			clickRightPositionY = Gdx.input.getY();
 			newSun = true;
 		}
 		
-		else if (!Gdx.input.isButtonPressed(1) && newSun == true) {
+		else if (!Gdx.input.isButtonPressed(1) && newSun) {
 			
 			unclickRightPositionX = Gdx.input.getX();
 			unclickRightPositionY = Gdx.input.getY();
@@ -188,41 +188,37 @@ public class RunSimulation extends ApplicationAdapter {
 		
 		int listLength = listOfBodies.size();
 
-		if(Gdx.input.isKeyPressed(Input.Keys.N)){
+		if(Gdx.input.isKeyPressed(Input.Keys.N) && !focusShift){
 			n++;
 			n = n % listLength;
-			nDuration++;
-			if (nDuration > 1 && n != 0){
-				n--;
-			}
-			
-			System.out.println("n: " + n);
+			focusShift = true;
 	    }
-		else {
-			nDuration = 0;
-		}
 		
-		if(Gdx.input.isKeyPressed(Input.Keys.S)){
+		else if(!Gdx.input.isKeyPressed(Input.Keys.N) && focusShift){
+			focusShift = false;
+	    }
+		
+		if(Gdx.input.isKeyPressed(Input.Keys.B)){
 			listOfBodies.get(n).posVect.set(100, 100, 100);
 			listOfBodies.get(n).velVect.set(0, 0, 0);
 	    }
 		
-        if(Gdx.input.isKeyPressed(Input.Keys.UP)){
+        if(Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)){
         	listOfBodies.get(n).velVect.y += 3;
         }
         
-        if(Gdx.input.isKeyPressed(Input.Keys.DOWN)){
+        if(Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)){
         	listOfBodies.get(n).velVect.y -= 3;
         }
         
-        if(Gdx.input.isKeyPressed(Input.Keys.LEFT)){
+        if(Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)){
         	listOfBodies.get(n).velVect.x -= 3;
         }
         
-        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
+        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)){
         	listOfBodies.get(n).velVect.x += 3;
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.NUM_0)){
+        if(Gdx.input.isKeyPressed(Input.Keys.M)){
         	listOfBodies.get(n).velVect.set(0,0,0);
         }
 		
@@ -231,8 +227,6 @@ public class RunSimulation extends ApplicationAdapter {
 		font.draw(batch, "Orbital Simulation", 10, 20);
 		
 		font.draw(batch, "(n) focus  (s) set pos/vel to [100, 100]  (arrow keys) vel  (0) vel = 0", 155, 40);
-
-		
 		
 		String printNumOfBodies = "Number of bodies: " + String.valueOf(listOfBodies.size());
 		String printDeltaTime = "dt: " + String.valueOf(deltaTime);
