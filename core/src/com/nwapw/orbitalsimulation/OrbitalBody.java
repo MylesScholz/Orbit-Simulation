@@ -101,14 +101,14 @@ public class OrbitalBody {
 		currentPos[0] = NumericalIntegration.integrateRect(currentPos[0], currentVel[0], deltaTime);
 		currentPos[1] = NumericalIntegration.integrateRect(currentPos[1], currentVel[1], deltaTime);
 		currentPos[2] = NumericalIntegration.integrateRect(currentPos[2], currentVel[2], deltaTime);		
-		
+		/*
 		// TODO quickfix bug, find reason why
 		if (RunSimulation.listOfBodies.size() % 2 == 0){		
 			currentPos[0] *= -1;
 			currentPos[1] *= -1;
 			currentPos[2] *= -1;
 		}
-		
+		*/
 		posVect.set(currentPos);
 		/*
 		if (this.name == "Planet #1") {
