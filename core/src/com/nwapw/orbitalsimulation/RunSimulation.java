@@ -48,6 +48,8 @@ public class RunSimulation extends ApplicationAdapter {
 	public static ArrayList<OrbitalBody> listOfBodies = new ArrayList<OrbitalBody>();
 	
 	boolean focusShift;
+	boolean pauseIteration;
+	boolean deleteBody;
 	
 	// Booleans for mouse input edge detection
 	boolean newPlanet = false;
@@ -79,6 +81,7 @@ public class RunSimulation extends ApplicationAdapter {
 	
 	BitmapFont font;
 	
+	boolean pauseState = false;
 	
 	@Override
 	public void create () {
@@ -113,14 +116,16 @@ public class RunSimulation extends ApplicationAdapter {
 		// INITIALIZE IN ORDER OF MASS SMALLEST TO LARGEST
 		// Name, Mass, posx, posy, velx, vely, spritewidth
 		
-		
+       /*
 		LibGDXTools.bodyInitialize("#1", 1, 5, 70, 70, 30, -30, 10);
 		LibGDXTools.bodyInitialize("#2", 1, 5, 90, 90, 50, -50, 10);
 		LibGDXTools.bodyInitialize("#3", 1, 5, 110, 110, 50, -50, 10);
 		LibGDXTools.bodyInitialize("#4", 1, 5, 130, 130, 60, -60, 10);
 		LibGDXTools.bodyInitialize("#5", 1, 5, 150, 150, 70, -70, 10);
-		LibGDXTools.bodyInitialize("Star", 10000, 25, 0, 0, 0, 0, 40);
-
+		*/
+		LibGDXTools.bodyInitialize("Star 1", 10000, 25, -200, 0, 0.001, 0.001, 40);
+		LibGDXTools.bodyInitialize("Star 2", 10000, 25, 200, 0, 0.001, 0.001, 40);
+		
 		batch = new SpriteBatch();
 
 		float w = Gdx.graphics.getWidth();
@@ -182,6 +187,8 @@ public class RunSimulation extends ApplicationAdapter {
 	@Override
 	public void render () {
 	
+		
+		
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -202,11 +209,34 @@ public class RunSimulation extends ApplicationAdapter {
 			listOfBodies.get(n).posVect.set(100, 100, 100);
 			listOfBodies.get(n).velVect.set(0, 0, 0);
 	    }
+
+		if(Gdx.input.isKeyPressed(Input.Keys.BACKSPACE) && !deleteBody){
+			listOfBodies.remove(n);
+			deleteBody = true;
+	    }
+		
+		else if(!Gdx.input.isKeyPressed(Input.Keys.BACKSPACE) && deleteBody){
+			deleteBody = false;
+	    }
+		
+		if(Gdx.input.isKeyPressed(Input.Keys.P) && !pauseIteration){
+			if (pauseState == false){
+				pauseState = true;
+			}
+			else {
+				pauseState = false;
+			}
+			pauseIteration = true;
+	    }
+		
+		else if(!Gdx.input.isKeyPressed(Input.Keys.P) && pauseIteration){
+			pauseIteration = false;
+	    }
 		
         if(Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)){
         	listOfBodies.get(n).velVect.y += 3;
         }
-        
+		
         if(Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)){
         	listOfBodies.get(n).velVect.y -= 3;
         }
@@ -222,20 +252,35 @@ public class RunSimulation extends ApplicationAdapter {
         	listOfBodies.get(n).velVect.set(0,0,0);
         }
 		
+        
+        if (listOfBodies.size() == 0){
+			LibGDXTools.bodyInitialize("Star", 10000, 25, 0.001, 0.001, 0.001, 0.001, 40);
+		}
+        
+        
 		batch.begin();
 		
 		font.draw(batch, "Orbital Simulation", 10, 20);
 		
-		font.draw(batch, "(n) focus  (s) set pos/vel to [100, 100]  (arrow keys) vel  (0) vel = 0", 155, 40);
+		font.draw(batch, "(p) pause (n) focus  (backspace) delete (b) pos/vel = 0 (arrow keys/wasd) vel  (m) vel = 0", 155, 40);
+		
+		String printPosVelAcc = "Most Pull: " + listOfBodies.get(n).mostPullingBodyName + 
+				"      Pos: " + listOfBodies.get(n).posVect.print() + 
+				"  Vel: " + listOfBodies.get(n).velVect.print() + 
+				"  Acc: " + listOfBodies.get(n).accVect.print();
+		font.draw(batch, printPosVelAcc, 155, 60);
 		
 		String printNumOfBodies = "Number of bodies: " + String.valueOf(listOfBodies.size());
 		String printDeltaTime = "dt: " + String.valueOf(deltaTime);
 		String printIterationStep = "step: " + String.valueOf(iterationCounter);
 		String printFocusPlanet = "focus: " + listOfBodies.get(n).name;
+		
 		font.draw(batch, printNumOfBodies, 155, 20);
 		font.draw(batch, printDeltaTime, 300, 20);
 		font.draw(batch, printIterationStep, 360, 20);
 		font.draw(batch, printFocusPlanet, 440, 20);
+		
+		
 		for (int i = 0; i < listOfBodies.size(); i++) {
 
 			OrbitalBody renderBody = listOfBodies.get(i);
@@ -249,6 +294,7 @@ public class RunSimulation extends ApplicationAdapter {
 
 			Texture spriteTexture = renderBody.texture;
 			batch.draw(spriteTexture, spriteX, spriteY, spriteWidth, spriteWidth);
+
 			
 		}
 		//cam.update();
@@ -257,30 +303,21 @@ public class RunSimulation extends ApplicationAdapter {
 		batch.end();	
 
 		OrbitalPhysics.passList(listOfBodies);
+		System.out.println(pauseState);
+		if (pauseState == false){
+			if (iterationCounter <= numOfIterations){
+				timeCounter += deltaTime;
+				OrbitalPhysics.iterateSimulation(deltaTime);	
+				place();
+				// DEBUG
+				if ((iterationCounter % dataDivision) == 0){
+							
+	
+				}				
+			}	
+			iterationCounter += 1;
+		}
 		
-		if (iterationCounter <= numOfIterations){
-			timeCounter += deltaTime;
-			OrbitalPhysics.iterateSimulation(deltaTime);	
-			place();
-			// DEBUG
-			if ((iterationCounter % dataDivision) == 0){
-						
-				//System.out.println(planet.posVect.getX());
-				/*
-				System.out.println(planet.name);
-				System.out.println(iterationCounter);
-				System.out.println("px: " + planet.posVect.getX());
-				System.out.println("py: " + planet.posVect.getY());
-				System.out.println("vx: " + planet.velVect.getX());
-				System.out.println("vy: " + planet.velVect.getY());
-				System.out.println("ax: " + planet.accVect.getX());
-				System.out.println("ay: " + planet.accVect.getY());
-				System.out.println("");
-				*/
-			}				
-		}	
-		
-		iterationCounter += 1;
 		
 	}
 

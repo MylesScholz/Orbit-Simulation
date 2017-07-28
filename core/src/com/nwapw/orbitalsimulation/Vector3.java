@@ -3,7 +3,7 @@ package com.nwapw.orbitalsimulation;
 public class Vector3 {
 	double x;
 	double y;
-	double z;
+	double z = 0;
 	
 	double getX() {
 		return x;
@@ -26,18 +26,18 @@ public class Vector3 {
 	void add(Vector3 otherVector) {
 		this.x += otherVector.x;
 		this.y += otherVector.y;
-		this.z += otherVector.z;
+		//this.z += otherVector.z;
 	}
 	void subtract(Vector3 otherVector){
 		this.x -= otherVector.x;
 		this.y -= otherVector.y;
-		this.z -= otherVector.z;
+		//this.z -= otherVector.z;
 	}
 	
 	void scale(double scalar){
 		this.x *= scalar;
 		this.y *= scalar;
-		this.z *= scalar;
+		//this.z *= scalar;
 	}
 	
 	double[] get() {
@@ -49,19 +49,19 @@ public class Vector3 {
 	void set(Vector3 newValues) {
 		this.x = newValues.x;
 		this.y = newValues.y;
-		this.z = newValues.z;
+		//this.z = newValues.z;
 	}
 	
 	void set(double[] newValues) {
 		this.x = newValues[0];
 		this.y = newValues[1];
-		this.z = newValues[2];
+		//this.z = newValues[2];
 	}
 	
 	void set(double x, double y, double z){
 		this.x = x;
 		this.y = y;
-		this.z = z;
+		//this.z = z;
 	}
 	
 	static double distBetween(Vector3 vectorOne, Vector3 vectorTwo){
@@ -69,7 +69,8 @@ public class Vector3 {
 		return vectorOne.length();
 	}
 	String print() {
-		String print = x + " / " + y + " / " + z;
+		String print = (int) x + " / " + (int) y + " / " + (int) z;
+		//String print = z + " ";
 		return print;
 	}
 	
