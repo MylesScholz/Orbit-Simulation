@@ -35,6 +35,7 @@ public class LibGDXTools {
 		body.setName(name);
 		body.setMass(mass);
 		body.setRadius(radius);
+
 		body.posVect.x = posX;
 		body.posVect.y = posY;
 		
@@ -54,7 +55,7 @@ public class LibGDXTools {
 		body.setName(name);
 		body.setMass(mass);
 		body.setRadius(radius);
-		
+
 		body.posVect.x = posX;
 		body.posVect.y = posY;
 		
@@ -90,7 +91,11 @@ public class LibGDXTools {
 			//newTexture = new Texture("planets/planet18.png");
 		}
 		else if (mass < 150000){ // body is a "main sequence star"
-			newTexture = new Texture("stars/mainsequence/star_orange01.png");
+            int listLength = RunSimulation.availableStarTextures.size();
+            int randTexture = random.nextInt(listLength);
+
+            newTexture = RunSimulation.availableStarTextures.get(randTexture);
+            //RunSimulation.availablePlanetTextures.remove(randTexture);
 		}
 		else { // body is a "giant" star
 			newTexture = new Texture("stars/giant/star_blue_giant01.png");
