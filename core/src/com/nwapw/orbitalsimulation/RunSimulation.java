@@ -43,6 +43,8 @@ public class RunSimulation extends ApplicationAdapter {
 	// Prevents overpressing keys
 	int nDuration = 0;
 	
+	int placedPlanetCounter = 0;
+	
 	// List of currently running bodies in the simulation
 	public static ArrayList<OrbitalBody> listOfBodies = new ArrayList<OrbitalBody>();
 	
@@ -118,7 +120,9 @@ public class RunSimulation extends ApplicationAdapter {
 			System.out.println("Unclick");
 			unclickPositionX = Gdx.input.getX();
 			unclickPositionY = Gdx.input.getY();
-			LibGDXTools.bodyInitialize("Placed Planet", 1, clickPositionX - 300, (clickPositionY - 250) * -1, unclickPositionX - clickPositionX, (unclickPositionY - clickPositionY) * -1, 10);
+			String planetName = "New Planet " + placedPlanetCounter;	
+			placedPlanetCounter++;
+			LibGDXTools.bodyInitialize(planetName, 1, 5, clickPositionX - 300, (clickPositionY - 250) * -1, unclickPositionX - clickPositionX, (unclickPositionY - clickPositionY) * -1);
 			//OrbitalBody.evenBodyBug();
 			newPlanet = false;
 		}

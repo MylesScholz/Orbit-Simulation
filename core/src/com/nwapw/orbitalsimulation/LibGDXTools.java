@@ -85,7 +85,7 @@ public class LibGDXTools {
 			int randTexture = random.nextInt(listLength);
 			
 			newTexture = RunSimulation.availablePlanetTextures.get(randTexture);
-			RunSimulation.availablePlanetTextures.remove(randTexture);
+			//RunSimulation.availablePlanetTextures.remove(randTexture);
 			
 			//newTexture = new Texture("planets/planet18.png");
 		}
