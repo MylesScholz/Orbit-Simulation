@@ -116,15 +116,14 @@ public class RunSimulation extends ApplicationAdapter {
 		// INITIALIZE IN ORDER OF MASS SMALLEST TO LARGEST
 		// Name, Mass, posx, posy, velx, vely, spritewidth
 		
-       /*
 		LibGDXTools.bodyInitialize("#1", 1, 5, 70, 70, 30, -30, 10);
 		LibGDXTools.bodyInitialize("#2", 1, 5, 90, 90, 50, -50, 10);
 		LibGDXTools.bodyInitialize("#3", 1, 5, 110, 110, 50, -50, 10);
 		LibGDXTools.bodyInitialize("#4", 1, 5, 130, 130, 60, -60, 10);
 		LibGDXTools.bodyInitialize("#5", 1, 5, 150, 150, 70, -70, 10);
-		*/
-		LibGDXTools.bodyInitialize("Star 1", 10000, 25, -200, 0, 0.001, 0.001, 40);
-		LibGDXTools.bodyInitialize("Star 2", 10000, 25, 200, 0, 0.001, 0.001, 40);
+		
+		LibGDXTools.bodyInitialize("Star 1", 10000, 25, 0, 0, 0, 0, 50);
+		//LibGDXTools.bodyInitialize("Star 2", 10000, 25, 200, 0, 0.001, 0.001, 40);
 		
 		batch = new SpriteBatch();
 
@@ -197,7 +196,9 @@ public class RunSimulation extends ApplicationAdapter {
 
 		if(Gdx.input.isKeyPressed(Input.Keys.N) && !focusShift){
 			n++;
-			n = n % listLength;
+			if (n % listLength == 0) {
+				n -= n;
+			}
 			focusShift = true;
 	    }
 		
@@ -206,11 +207,17 @@ public class RunSimulation extends ApplicationAdapter {
 	    }
 		
 		if(Gdx.input.isKeyPressed(Input.Keys.B)){
+			if (n % listLength == 0) {
+				n -= n;
+			}
 			listOfBodies.get(n).posVect.set(100, 100, 100);
 			listOfBodies.get(n).velVect.set(0, 0, 0);
 	    }
 
 		if(Gdx.input.isKeyPressed(Input.Keys.BACKSPACE) && !deleteBody){
+			if (n % listLength == 0) {
+				n -= n;
+			}
 			listOfBodies.remove(n);
 			deleteBody = true;
 	    }
@@ -234,21 +241,36 @@ public class RunSimulation extends ApplicationAdapter {
 	    }
 		
         if(Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)){
+        	if (n % listLength == 0) {
+				n -= n;
+			}
         	listOfBodies.get(n).velVect.y += 3;
         }
 		
         if(Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)){
+        	if (n % listLength == 0) {
+				n -= n;
+			}
         	listOfBodies.get(n).velVect.y -= 3;
         }
         
         if(Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)){
+        	if (n % listLength == 0) {
+				n -= n;
+			}
         	listOfBodies.get(n).velVect.x -= 3;
         }
         
         if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)){
+        	if (n % listLength == 0) {
+				n -= n;
+			}
         	listOfBodies.get(n).velVect.x += 3;
         }
         if(Gdx.input.isKeyPressed(Input.Keys.M)){
+        	if (n % listLength == 0) {
+				n -= n;
+			}
         	listOfBodies.get(n).velVect.set(0,0,0);
         }
 		
@@ -264,8 +286,11 @@ public class RunSimulation extends ApplicationAdapter {
 		
 		font.draw(batch, "(p) pause (n) focus  (backspace) delete (b) pos/vel = 0 (arrow keys/wasd) vel  (m) vel = 0", 155, 40);
 		
+		if (n % listLength == 0) {
+			n -= n;
+		}
 		String printPosVelAcc = "Most Pull: " + listOfBodies.get(n).mostPullingBodyName + 
-				"      Pos: " + listOfBodies.get(n).posVect.print() + 
+				"  Pos: " + listOfBodies.get(n).posVect.print() + 
 				"  Vel: " + listOfBodies.get(n).velVect.print() + 
 				"  Acc: " + listOfBodies.get(n).accVect.print();
 		font.draw(batch, printPosVelAcc, 155, 60);
@@ -303,7 +328,7 @@ public class RunSimulation extends ApplicationAdapter {
 		batch.end();	
 
 		OrbitalPhysics.passList(listOfBodies);
-		System.out.println(pauseState);
+		//System.out.println(pauseState);
 		if (pauseState == false){
 			if (iterationCounter <= numOfIterations){
 				timeCounter += deltaTime;
