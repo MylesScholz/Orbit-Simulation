@@ -88,10 +88,11 @@ public class OrbitalPhysics {
 	}	
 	
 	static Vector3 cowellsFormulation(OrbitalBody currentBody, OrbitalBody pullingBody) {
-		
+				
 		Vector3 currentPos = currentBody.posVect;
 		Vector3 pullingPos = pullingBody.posVect;
-
+		
+		/*
 		Vector3 diffOfPosVect = new Vector3();
 		diffOfPosVect.add(pullingPos);	
 		
@@ -100,12 +101,35 @@ public class OrbitalPhysics {
 		}
 		
 		diffOfPosVect.add(currentPos);
+		*/
+		
 		
 		Vector3 calculatedAcc = new Vector3(0,0,0);	
+		
+		/*
 		calculatedAcc.add(diffOfPosVect);
 		
-		calculatedAcc.scl((float) (-1*gravConst * pullingBody.mass / Math.pow(diffOfPosVect.len(), 3)));	
-	
+		calculatedAcc.scl((float) (-1*gravConst * pullingBody.mass / Math.pow(currentPos.dst(pullingPos), 3)));	
+		*/
+		
+		float px1 = currentPos.x;
+		float py1 = currentPos.y;
+		float px2 = pullingPos.x;
+		float py2 = pullingPos.y;
+		
+		float dx = pullingPos.x - currentPos.x;
+		float dy = pullingPos.y - currentPos.y;
+		
+		float d = (float) Math.sqrt(dx*dx + dy*dy);
+		
+		float f = gravConst * currentBody.mass * pullingBody.mass / (d*d);
+		
+		float theta = (float) Math.atan2(dy, dx);
+		float fx = (float) Math.cos(theta) * f;
+		float fy = (float) Math.sin(theta) * f;
+		
+		calculatedAcc.x = fx;
+		calculatedAcc.y = fy;
 		
 		return calculatedAcc;
 	

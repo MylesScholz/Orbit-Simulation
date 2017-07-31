@@ -20,7 +20,7 @@ import com.badlogic.gdx.math.Vector3;
 public class RunSimulation extends ApplicationAdapter implements InputProcessor {
 		
 	// Constant for the force of gravity, affects how much bodies accelerate
-	final static int gravConst = 1000; 
+	final static int gravConst = 100; 
 
 	// TODO Switches methods of calculating perturbations
 	final static int perturbationCalculationMethod = 0; // 0 = Cowell's Method
@@ -73,7 +73,8 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 	
 	SpriteBatch batch;
 	private OrthographicCamera cam;
-	
+	float camX = 0;
+	float camY = 0;
 	
 	Texture textures;
 	static ArrayList<Texture> availablePlanetTextures = new ArrayList<Texture>();
@@ -126,20 +127,24 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 		// Name, Mass, posx, posy, velx, vely, spritewidth
 		
        
-		//LibGDXTools.bodyInitialize("#1", 1, 5, 70, 70, 30, -30, 10);
+		//LibGDXTools.bodyInitialize("#1", 1, 5, 70, 70, 50, -50, 10);
 		//LibGDXTools.bodyInitialize("#2", 1, 5, 90, 90, 50, -50, 10);
-		LibGDXTools.bodyInitialize("#3", 1, 5, 110, 110, 0, 0, 10);
-		//LibGDXTools.bodyInitialize("#4", 1, 5, 130, 130, 60, -60, 10);
-		//LibGDXTools.bodyInitialize("#5", 1, 5, 150, 150, 70, -70, 10);
+       // LibGDXTools.bodyInitialize("#3", 1, 5, 110, 110, 60, -60, 10);
 		
-		LibGDXTools.bodyInitialize("Star 1", 10000, 25, 0, 0, 0, 0, 40);
-		//LibGDXTools.bodyInitialize("Star 2", 10000, 25, 200, 100, 0, 0, 40);
+       // LibGDXTools.bodyInitialize("#4", 1, 5, 130, 130, 60, -60, 10);
+		LibGDXTools.bodyInitialize("#5", 1, 5, 150, 150, 100, 0, 10);
+		
+		//LibGDXTools.bodyInitialize("Star 1", 10000, 25, -200, 0, 0, 0, 40);
+		LibGDXTools.bodyInitialize("Star 2", 10000, 25, 200, 0, 0, 0, 40);
 		
 		batch = new SpriteBatch();
 
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
 
+		System.out.println(w);
+		System.out.println(h);
+		
 		// Constructs a new OrthographicCamera, using the given viewport width and height
 		// Height is multiplied by aspect ratio.
 		
@@ -147,6 +152,9 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 
 		cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
 
+		
+		camX = 0;
+		camY = 0;
 		
 	}
 	
@@ -181,7 +189,6 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 	    }
 
 		if(Gdx.input.isKeyPressed(Input.Keys.D)){				
-			System.out.println("clickDuration");
 			if (clickDuration < 1){
 
 				listOfBodies.remove(n);
@@ -255,14 +262,34 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 			
 		}
 		
-		float camX = (float) listOfBodies.get(n).posVect.x;
-		float camY = (float) listOfBodies.get(n).posVect.y;
+		float focusX = (float) listOfBodies.get(n).posVect.x - (listOfBodies.get(n).spriteWidth / 2);
+		float focusY = (float) listOfBodies.get(n).posVect.y - (listOfBodies.get(n).spriteWidth  / 2);		
+		float moveX = (camX - focusX) * 1/3;
+		float moveY = (camY - focusY) * 1/3;
+		camX -= moveX;
+		camY -= moveY;
+		
+		
+		System.out.println("moveX " + moveX);
+		System.out.println("moveY " + moveY);
+		System.out.println("");
+		
+		//camX = 0;
+		//camY = 0;
+		
+		//cam.position.set(camX, camY, 0);
 		cam.position.set(camX, camY, 0);
+		
+		
+		
+		
+		//System.out.println("Width " + cam.viewportWidth);
+		//System.out.println("Height " + cam.viewportHeight);
 		cam.update();
 		batch.setProjectionMatrix(cam.combined);
 		
-		float frameX = camX - 450;
-		float frameY = camY;
+		float frameX = camX - 470;
+		float frameY = camY - 250;
 		
 		font.draw(batch, "Orbital Simulation", frameX + 15, frameY + 20);
 		
@@ -321,12 +348,7 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 	
 		}
 		
-		font.draw(batch, printPosVelAcc, frameX + 15, frameY + 60);
-	
-		
-		
-		
-		
+		font.draw(batch, printPosVelAcc, frameX + 15, frameY + 60);	
 		
 		String printNumOfBodies = "Number of bodies: " + String.valueOf(listOfBodies.size());
 		String printDeltaTime = "dt: " + String.valueOf(deltaTime);
