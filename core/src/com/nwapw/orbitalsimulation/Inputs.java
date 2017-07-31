@@ -57,7 +57,7 @@ public class Inputs implements InputProcessor {
 		}
 		
 		if (RunSimulation.zF < 0){
-			RunSimulation.zF = 0.05f;
+			RunSimulation.zF = 0f;
 		}
 		
 		return false;

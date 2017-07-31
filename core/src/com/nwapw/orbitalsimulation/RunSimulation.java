@@ -332,17 +332,17 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 			font.draw(batch, renderBody.name, spriteX + 10, spriteY);
 
 			Texture spriteTexture = renderBody.texture;
-			batch.draw(spriteTexture, spriteX, spriteY, spriteWidth * zF, spriteWidth * zF);
+			batch.draw(spriteTexture, spriteX, spriteY, (float) (spriteWidth * zF), (float) (spriteWidth * zF));
 
 			
 		}
 
 
-		float focusX = (float) listOfBodies.get(n).posVect.x - (listOfBodies.get(n).spriteWidth / 2);
-		float focusY = (float) listOfBodies.get(n).posVect.y - (listOfBodies.get(n).spriteWidth  / 2);	
+		float focusX = (float) listOfBodies.get(n).posVect.x * zF - (listOfBodies.get(n).spriteWidth / 2);
+		float focusY = (float) listOfBodies.get(n).posVect.y * zF - (listOfBodies.get(n).spriteWidth  / 2);	
 		
-		float moveX = (camX - focusX) * 1/3;
-		float moveY = (camY - focusY) * 1/3;
+		float moveX = (camX - focusX) * 2/3;
+		float moveY = (camY - focusY) * 2/3;
 		
 		camX -= moveX;
 		camY -= moveY;
