@@ -9,6 +9,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -72,9 +73,14 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 	OrbitalBody sun = new OrbitalBody();
 	
 	SpriteBatch batch;
+	Texture backgroundTexture;
+	
 	private OrthographicCamera cam;
 	float camX = 0;
 	float camY = 0;
+	float sourceX = 0;
+	float sourceY = 0;
+	
 	
 	Texture textures;
 	static ArrayList<Texture> availablePlanetTextures = new ArrayList<Texture>();
@@ -127,18 +133,25 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 		// Name, Mass, posx, posy, velx, vely, spritewidth
 		
 
-
+        LibGDXTools.bodyInitialize("Sun", 10000, 25, 0, 0,0, 0, 50);
 		
-		LibGDXTools.bodyInitialize("Star 1", 10000, 25, 100, 100, 30, -30, 50);
-		LibGDXTools.bodyInitialize("Star 2", 10000, 25, -100, -100, -30, -30, 50);
+		//LibGDXTools.bodyInitialize("Star 1", 10000, 25, 100, 100, 30, -30, 50);
+		//LibGDXTools.bodyInitialize("Star 2", 10000, 25, -100, -100, -30, 30, 50);
 		
 		batch = new SpriteBatch();
 
+		int i = 1 + (int)(Math.random() * 8); 
+        String backgroundFileName = "background/" + i + ".jpg";
+        backgroundTexture = new Texture(backgroundFileName);
+        
+		
+		//backgroundTexture = new Texture("background/3.jpg");
+		
+        backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+		//backgroundTexture.setTextureWrap(TextureWrap.GL_REPEAT);
+		
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
-
-		System.out.println(w);
-		System.out.println(h);
 		
 		// Constructs a new OrthographicCamera, using the given viewport width and height
 		// Height is multiplied by aspect ratio.
@@ -156,15 +169,15 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 	public void place() {		
 		
 		if (Gdx.input.isButtonPressed(0) && !newPlanet) {
-			clickLeftPositionX = Gdx.input.getX();
-			clickLeftPositionY = Gdx.input.getY();
+			clickLeftPositionX = (int) (Gdx.input.getX() - cam.viewportWidth/2f + camX);
+			clickLeftPositionY = (int) (Gdx.input.getY() - cam.viewportHeight/2f + camY);
 			newPlanet = true;
 		}
 		
 		else if (!Gdx.input.isButtonPressed(0) && newPlanet) {
 			
-			unclickLeftPositionX = Gdx.input.getX();
-			unclickLeftPositionY = Gdx.input.getY();
+			unclickLeftPositionX = (int) (Gdx.input.getX() - cam.viewportWidth/2f + camX);
+			unclickLeftPositionY = (int) (Gdx.input.getY() - cam.viewportHeight/2f + camY);
 			
 			int randomMass = 1 + (int)(Math.random() * 4);
 			int randomRadius = randomMass * 5;
@@ -172,7 +185,7 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 			String planetName = "New Planet " + placedPlanetCounter;	
 			placedPlanetCounter++;
 			
-			LibGDXTools.bodyInitialize(planetName, randomMass, randomRadius, clickLeftPositionX - 300, -(clickLeftPositionY - 250), unclickLeftPositionX - clickLeftPositionX, -(unclickLeftPositionY - clickLeftPositionY), randomRadius * 2);
+			LibGDXTools.bodyInitialize(planetName, randomMass, randomRadius, clickLeftPositionX , -(clickLeftPositionY), unclickLeftPositionX - clickLeftPositionX, -(unclickLeftPositionY - clickLeftPositionY), randomRadius * 2);
 			newPlanet = false;
 		}
 		
@@ -193,7 +206,7 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 			String sunName = "New Sun " + placedSunCounter;	
 			placedSunCounter++;
 			
-			LibGDXTools.bodyInitialize(sunName, randomMass, randomRadius, clickRightPositionX - 300, -(clickRightPositionY - 250), unclickRightPositionX - clickRightPositionX, -(unclickRightPositionY - clickRightPositionY), randomRadius * 2);
+			LibGDXTools.bodyInitialize(sunName, randomMass, randomRadius, clickRightPositionX - cam.viewportWidth/4f, -(clickRightPositionY - cam.viewportHeight/4f), unclickRightPositionX - clickRightPositionX, -(unclickRightPositionY - clickRightPositionY), randomRadius * 2);
 			newSun = false;
 		}
 	}
@@ -289,13 +302,16 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
         }
 
         
+        
+        
         if (listOfBodies.size() == 0){
         	LibGDXTools.bodyInitialize("Star", 10000, 25, 0.001f, 0.001f, 0.001f, 0.001f, 40);
 		}
         
         
 		batch.begin();
-	
+		batch.draw(backgroundTexture, -cam.viewportWidth/2 + camX, -cam.viewportHeight/2 + camY, (int) camX, (int) -camY, (int) cam.viewportWidth, (int) cam.viewportHeight);
+		
 		
 		for (int i = 0; i < listOfBodies.size(); i++) {
 
@@ -320,14 +336,15 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 		float moveY = (camY - focusY) * 1/3;
 		camX -= moveX;
 		camY -= moveY;
+		sourceX -= moveX;
+		sourceY -= moveY;
 		
+		//System.out.println("moveX " + moveX);
+		//System.out.println("moveY " + moveY);
+		//System.out.println("");
 		
-		System.out.println("moveX " + moveX);
-		System.out.println("moveY " + moveY);
-		System.out.println("");
-		
-		camX = 0;
-		camY = 0;
+		//camX = 0;
+		//camY = 0;
 		
 		//cam.position.set(camX, camY, 0);
 		cam.position.set(camX, camY, 0);
@@ -493,6 +510,7 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 
 	@Override
 	public boolean scrolled(int amount) {
+		System.out.println("scrolled");
 		return false;
 	}
 }
