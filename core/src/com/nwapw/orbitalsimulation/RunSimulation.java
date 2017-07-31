@@ -37,6 +37,9 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 	// The max number of iterations that the simulation runs
 	final static int numOfIterations = 100000000;
 	
+	// 0 = Focus on a particular body, 1 = free movement
+	static int cameraMode = 0;
+	
 	// To debug
 	double timeCounter = 0;
 	int iterationCounter = 0;
@@ -58,6 +61,7 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 	// Booleans for mouse input edge detection
 	boolean newPlanet = false;
 	boolean newSun = false;
+	
 	// Mouse position variables for new bodies
 	int clickLeftPositionX;
 	int clickLeftPositionY;
@@ -75,12 +79,13 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 	SpriteBatch batch;
 	Texture backgroundTexture;
 	
-	private OrthographicCamera cam;
+	static OrthographicCamera cam;
 	float camX = 0;
 	float camY = 0;
 	float sourceX = 0;
 	float sourceY = 0;
-	
+	// zoom factor
+	static float zF = 1;
 	
 	Texture textures;
 	static ArrayList<Texture> availablePlanetTextures = new ArrayList<Texture>();
@@ -133,11 +138,11 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 		// Name, Mass, posx, posy, velx, vely, spritewidth
 		
 
-        LibGDXTools.bodyInitialize("Sun", 10000, 25, 0, 0,0, 0, 50);
+        LibGDXTools.bodyInitialize("Sun", 10000, 25, 0, 0, 0, 0, 50);
 		
 
-		LibGDXTools.bodyInitialize("Star 1", 10000, 25, 100, 100, 0, 0, 50);
-		LibGDXTools.bodyInitialize("Star 2", 10000, 25, -100, -100, 0, 0, 50);
+		//LibGDXTools.bodyInitialize("Star 1", 10000, 25, 100, 100, 0, 0, 50);
+		//LibGDXTools.bodyInitialize("Star 2", 10000, 25, -100, -100, 0, 0, 50);
 
 		
 		batch = new SpriteBatch();
@@ -163,8 +168,11 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 		cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
 
 		
-		camX = 0;
+		camX = 0;		
 		camY = 0;
+		
+		InputProcessor inputProcessor = new Inputs();
+		Gdx.input.setInputProcessor(inputProcessor);
 		
 	}
 	
@@ -318,24 +326,24 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 
             float spriteWidth = renderBody.spriteWidth;
 
-			float spriteX = (float) renderBody.posVect.x - (spriteWidth / 2);
-			float spriteY = (float) renderBody.posVect.y - (spriteWidth / 2);
+			float spriteX = (float) renderBody.posVect.x * zF - (spriteWidth / 2);
+			float spriteY = (float) renderBody.posVect.y * zF - (spriteWidth / 2);
 			
 			font.draw(batch, renderBody.name, spriteX + 10, spriteY);
 
 			Texture spriteTexture = renderBody.texture;
-			batch.draw(spriteTexture, spriteX, spriteY, spriteWidth, spriteWidth);
+			batch.draw(spriteTexture, spriteX, spriteY, spriteWidth * zF, spriteWidth * zF);
 
 			
 		}
 
-		System.out.println(camX);
-		System.out.println(camY);
-		System.out.println("");
+
 		float focusX = (float) listOfBodies.get(n).posVect.x - (listOfBodies.get(n).spriteWidth / 2);
-		float focusY = (float) listOfBodies.get(n).posVect.y - (listOfBodies.get(n).spriteWidth  / 2);		
+		float focusY = (float) listOfBodies.get(n).posVect.y - (listOfBodies.get(n).spriteWidth  / 2);	
+		
 		float moveX = (camX - focusX) * 1/3;
 		float moveY = (camY - focusY) * 1/3;
+		
 		camX -= moveX;
 		camY -= moveY;
 		sourceX -= moveX;
