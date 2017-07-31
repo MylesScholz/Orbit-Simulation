@@ -127,14 +127,10 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 		// Name, Mass, posx, posy, velx, vely, spritewidth
 		
 
-		LibGDXTools.bodyInitialize("#1", 1, 5, 70, 70, 30, -30, 10);
-		LibGDXTools.bodyInitialize("#2", 1, 5, 90, 90, 50, -50, 10);
-		LibGDXTools.bodyInitialize("#3", 1, 5, 110, 110, 50, -50, 10);
-		LibGDXTools.bodyInitialize("#4", 1, 5, 130, 130, 60, -60, 10);
-		LibGDXTools.bodyInitialize("#5", 1, 5, 150, 150, 70, -70, 10);
+
 		
-		LibGDXTools.bodyInitialize("Star 1", 10000, 25, 0, 0, 0, 0, 50);
-		//LibGDXTools.bodyInitialize("Star 2", 10000, 25, 200, 0, 0.001, 0.001, 40);
+		LibGDXTools.bodyInitialize("Star 1", 10000, 25, 100, 100, 30, -30, 50);
+		LibGDXTools.bodyInitialize("Star 2", 10000, 25, -100, -100, -30, -30, 50);
 		
 		batch = new SpriteBatch();
 
@@ -291,7 +287,7 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 			}
         	listOfBodies.get(n).velVect.set(0,0,0);
         }
-		
+
         
         if (listOfBodies.size() == 0){
         	LibGDXTools.bodyInitialize("Star", 10000, 25, 0.001f, 0.001f, 0.001f, 0.001f, 40);
@@ -330,8 +326,8 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 		System.out.println("moveY " + moveY);
 		System.out.println("");
 		
-		//camX = 0;
-		//camY = 0;
+		camX = 0;
+		camY = 0;
 		
 		//cam.position.set(camX, camY, 0);
 		cam.position.set(camX, camY, 0);
