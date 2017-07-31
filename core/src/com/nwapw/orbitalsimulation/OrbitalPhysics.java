@@ -94,14 +94,17 @@ public class OrbitalPhysics {
 		
 		
 		Vector3 diffOfPosVect = new Vector3();
-		diffOfPosVect.add(pullingPos);	
-		
+		diffOfPosVect.add(pullingPos);
 		diffOfPosVect.scl(-1);
+
+		/*
+>>>>>>> 9a9fefd90d52d49a5e2e816078174ce108eff0fb
 		if (!(RunSimulation.listOfBodies.size() % 2 == 0)) {
 			//System.out.println("Scale Position Negative");
 			currentPos.scl(-1);
 		}
-		
+		*/
+
 		diffOfPosVect.add(currentPos);
 		
 		
@@ -158,10 +161,15 @@ public class OrbitalPhysics {
     	for (int i = 0; i < listOfBodies.size(); i++) {
             for (int j = 0; j < listOfBodies.size(); j++) {
                 if (i != j && checkCollision(listOfBodies.get(i), listOfBodies.get(j))) {
-                    if (listOfBodies.get(i).mass <= listOfBodies.get(j).mass) {
-                      listOfBodies.remove(i);
+                    if (listOfBodies.get(i).mass < listOfBodies.get(j).mass) {
+                        listOfBodies.remove(i);
+                    } else if (listOfBodies.get(i).mass > listOfBodies.get(j).mass) {
+                        listOfBodies.remove(j);
                     } else {
-                      listOfBodies.remove(j);
+                        listOfBodies.get(i).mass += listOfBodies.get(j).mass;
+                        listOfBodies.get(i).velVect.add(listOfBodies.get(j).velVect);
+                        listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
+                        listOfBodies.get(i).spriteWidth = listOfBodies.get(i).radius * 2;
                     }
                 }
             }

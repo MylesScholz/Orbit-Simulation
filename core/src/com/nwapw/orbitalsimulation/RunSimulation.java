@@ -135,13 +135,15 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 
         LibGDXTools.bodyInitialize("Sun", 10000, 25, 0, 0,0, 0, 50);
 		
-		//LibGDXTools.bodyInitialize("Star 1", 10000, 25, 100, 100, 30, -30, 50);
-		//LibGDXTools.bodyInitialize("Star 2", 10000, 25, -100, -100, -30, 30, 50);
+
+		LibGDXTools.bodyInitialize("Star 1", 10000, 25, 100, 100, 0, 0, 50);
+		LibGDXTools.bodyInitialize("Star 2", 10000, 25, -100, -100, 0, 0, 50);
+
 		
 		batch = new SpriteBatch();
 
 		int i = 1 + (int)(Math.random() * 8); 
-        String backgroundFileName = "background/" + i + ".jpg";
+        String backgroundFileName = "backgrounds/" + i + ".jpg";
         backgroundTexture = new Texture(backgroundFileName);
         
 		
@@ -152,7 +154,7 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 		
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
-		
+
 		// Constructs a new OrthographicCamera, using the given viewport width and height
 		// Height is multiplied by aspect ratio.
 		
@@ -301,13 +303,12 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
         	listOfBodies.get(n).velVect.set(0,0,0);
         }
 
-        
-        
-        
+        /*
+>>>>>>> 9a9fefd90d52d49a5e2e816078174ce108eff0fb
         if (listOfBodies.size() == 0){
         	LibGDXTools.bodyInitialize("Star", 10000, 25, 0.001f, 0.001f, 0.001f, 0.001f, 40);
 		}
-        
+        */
         
 		batch.begin();
 		batch.draw(backgroundTexture, -cam.viewportWidth/2 + camX, -cam.viewportHeight/2 + camY, (int) camX, (int) -camY, (int) cam.viewportWidth, (int) cam.viewportHeight);
@@ -329,7 +330,10 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 
 			
 		}
-		
+
+        camX = 0;
+        camY = 0;
+
 		float focusX = (float) listOfBodies.get(n).posVect.x - (listOfBodies.get(n).spriteWidth / 2);
 		float focusY = (float) listOfBodies.get(n).posVect.y - (listOfBodies.get(n).spriteWidth  / 2);		
 		float moveX = (camX - focusX) * 1/3;
@@ -342,11 +346,7 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 		//System.out.println("moveX " + moveX);
 		//System.out.println("moveY " + moveY);
 		//System.out.println("");
-		
-		//camX = 0;
-		//camY = 0;
-		
-		//cam.position.set(camX, camY, 0);
+
 		cam.position.set(camX, camY, 0);
 		
 		
