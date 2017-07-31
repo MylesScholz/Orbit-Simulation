@@ -163,8 +163,8 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 		cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
 
 		
-		//camX = 0;
-		//camY = 0;
+		camX = 0;
+		camY = 0;
 		
 	}
 	
@@ -303,12 +303,10 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
         	listOfBodies.get(n).velVect.set(0,0,0);
         }
 
-        /*
->>>>>>> 9a9fefd90d52d49a5e2e816078174ce108eff0fb
         if (listOfBodies.size() == 0){
         	LibGDXTools.bodyInitialize("Star", 10000, 25, 0.001f, 0.001f, 0.001f, 0.001f, 40);
 		}
-        */
+
         
 		batch.begin();
 		batch.draw(backgroundTexture, -cam.viewportWidth/2 + camX, -cam.viewportHeight/2 + camY, (int) camX, (int) -camY, (int) cam.viewportWidth, (int) cam.viewportHeight);
@@ -331,9 +329,9 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 			
 		}
 
-        camX = 0;
-        camY = 0;
-
+		System.out.println(camX);
+		System.out.println(camY);
+		System.out.println("");
 		float focusX = (float) listOfBodies.get(n).posVect.x - (listOfBodies.get(n).spriteWidth / 2);
 		float focusY = (float) listOfBodies.get(n).posVect.y - (listOfBodies.get(n).spriteWidth  / 2);		
 		float moveX = (camX - focusX) * 1/3;
