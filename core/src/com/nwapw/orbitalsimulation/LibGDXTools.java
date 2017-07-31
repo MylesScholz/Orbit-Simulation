@@ -106,7 +106,7 @@ public class LibGDXTools {
 	
 	static float spriteWidthCalculator(float mass){
 		
-		float length = 1;;
+		float length = 1;
 		
 		if (mass < 100){ // body is a "planet"
 			length = 20;

@@ -129,16 +129,16 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 
 
 		
-		LibGDXTools.bodyInitialize("Star 1", 10000, 25, 100, 100, 30, -30, 50);
-		LibGDXTools.bodyInitialize("Star 2", 10000, 25, -100, -100, -30, -30, 50);
+		LibGDXTools.bodyInitialize("Star 1", 10000, 25, 100, 100, 0, 0, 50);
+		LibGDXTools.bodyInitialize("Star 2", 10000, 25, -100, -100, 0, 0, 50);
 		
 		batch = new SpriteBatch();
 
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
 
-		System.out.println(w);
-		System.out.println(h);
+		//System.out.println(w);
+		//System.out.println(h);
 		
 		// Constructs a new OrthographicCamera, using the given viewport width and height
 		// Height is multiplied by aspect ratio.
@@ -288,11 +288,11 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
         	listOfBodies.get(n).velVect.set(0,0,0);
         }
 
-        
+        /*
         if (listOfBodies.size() == 0){
         	LibGDXTools.bodyInitialize("Star", 10000, 25, 0.001f, 0.001f, 0.001f, 0.001f, 40);
 		}
-        
+        */
         
 		batch.begin();
 	
@@ -313,7 +313,10 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 
 			
 		}
-		
+
+        camX = 0;
+        camY = 0;
+
 		float focusX = (float) listOfBodies.get(n).posVect.x - (listOfBodies.get(n).spriteWidth / 2);
 		float focusY = (float) listOfBodies.get(n).posVect.y - (listOfBodies.get(n).spriteWidth  / 2);		
 		float moveX = (camX - focusX) * 1/3;
@@ -321,13 +324,9 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 		camX -= moveX;
 		camY -= moveY;
 		
-		
-		System.out.println("moveX " + moveX);
-		System.out.println("moveY " + moveY);
-		System.out.println("");
-		
-		camX = 0;
-		camY = 0;
+		//System.out.println("moveX " + moveX);
+		//System.out.println("moveY " + moveY);
+		//System.out.println("");
 		
 		//cam.position.set(camX, camY, 0);
 		cam.position.set(camX, camY, 0);
