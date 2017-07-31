@@ -97,7 +97,12 @@ public class OrbitalPhysics {
 		diffOfPosVect.add(pullingPos);	
 		
 		if (!(RunSimulation.listOfBodies.size() % 2 == 0)) {
+<<<<<<< HEAD
 			currentPos.scl(-1);
+=======
+			//System.out.println("Scale Position Negative");
+			currentPos.scale(-1);
+>>>>>>> master
 		}
 		
 		diffOfPosVect.add(currentPos);

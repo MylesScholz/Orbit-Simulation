@@ -43,16 +43,16 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 	
 	// Cycle through focus
 	int n = 0;
-	// Prevents overpressing keys
-	int clickDuration = 0;
-	int nDuration = 0;
-	int pDuration = 0;
 	
 	int placedPlanetCounter = 0;
 	int placedSunCounter = 0;
 	
 	// List of currently running bodies in the simulation
 	public static ArrayList<OrbitalBody> listOfBodies = new ArrayList<OrbitalBody>();
+	
+	boolean focusShift;
+	boolean pauseIteration;
+	boolean deleteBody;
 	
 	// Booleans for mouse input edge detection
 	boolean newPlanet = false;
@@ -88,7 +88,7 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 	String printPosVelAcc = "";
 	
 	
-	Boolean pauseState = false;
+	boolean pauseState = false;
 	
 	@Override
 	public void create () {
@@ -126,16 +126,15 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 		// INITIALIZE IN ORDER OF MASS SMALLEST TO LARGEST
 		// Name, Mass, posx, posy, velx, vely, spritewidth
 		
-       
-		//LibGDXTools.bodyInitialize("#1", 1, 5, 70, 70, 50, -50, 10);
-		//LibGDXTools.bodyInitialize("#2", 1, 5, 90, 90, 50, -50, 10);
-       // LibGDXTools.bodyInitialize("#3", 1, 5, 110, 110, 60, -60, 10);
+
+		LibGDXTools.bodyInitialize("#1", 1, 5, 70, 70, 30, -30, 10);
+		LibGDXTools.bodyInitialize("#2", 1, 5, 90, 90, 50, -50, 10);
+		LibGDXTools.bodyInitialize("#3", 1, 5, 110, 110, 50, -50, 10);
+		LibGDXTools.bodyInitialize("#4", 1, 5, 130, 130, 60, -60, 10);
+		LibGDXTools.bodyInitialize("#5", 1, 5, 150, 150, 70, -70, 10);
 		
-       // LibGDXTools.bodyInitialize("#4", 1, 5, 130, 130, 60, -60, 10);
-		LibGDXTools.bodyInitialize("#5", 1, 5, 150, 150, 100, 0, 10);
-		
-		//LibGDXTools.bodyInitialize("Star 1", 10000, 25, -200, 0, 0, 0, 40);
-		LibGDXTools.bodyInitialize("Star 2", 10000, 25, 200, 0, 0, 0, 40);
+		LibGDXTools.bodyInitialize("Star 1", 10000, 25, 0, 0, 0, 0, 50);
+		//LibGDXTools.bodyInitialize("Star 2", 10000, 25, 200, 0, 0.001, 0.001, 40);
 		
 		batch = new SpriteBatch();
 
@@ -153,9 +152,54 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 		cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
 
 		
-		camX = 0;
-		camY = 0;
+		//camX = 0;
+		//camY = 0;
 		
+	}
+	
+	public void place() {		
+		
+		if (Gdx.input.isButtonPressed(0) && !newPlanet) {
+			clickLeftPositionX = Gdx.input.getX();
+			clickLeftPositionY = Gdx.input.getY();
+			newPlanet = true;
+		}
+		
+		else if (!Gdx.input.isButtonPressed(0) && newPlanet) {
+			
+			unclickLeftPositionX = Gdx.input.getX();
+			unclickLeftPositionY = Gdx.input.getY();
+			
+			int randomMass = 1 + (int)(Math.random() * 4);
+			int randomRadius = randomMass * 5;
+			
+			String planetName = "New Planet " + placedPlanetCounter;	
+			placedPlanetCounter++;
+			
+			LibGDXTools.bodyInitialize(planetName, randomMass, randomRadius, clickLeftPositionX - 300, -(clickLeftPositionY - 250), unclickLeftPositionX - clickLeftPositionX, -(unclickLeftPositionY - clickLeftPositionY), randomRadius * 2);
+			newPlanet = false;
+		}
+		
+		if (Gdx.input.isButtonPressed(1) && !newSun) {
+			clickRightPositionX = Gdx.input.getX();
+			clickRightPositionY = Gdx.input.getY();
+			newSun = true;
+		}
+		
+		else if (!Gdx.input.isButtonPressed(1) && newSun) {
+			
+			unclickRightPositionX = Gdx.input.getX();
+			unclickRightPositionY = Gdx.input.getY();
+			
+			int randomMass = 10000 + (int)(Math.random() * 40000);
+			int randomRadius = randomMass / 800;
+			
+			String sunName = "New Sun " + placedSunCounter;	
+			placedSunCounter++;
+			
+			LibGDXTools.bodyInitialize(sunName, randomMass, randomRadius, clickRightPositionX - 300, -(clickRightPositionY - 250), unclickRightPositionX - clickRightPositionX, -(unclickRightPositionY - clickRightPositionY), randomRadius * 2);
+			newSun = false;
+		}
 	}
 	
 
@@ -168,70 +212,83 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 		
 		int listLength = listOfBodies.size();
 
-		if(Gdx.input.isKeyPressed(Input.Keys.N)){
+		if(Gdx.input.isKeyPressed(Input.Keys.N) && !focusShift){
 			n++;
-			n = n % listLength;
-			nDuration++;
-			if (nDuration > 1 && n != 0){
-				n--;
+			if (n % listLength == 0) {
+				n -= n;
 			}
-			
+			focusShift = true;
 	    }
-		else {
-			nDuration = 0;
-		}
-
 		
+		else if(!Gdx.input.isKeyPressed(Input.Keys.N) && focusShift){
+			focusShift = false;
+	    }
 		
-		if(Gdx.input.isKeyPressed(Input.Keys.S)){
+		if(Gdx.input.isKeyPressed(Input.Keys.B)){
+			if (n % listLength == 0) {
+				n -= n;
+			}
 			listOfBodies.get(n).posVect.set(100, 100, 100);
 			listOfBodies.get(n).velVect.set(0, 0, 0);
 	    }
 
-		if(Gdx.input.isKeyPressed(Input.Keys.D)){				
-			if (clickDuration < 1){
-
-				listOfBodies.remove(n);
-				
+		if(Gdx.input.isKeyPressed(Input.Keys.BACKSPACE) && !deleteBody){
+			if (n % listLength == 0) {
+				n -= n;
 			}
-			clickDuration++;
+			listOfBodies.remove(n);
+			deleteBody = true;
 	    }
-		else {
-			clickDuration = 0;
-		}
 		
-		if(Gdx.input.isKeyPressed(Input.Keys.P)){				
-
-			if (pDuration < 1){
-				if (pauseState == false){
-					pauseState = true;
-				}
-				else {
-					pauseState = false;
-				}
-				
-			}
-			pDuration++;
+		else if(!Gdx.input.isKeyPressed(Input.Keys.BACKSPACE) && deleteBody){
+			deleteBody = false;
 	    }
-		else {
-			pDuration = 0;
-		}	
-        if(Gdx.input.isKeyPressed(Input.Keys.UP)){
+		
+		if(Gdx.input.isKeyPressed(Input.Keys.P) && !pauseIteration){
+			if (pauseState == false){
+				pauseState = true;
+			}
+			else {
+				pauseState = false;
+			}
+			pauseIteration = true;
+	    }
+		
+		else if(!Gdx.input.isKeyPressed(Input.Keys.P) && pauseIteration){
+			pauseIteration = false;
+	    }
+		
+        if(Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)){
+        	if (n % listLength == 0) {
+				n -= n;
+			}
         	listOfBodies.get(n).velVect.y += 3;
         }
-        
-        if(Gdx.input.isKeyPressed(Input.Keys.DOWN)){
+		
+        if(Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)){
+        	if (n % listLength == 0) {
+				n -= n;
+			}
         	listOfBodies.get(n).velVect.y -= 3;
         }
         
-        if(Gdx.input.isKeyPressed(Input.Keys.LEFT)){
+        if(Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)){
+        	if (n % listLength == 0) {
+				n -= n;
+			}
         	listOfBodies.get(n).velVect.x -= 3;
         }
         
-        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
+        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)){
+        	if (n % listLength == 0) {
+				n -= n;
+			}
         	listOfBodies.get(n).velVect.x += 3;
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.NUM_0)){
+        if(Gdx.input.isKeyPressed(Input.Keys.M)){
+        	if (n % listLength == 0) {
+				n -= n;
+			}
         	listOfBodies.get(n).velVect.set(0,0,0);
         }
 		
@@ -242,8 +299,7 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
         
         
 		batch.begin();
-		
-
+	
 		
 		for (int i = 0; i < listOfBodies.size(); i++) {
 
@@ -365,6 +421,7 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 		batch.end();	
 
 		OrbitalPhysics.passList(listOfBodies);
+		//System.out.println(pauseState);
 
 		if (pauseState == false){
 			if (iterationCounter <= numOfIterations){
@@ -396,52 +453,7 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 		}
 		
 	}
-	public void place () {		
-		
-		if (Gdx.input.isButtonPressed(0) && newPlanet == false) {
-			clickLeftPositionX = Gdx.input.getX();
-			clickLeftPositionY = Gdx.input.getY();
-			newPlanet = true;
-		}
-		
-		else if (!Gdx.input.isButtonPressed(0) && newPlanet == true) {
-			
-			unclickLeftPositionX = Gdx.input.getX();
-			unclickLeftPositionY = Gdx.input.getY();
-			
-			int randomMass = 1 + (int)(Math.random() * 4);
-			int randomRadius = randomMass * 5;
-			
-			String planetName = "New Planet " + placedPlanetCounter;	
-			placedPlanetCounter++;
-			
-			LibGDXTools.bodyInitialize(planetName, randomMass, randomRadius, clickLeftPositionX - 300, -(clickLeftPositionY - 250), unclickLeftPositionX - clickLeftPositionX, -(unclickLeftPositionY - clickLeftPositionY), randomRadius * 2);
-			newPlanet = false;
-		}
-		
-		if (Gdx.input.isButtonPressed(1) && newSun == false) {
-			clickRightPositionX = Gdx.input.getX();
-			clickRightPositionY = Gdx.input.getY();
-			newSun = true;
-		}
-		
-		else if (!Gdx.input.isButtonPressed(1) && newSun == true) {
-			
-			unclickRightPositionX = Gdx.input.getX();
-			unclickRightPositionY = Gdx.input.getY();
-			
-			int randomMass = 10000 + (int)(Math.random() * 40000);
-			int randomRadius = randomMass / 800;
-			
-			String sunName = "New Sun " + placedSunCounter;	
-			placedSunCounter++;
-			
-			
-			
-			LibGDXTools.bodyInitialize(sunName, randomMass, randomRadius, clickRightPositionX - 300, -(clickRightPositionY - 250), unclickRightPositionX - clickRightPositionX, -(unclickRightPositionY - clickRightPositionY), randomRadius * 2);
-			newSun = false;
-		}
-	}
+
 	@Override
 	public boolean keyDown(int keycode) {
 		// TODO Auto-generated method stub
