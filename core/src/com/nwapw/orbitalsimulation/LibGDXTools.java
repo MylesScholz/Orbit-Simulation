@@ -3,8 +3,6 @@ package com.nwapw.orbitalsimulation;
 import java.util.ArrayList;
 import java.util.Random;
 
-//import javax.swing.plaf.synth.SynthSeparatorUI;
-
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
@@ -29,15 +27,15 @@ public class LibGDXTools {
 		
 		return body;
 	}	
-	static OrbitalBody bodyInitialize(String name, float mass, float radius, double posX, double posY, double velX, double velY){
+	static OrbitalBody bodyInitialize(String name, float mass, float radius, float posX, float posY, float velX, float velY){
 		OrbitalBody body = new OrbitalBody();
 		
 		body.setName(name);
 		body.setMass(mass);
 		body.setRadius(radius);
 
-		body.posVect.x = posX;
-		body.posVect.y = posY;
+		body.posVect.x = (float) posX;
+		body.posVect.y = (float) posY;
 		
 		body.velVect.x = velX;
 		body.velVect.y = velY;
@@ -48,7 +46,7 @@ public class LibGDXTools {
 		return body;
 	}	
 	
-	static OrbitalBody bodyInitialize(String name, float mass, float radius, double posX, double posY, double velX, double velY, float spriteWidth){
+	static OrbitalBody bodyInitialize(String name, float mass, float radius, float posX, float posY, float velX, float velY, float spriteWidth){
 		
 		OrbitalBody body = new OrbitalBody();
 		
@@ -77,7 +75,7 @@ public class LibGDXTools {
 		
 	}
 		
-	static Texture bodyTextureChooser(double mass) {
+	static Texture bodyTextureChooser(float mass) {
 		Texture newTexture;
 		//TODO randomly select from available sprites
 		if (mass < 100){ // body is a "planet"		
@@ -106,7 +104,7 @@ public class LibGDXTools {
 		return newTexture;
 	}
 	
-	static float spriteWidthCalculator(double mass){
+	static float spriteWidthCalculator(float mass){
 		
 		float length = 1;;
 		

@@ -7,7 +7,7 @@ public class NumericalIntegration {
 	 */
 	
 	// Rectangular Method
-	static double integrateRect(double initial, double slope, double delta) {
+	static float integrateRect(float initial, float slope, float delta) {
 		initial += slope * delta;
 		//System.out.println("initial " + initial + " slope " + slope + " final " + result);
 		return initial;

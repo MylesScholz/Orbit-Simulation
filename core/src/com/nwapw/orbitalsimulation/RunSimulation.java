@@ -12,12 +12,15 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector3;
 
-public class RunSimulation extends ApplicationAdapter {
+public class RunSimulation extends ApplicationAdapter implements InputProcessor {
 		
 	// Constant for the force of gravity, affects how much bodies accelerate
-	final static int gravConst = 100; 
+	final static int gravConst = 1000; 
 
 	// TODO Switches methods of calculating perturbations
 	final static int perturbationCalculationMethod = 0; // 0 = Cowell's Method
@@ -71,6 +74,7 @@ public class RunSimulation extends ApplicationAdapter {
 	SpriteBatch batch;
 	private OrthographicCamera cam;
 	
+	
 	Texture textures;
 	static ArrayList<Texture> availablePlanetTextures = new ArrayList<Texture>();
     static ArrayList<Texture> availableStarTextures = new ArrayList<Texture>();
@@ -80,6 +84,8 @@ public class RunSimulation extends ApplicationAdapter {
 	static ArrayList<Texture> runningTextures = new ArrayList<Texture>();
 	
 	BitmapFont font;
+	String printPosVelAcc = "";
+	
 	
 	Boolean pauseState = false;
 	
@@ -87,6 +93,9 @@ public class RunSimulation extends ApplicationAdapter {
 	public void create () {
 		
 		font = new BitmapFont();
+		font.setUseIntegerPositions(false);
+		
+		
         starColors[0] = "blue";
         starColors[1] = "orange";
         starColors[2] = "red";
@@ -119,12 +128,12 @@ public class RunSimulation extends ApplicationAdapter {
        
 		//LibGDXTools.bodyInitialize("#1", 1, 5, 70, 70, 30, -30, 10);
 		//LibGDXTools.bodyInitialize("#2", 1, 5, 90, 90, 50, -50, 10);
-		LibGDXTools.bodyInitialize("#3", 1, 5, 110, 110, 50, -50, 10);
+		LibGDXTools.bodyInitialize("#3", 1, 5, 110, 110, 0, 0, 10);
 		//LibGDXTools.bodyInitialize("#4", 1, 5, 130, 130, 60, -60, 10);
 		//LibGDXTools.bodyInitialize("#5", 1, 5, 150, 150, 70, -70, 10);
 		
-		LibGDXTools.bodyInitialize("Star 1", 10000, 25, -200, 0, 0.001, 0.001, 40);
-		//LibGDXTools.bodyInitialize("Star 2", 10000, 25, 200, 0, 0.001, 0.001, 40);
+		LibGDXTools.bodyInitialize("Star 1", 10000, 25, 0, 0, 0, 0, 40);
+		//LibGDXTools.bodyInitialize("Star 2", 10000, 25, 200, 100, 0, 0, 40);
 		
 		batch = new SpriteBatch();
 
@@ -141,61 +150,14 @@ public class RunSimulation extends ApplicationAdapter {
 		
 	}
 	
-	public void place () {		
-		
-		if (Gdx.input.isButtonPressed(0) && newPlanet == false) {
-			clickLeftPositionX = Gdx.input.getX();
-			clickLeftPositionY = Gdx.input.getY();
-			newPlanet = true;
-		}
-		
-		else if (!Gdx.input.isButtonPressed(0) && newPlanet == true) {
-			
-			unclickLeftPositionX = Gdx.input.getX();
-			unclickLeftPositionY = Gdx.input.getY();
-			
-			int randomMass = 1 + (int)(Math.random() * 4);
-			int randomRadius = randomMass * 5;
-			
-			String planetName = "New Planet " + placedPlanetCounter;	
-			placedPlanetCounter++;
-			
-			LibGDXTools.bodyInitialize(planetName, randomMass, randomRadius, clickLeftPositionX - 300, -(clickLeftPositionY - 250), unclickLeftPositionX - clickLeftPositionX, -(unclickLeftPositionY - clickLeftPositionY), randomRadius * 2);
-			newPlanet = false;
-		}
-		
-		if (Gdx.input.isButtonPressed(1) && newSun == false) {
-			clickRightPositionX = Gdx.input.getX();
-			clickRightPositionY = Gdx.input.getY();
-			newSun = true;
-		}
-		
-		else if (!Gdx.input.isButtonPressed(1) && newSun == true) {
-			
-			unclickRightPositionX = Gdx.input.getX();
-			unclickRightPositionY = Gdx.input.getY();
-			
-			int randomMass = 10000 + (int)(Math.random() * 40000);
-			int randomRadius = randomMass / 800;
-			
-			String sunName = "New Sun " + placedSunCounter;	
-			placedSunCounter++;
-			
-			LibGDXTools.bodyInitialize(sunName, randomMass, randomRadius, clickRightPositionX - 300, -(clickRightPositionY - 250), unclickRightPositionX - clickRightPositionX, -(unclickRightPositionY - clickRightPositionY), randomRadius * 2);
-			newSun = false;
-		}
-	}
+
 	
 	@Override
 	public void render () {
-	
-		
 		
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
-
-
 		int listLength = listOfBodies.size();
 
 		if(Gdx.input.isKeyPressed(Input.Keys.N)){
@@ -268,7 +230,7 @@ public class RunSimulation extends ApplicationAdapter {
 		
         
         if (listOfBodies.size() == 0){
-			LibGDXTools.bodyInitialize("Star", 10000, 25, 0.001, 0.001, 0.001, 0.001, 40);
+        	LibGDXTools.bodyInitialize("Star", 10000, 25, 0.001f, 0.001f, 0.001f, 0.001f, 40);
 		}
         
         
@@ -282,8 +244,8 @@ public class RunSimulation extends ApplicationAdapter {
 
             float spriteWidth = renderBody.spriteWidth;
 
-			float spriteX = (float) renderBody.posVect.getX() - (spriteWidth / 2);
-			float spriteY = (float) renderBody.posVect.getY() - (spriteWidth / 2);
+			float spriteX = (float) renderBody.posVect.x - (spriteWidth / 2);
+			float spriteY = (float) renderBody.posVect.y - (spriteWidth / 2);
 			
 			font.draw(batch, renderBody.name, spriteX + 10, spriteY);
 
@@ -293,24 +255,78 @@ public class RunSimulation extends ApplicationAdapter {
 			
 		}
 		
-		float camX = (float) listOfBodies.get(n).posVect.getX();
-		float camY = (float) listOfBodies.get(n).posVect.getY();
+		float camX = (float) listOfBodies.get(n).posVect.x;
+		float camY = (float) listOfBodies.get(n).posVect.y;
 		cam.position.set(camX, camY, 0);
 		cam.update();
 		batch.setProjectionMatrix(cam.combined);
 		
-		float frameX = camX - 300;
-		float frameY = camY - 300;
+		float frameX = camX - 450;
+		float frameY = camY;
 		
 		font.draw(batch, "Orbital Simulation", frameX + 15, frameY + 20);
 		
 		font.draw(batch, "(p) pause (n) focus  (d) delete (s) set pos/vel (arrow keys) vel  (0) vel = 0", frameX + 155, frameY + 40);
 		
-		String printPosVelAcc = "Most Pull: " + listOfBodies.get(n).mostPullingBodyName + 
-				"      Pos: " + listOfBodies.get(n).posVect.print() + 
-				"  Vel: " + listOfBodies.get(n).velVect.print() + 
-				"  Acc: " + listOfBodies.get(n).accVect.print();
+		
+		if (iterationCounter % 6 == 0 || pauseState == true ) {
+			printPosVelAcc = "";
+	
+			printPosVelAcc += "Most Pull: " + listOfBodies.get(n).mostPullingBodyName + " ";
+			Vector3 currentVect = new Vector3();
+			
+			for (int p = 0; p < 3; p++){
+				
+				if (p == 0){
+					printPosVelAcc += "Pos: ";
+					currentVect = listOfBodies.get(n).posVect;
+				}
+				
+				if (p == 1){
+					printPosVelAcc += "  Vel: ";
+					currentVect = listOfBodies.get(n).velVect;
+				}
+				if (p == 2){
+					printPosVelAcc += "  Acc: ";
+					currentVect = listOfBodies.get(n).accVect;
+				}		
+				
+				printPosVelAcc += "(";
+				for (int q = 0; q < 3; q++){
+					
+					float value = 0;
+					
+					if (q == 0){
+						value = currentVect.x;
+					}
+					if (q == 1){
+						value = currentVect.y;
+					}
+					if (q == 2){
+						value = currentVect.z;
+					}					
+					
+					value = Math.round(value * 100f) / 100f;
+					
+					if (q != 2){
+						printPosVelAcc += value + ", ";
+					}
+					else {
+						printPosVelAcc += value + ")";
+					}
+					
+				}
+				
+			}
+	
+		}
+		
 		font.draw(batch, printPosVelAcc, frameX + 15, frameY + 60);
+	
+		
+		
+		
+		
 		
 		String printNumOfBodies = "Number of bodies: " + String.valueOf(listOfBodies.size());
 		String printDeltaTime = "dt: " + String.valueOf(deltaTime);
@@ -357,5 +373,96 @@ public class RunSimulation extends ApplicationAdapter {
 			runningTextures.get(i).dispose();
 		}
 		
+	}
+	public void place () {		
+		
+		if (Gdx.input.isButtonPressed(0) && newPlanet == false) {
+			clickLeftPositionX = Gdx.input.getX();
+			clickLeftPositionY = Gdx.input.getY();
+			newPlanet = true;
+		}
+		
+		else if (!Gdx.input.isButtonPressed(0) && newPlanet == true) {
+			
+			unclickLeftPositionX = Gdx.input.getX();
+			unclickLeftPositionY = Gdx.input.getY();
+			
+			int randomMass = 1 + (int)(Math.random() * 4);
+			int randomRadius = randomMass * 5;
+			
+			String planetName = "New Planet " + placedPlanetCounter;	
+			placedPlanetCounter++;
+			
+			LibGDXTools.bodyInitialize(planetName, randomMass, randomRadius, clickLeftPositionX - 300, -(clickLeftPositionY - 250), unclickLeftPositionX - clickLeftPositionX, -(unclickLeftPositionY - clickLeftPositionY), randomRadius * 2);
+			newPlanet = false;
+		}
+		
+		if (Gdx.input.isButtonPressed(1) && newSun == false) {
+			clickRightPositionX = Gdx.input.getX();
+			clickRightPositionY = Gdx.input.getY();
+			newSun = true;
+		}
+		
+		else if (!Gdx.input.isButtonPressed(1) && newSun == true) {
+			
+			unclickRightPositionX = Gdx.input.getX();
+			unclickRightPositionY = Gdx.input.getY();
+			
+			int randomMass = 10000 + (int)(Math.random() * 40000);
+			int randomRadius = randomMass / 800;
+			
+			String sunName = "New Sun " + placedSunCounter;	
+			placedSunCounter++;
+			
+			
+			
+			LibGDXTools.bodyInitialize(sunName, randomMass, randomRadius, clickRightPositionX - 300, -(clickRightPositionY - 250), unclickRightPositionX - clickRightPositionX, -(unclickRightPositionY - clickRightPositionY), randomRadius * 2);
+			newSun = false;
+		}
+	}
+	@Override
+	public boolean keyDown(int keycode) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean keyUp(int keycode) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean keyTyped(char character) {
+		System.out.println("yes");
+		return false;
+	}
+
+	@Override
+	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		return false;
+	}
+
+	@Override
+	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean mouseMoved(int screenX, int screenY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean scrolled(int amount) {
+		return false;
 	}
 }

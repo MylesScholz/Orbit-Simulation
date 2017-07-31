@@ -2,6 +2,7 @@ package com.nwapw.orbitalsimulation;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Vector3;
 
 public class OrbitalBody {
 	
@@ -11,17 +12,17 @@ public class OrbitalBody {
 	String name;
 	
 	String mostPullingBodyName;
-	double mostPullingBodyAcc;
+	float mostPullingBodyAcc;
 	
 	float mass;
 	float radius;
 	
-	static double[] currentPos = new double[3];
-	double[] currentVel = new double[3];
-	double[] currentAcc = new double[3];
+	static float[] currentPos = new float[3];
+	float[] currentVel = new float[3];
+	float[] currentAcc = new float[3];
 	
 	
-	// x = 0, y = 1, z = 2, stored as double
+	// x = 0, y = 1, z = 2, stored as float
 	Vector3 posVect = new Vector3();
 	Vector3 velVect = new Vector3();
 	Vector3 accVect = new Vector3();
@@ -48,19 +49,19 @@ public class OrbitalBody {
 		this.texture = newTexture;
 	}	
 	
-	void setPosition(double x, double y, double z){
+	void setPosition(float x, float y, float z){
 		posVect.set(x,y,z);	
 	}	
 	
-	void setVelocity(double x, double y, double z){
+	void setVelocity(float x, float y, float z){
 		velVect.set(x,y,z);
 	}
 	
-	void setAcceleration(double x, double y, double z){
+	void setAcceleration(float x, float y, float z){
 		accVect.set(x,y,z);
 	}
 
-	void setBody(String newName, float newMass, double[] position, double[] velocity) {
+	void setBody(String newName, float newMass, float[] position, float[] velocity) {
 		name = newName;
 		mass = newMass;
 		posVect.set(position);	
@@ -72,7 +73,7 @@ public class OrbitalBody {
 	
 	
 	// TODO create integrator choice picker
-	double integratorChoice(double value, double deltaTime) {
+	float integratorChoice(float value, float deltaTime) {
 		if (integrationMethod == 0){
 			//rectangular method
 		}
@@ -82,9 +83,9 @@ public class OrbitalBody {
 	}
 	
 	void iterateVelThenPos(float deltaTime) {
-		currentPos = posVect.get();
-		currentVel = velVect.get();
-		currentAcc = accVect.get();
+		float[] currentPos = {posVect.x, posVect.y, posVect.z};
+		float[] currentVel = {velVect.x, velVect.y, velVect.z};
+		float[] currentAcc = {accVect.x, accVect.y, accVect.z};
 		
 		//TODO change to integrator choice
 		
