@@ -8,6 +8,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
@@ -106,7 +107,9 @@ public class RunSimulation extends ApplicationAdapter {
 	static ArrayList<Texture> runningTextures = new ArrayList<Texture>();
 	
 	BitmapFont font;
-	String printPosVelAcc = "";
+	String printPos;
+	String printVel;
+	String printAcc;
 	
 	boolean sidePanelState = false;
 	int sidePanelWidth = 200;
@@ -179,6 +182,9 @@ public class RunSimulation extends ApplicationAdapter {
 		cam = new OrthographicCamera(30, 30 * (h / w));
 		cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
 		
+		printPos = "Pos: (0.0, 0.0, 0.0)";
+		printVel = "Vel: (0.0, 0.0, 0.0)";
+		printAcc = "Acc: (0.0, 0.0, 0.0)";
 		
 		InputProcessor inputProcessor = new Inputs();
 		Gdx.input.setInputProcessor(inputProcessor);
@@ -413,12 +419,7 @@ public class RunSimulation extends ApplicationAdapter {
 		sourceX -= moveX;
 		sourceY -= moveY;
 		
-		
-		float frameX = camX - 425;
-		float frameY = camY - 250;
-		
-		System.out.println(frameX);
-		System.out.println(frameY);
+		camX += 1.1f*cam.viewportHeight/40;
 		
 		if (sidePanelState == true){
 	
@@ -428,90 +429,84 @@ public class RunSimulation extends ApplicationAdapter {
 		cam.position.set(camX, camY, 0);
 		cam.update();	
 
-
-
-
 		
-		font.draw(batch, "Orbital Simulation", frameX + 15, frameY + 20);
 				
-		font.draw(batch, "(p) pause (n) focus  (d) delete (s) set pos/vel (arrow keys) vel  (0) vel = 0", frameX + 155, frameY + 40);
-
-		
-		if (iterationCounter % 6 == 0 || pauseState == true ) {
-			printPosVelAcc = "";
-	
-			printPosVelAcc += "Most Pull: " + listOfBodies.get(n).mostPullingBodyName + " ";
-			Vector3 currentVect = new Vector3();
-			
-			for (int p = 0; p < 3; p++){
-				
-				if (p == 0){
-					printPosVelAcc += "Pos: ";
-					currentVect = listOfBodies.get(n).posVect;
-				}
-				
-				if (p == 1){
-					printPosVelAcc += "  Vel: ";
-					currentVect = listOfBodies.get(n).velVect;
-				}
-				if (p == 2){
-					printPosVelAcc += "  Acc: ";
-					currentVect = listOfBodies.get(n).accVect;
-				}		
-				
-				printPosVelAcc += "(";
-				for (int q = 0; q < 3; q++){
-					
-					float value = 0;
-					
-					if (q == 0){
-						value = currentVect.x;
-					}
-					if (q == 1){
-						value = currentVect.y;
-					}
-					if (q == 2){
-						value = currentVect.z;
-					}					
-					
-					value = Math.round(value * 100f) / 100f;
-					
-					if (q != 2){
-						printPosVelAcc += value + ", ";
-					}
-					else {
-						printPosVelAcc += value + ")";
-					}
-					
-				}
-				
-			}
-	
-		}
-		
-		font.draw(batch, printPosVelAcc, frameX + 15, frameY + 60);	
-		
-		String printNumOfBodies = "Number of bodies: " + String.valueOf(listOfBodies.size());
-		String printDeltaTime = "dt: " + String.valueOf(deltaTime);
-		String printIterationStep = "step: " + String.valueOf(iterationCounter);
-		String printFocusPlanet = "focus: " + listOfBodies.get(n).name;
-		
-		font.draw(batch, printNumOfBodies, frameX + 155, frameY + 20);
-		font.draw(batch, printDeltaTime, frameX + 300, frameY + 20);
-		font.draw(batch, printIterationStep, frameX + 360, frameY + 20);
-		font.draw(batch, printFocusPlanet, frameX + 440, frameY + 20);
-		
-		if (sidePanelState == true){
-			 
-			 shapeRenderer.begin(ShapeType.Filled);
-			 shapeRenderer.setColor(0.05f, 0.05f, 0.1f, 0.8f);
-			 shapeRenderer.rect(camX + cam.viewportWidth/6, camY - cam.viewportHeight/2, cam.viewportWidth/3, cam.viewportHeight);
-			 shapeRenderer.end();		 
-		}
-		
 		batch.end();
 
+		if (sidePanelState == true){
+			Gdx.gl.glEnable(GL30.GL_BLEND);
+			Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
+			 shapeRenderer.begin(ShapeType.Filled);
+			 shapeRenderer.setColor(0.05f, 0.05f, 0.1f, 0.8f);
+			 shapeRenderer.rect(camX + cam.viewportWidth/6, camY - cam.viewportHeight/2, cam.viewportWidth/2, cam.viewportHeight);
+			 shapeRenderer.end();	
+			 Gdx.gl.glDisable(GL30.GL_BLEND);
+		}
+		
+		// Workaround to make side panel items appear above shapeRenderer transparent rectangle
+		batch.begin();
+		if (sidePanelState == true) {
+			
+			String printNumOfBodies = "# of bodies: " + String.valueOf(listOfBodies.size());
+			String printDeltaTime = "dt: " + String.valueOf(deltaTime);
+			String printIterationStep = "step: " + String.valueOf(iterationCounter);
+			String printFocusPlanet = "FOCUS: " + listOfBodies.get(n).name;			
+			String printMostAttraction = "Most Grav. Attraction: " + listOfBodies.get(n).mostPullingBodyName;
+			
+			font.draw(batch, "(Scroll) Zoom", camX + 2.5f*cam.viewportWidth/12, camY + 8*cam.viewportHeight/20);
+			font.draw(batch, "(Left Click) Create new planet", camX + 2.5f*cam.viewportWidth/12, camY + 7*cam.viewportHeight/20);
+			font.draw(batch, "(Right Click) Create new star", camX + 2.5f*cam.viewportWidth/12, camY + 6*cam.viewportHeight/20);			
+			font.draw(batch, "(Arrow Keys) Move Focused Body", camX + 2.5f*cam.viewportWidth/12, camY + 5*cam.viewportHeight/20);
+			font.draw(batch, "(P) Pause   (N) Change Focus", camX + 2.5f*cam.viewportWidth/12, camY + 4*cam.viewportHeight/20);
+			font.draw(batch, "(M) Reset Current Body's Veloicty", camX + 2.5f*cam.viewportWidth/12, camY + 3*cam.viewportHeight/20);
+			
+	
+			font.draw(batch, "SIMULATION SETTINGS", camX + 2.5f*cam.viewportWidth/12, camY + cam.viewportHeight/20);
+			font.draw(batch, LibGDXTools.underlineCalculation("SIMULATION SETTINGS"), camX + 2.5f*cam.viewportWidth/12, camY + 0.9f*cam.viewportHeight/20);
+			font.draw(batch, printNumOfBodies, camX + 2.5f*cam.viewportWidth/12, camY);
+			font.draw(batch, printIterationStep, camX + 2.5f*cam.viewportWidth/12, camY - cam.viewportHeight/20);
+			font.draw(batch, printDeltaTime, camX + 2.5f*cam.viewportWidth/12, camY - 2*cam.viewportHeight/20);
+			
+			font.draw(batch, printFocusPlanet, camX + 2.5f*cam.viewportWidth/12, camY - 4*cam.viewportHeight/20);
+			font.draw(batch, LibGDXTools.underlineCalculation(printFocusPlanet), camX + 2.5f*cam.viewportWidth/12, camY - 4.1f*cam.viewportHeight/20);
+			font.draw(batch, printMostAttraction, camX + 2.5f*cam.viewportWidth/12, camY - 5*cam.viewportHeight/20);
 
+			
+			
+			
+			if (iterationCounter % 6 == 0 || pauseState == true ) {
+				printPos = "Pos: ";
+				printVel = "Vel: ";
+				printAcc = "Acc: ";
+
+				Vector3 currentVect = new Vector3();
+				
+				currentVect.set(listOfBodies.get(n).posVect);
+				currentVect.set(Math.round(currentVect.x*100f)/100f, Math.round(currentVect.y*100f)/100f, Math.round(currentVect.z*100f)/100f);
+				printPos += currentVect;
+
+				currentVect.set(listOfBodies.get(n).velVect);
+				currentVect.set(Math.round(currentVect.x*100f)/100f, Math.round(currentVect.y*100f)/100f, Math.round(currentVect.z*100f)/100f);
+				printVel += currentVect;
+
+				currentVect.set(listOfBodies.get(n).accVect);
+				currentVect.set(Math.round(currentVect.x*100f)/100f, Math.round(currentVect.y*100f)/100f, Math.round(currentVect.z*100f)/100f);
+				printAcc += currentVect;
+						
+			}
+			font.draw(batch, printPos, camX + 2.5f*cam.viewportWidth/12, camY - 6*cam.viewportHeight/20);
+			font.draw(batch, printVel, camX + 2.5f*cam.viewportWidth/12, camY - 7*cam.viewportHeight/20);
+			font.draw(batch, printAcc, camX + 2.5f*cam.viewportWidth/12, camY - 8*cam.viewportHeight/20);
+			
+			font.draw(batch, "ORBITAL SIMULATION", camX - 0.97f*cam.viewportWidth/2, camY + 0.93f*cam.viewportHeight/2);	
+			
+		}
+		else {
+			font.draw(batch, "ORBITAL SIMULATION", camX  - 0.9f*cam.viewportWidth/12, camY + 0.93f*cam.viewportHeight/2);	
+			font.draw(batch, "(press ESC for more info)", camX  - 0.91f*cam.viewportWidth/12, camY - 0.93f*cam.viewportHeight/2);	
+			
+		}
+		batch.end();
 		
 		
 		OrbitalPhysics.passList(listOfBodies);

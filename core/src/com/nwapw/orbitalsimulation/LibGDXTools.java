@@ -137,5 +137,13 @@ public class LibGDXTools {
 		
 		return length;
 	}
+	static String underlineCalculation(String title) {
+		String border = "_";
+		for(int i = 0; i < title.length(); i++){
+			border += "_";
+		}
+		return border;
+	}
+	
 	
 }
