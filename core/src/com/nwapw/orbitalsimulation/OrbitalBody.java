@@ -23,6 +23,7 @@ public class OrbitalBody {
 	
 	
 	// x = 0, y = 1, z = 2, stored as float
+	Vector3 oldPosVect = new Vector3();
 	Vector3 posVect = new Vector3();
 	Vector3 velVect = new Vector3();
 	Vector3 accVect = new Vector3();
@@ -48,6 +49,10 @@ public class OrbitalBody {
 	void setTexture(Texture newTexture){
 		this.texture = newTexture;
 	}	
+	
+	void setOldPosition(float x, float y, float z) {
+		oldPosVect.set(x,y,z);
+	}
 	
 	void setPosition(float x, float y, float z){
 		posVect.set(x,y,z);	
@@ -83,6 +88,8 @@ public class OrbitalBody {
 	}
 	
 	void iterateVelThenPos(float deltaTime) {
+		oldPosVect.set(currentPos);
+		
 		float[] currentPos = {posVect.x, posVect.y, posVect.z};
 		float[] currentVel = {velVect.x, velVect.y, velVect.z};
 		float[] currentAcc = {accVect.x, accVect.y, accVect.z};
@@ -109,7 +116,6 @@ public class OrbitalBody {
 		
 		// TODO quickfix bug, find reason why
 		//evenBodyBug();
-		
 		posVect.set(currentPos);
 		/*
 		if (this.name == "Planet #1") {
@@ -117,8 +123,6 @@ public class OrbitalBody {
 			System.out.println("AFTER1 " + posVect.getX());
 		}		 
 		*/
-		
-
 	}
 	
 	//public static void evenBodyBug () {

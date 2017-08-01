@@ -373,9 +373,16 @@ public class RunSimulation extends ApplicationAdapter {
 		batch.setProjectionMatrix(cam.combined);
 		shapeRenderer.setProjectionMatrix(cam.combined);
 		
-		
-		
 
+		for (int i = 0; i < listOfBodies.size(); i++) {
+			Gdx.gl.glEnable(GL30.GL_BLEND);
+			Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
+			shapeRenderer.begin(ShapeType.Line);
+			shapeRenderer.setColor(0, 0, 0, 0);
+			shapeRenderer.line(listOfBodies.get(i).posVect.x, listOfBodies.get(i).posVect.y, listOfBodies.get(i).oldPosVect.x, listOfBodies.get(i).oldPosVect.y);
+			shapeRenderer.end();	
+			Gdx.gl.glDisable(GL30.GL_BLEND);	
+		}
 
 		
 		batch.begin();
