@@ -94,8 +94,7 @@ public class RunSimulation extends ApplicationAdapter {
 	// zoom factor
 	static float zF = 1;
 	
-	// Makes camera transition either smooth (for moving focus) or fast (for zooming)
-	static float camTransition = 1/6;
+
 	
 	
 	Texture textures;
@@ -153,9 +152,9 @@ public class RunSimulation extends ApplicationAdapter {
 		// INITIALIZE IN ORDER OF MASS SMALLEST TO LARGEST
 		// Name, Mass, posx, posy, velx, vely, spritewidth
 		
-
-        LibGDXTools.bodyCreate("Sun", 10000, 0,0, 0, 0);
         LibGDXTools.bodyCreate("Planet", 1, 250,250, 40, -40);
+        LibGDXTools.bodyCreate("Star", 10000, 0,0, 0, 0);
+       
 
 		//LibGDXTools.bodyInitialize("Star 1", 10000, 25, 100, 100, 0, 0, 50);
 		//LibGDXTools.bodyInitialize("Star 2", 10000, 25, -100, -100, 0, 0, 50);
@@ -189,6 +188,7 @@ public class RunSimulation extends ApplicationAdapter {
 		InputProcessor inputProcessor = new Inputs();
 		Gdx.input.setInputProcessor(inputProcessor);
 		
+
 	}
 	
 	public void place() {		
@@ -248,6 +248,7 @@ public class RunSimulation extends ApplicationAdapter {
 			
 			LibGDXTools.bodyCreate(sunName, randomMass, clickRightPositionX, clickRightPositionY, unclickRightPositionX - clickRightPositionX, -(unclickRightPositionY - clickRightPositionY));
 			newSun = false;
+
 		}
 	}
 	
@@ -255,7 +256,7 @@ public class RunSimulation extends ApplicationAdapter {
 	
 	@Override
 	public void render () {
-		
+	
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
@@ -265,7 +266,9 @@ public class RunSimulation extends ApplicationAdapter {
 				n -= n;
 			}
 			focusShift = true;
-			camTransition = 2/3;
+			zF = LibGDXTools.calculateDefaultZoom(listOfBodies.get(n).spriteWidth);
+			
+
 	    }
 		
 		else if(!Gdx.input.isKeyPressed(Input.Keys.N) && focusShift){
@@ -310,7 +313,7 @@ public class RunSimulation extends ApplicationAdapter {
         		sidePanelState = true;
         	}
         	panelShift = true;
-        	// camTransition = 1/6;
+ 
 	    }
 		else if(!Gdx.input.isKeyPressed(Input.Keys.ESCAPE) && panelShift){
 			panelShift = false;
@@ -397,6 +400,7 @@ public class RunSimulation extends ApplicationAdapter {
 			
 		}
 
+		
         float focusX = 0;
 		float focusY = 0;
 
@@ -408,8 +412,8 @@ public class RunSimulation extends ApplicationAdapter {
 		
 		if (sidePanelState == true){
 			focusX += sidePanelWidth;
-		}
-		
+		}		
+
 		float moveX = (camX - focusX) * 2/3;
 		float moveY = (camY - focusY) * 2/3;
 		
@@ -472,7 +476,7 @@ public class RunSimulation extends ApplicationAdapter {
 			font.draw(batch, printFocusPlanet, camX + 2.5f*cam.viewportWidth/12, camY - 4*cam.viewportHeight/20);
 			font.draw(batch, LibGDXTools.underlineCalculation(printFocusPlanet), camX + 2.5f*cam.viewportWidth/12, camY - 4.1f*cam.viewportHeight/20);
 			font.draw(batch, printMostAttraction, camX + 2.5f*cam.viewportWidth/12, camY - 5*cam.viewportHeight/20);
-		
+			font.draw(batch, "Mass: " + listOfBodies.get(n).mass, camX + 2.5f*cam.viewportWidth/12, camY - 6*cam.viewportHeight/20);
 			if (iterationCounter % 6 == 0 || pauseState == true ) {
 				printPos = "Pos: ";
 				printVel = "Vel: ";
@@ -493,9 +497,9 @@ public class RunSimulation extends ApplicationAdapter {
 				printAcc += currentVect;
 						
 			}
-			font.draw(batch, printPos, camX + 2.5f*cam.viewportWidth/12, camY - 6*cam.viewportHeight/20);
-			font.draw(batch, printVel, camX + 2.5f*cam.viewportWidth/12, camY - 7*cam.viewportHeight/20);
-			font.draw(batch, printAcc, camX + 2.5f*cam.viewportWidth/12, camY - 8*cam.viewportHeight/20);
+			font.draw(batch, printPos, camX + 2.5f*cam.viewportWidth/12, camY - 7*cam.viewportHeight/20);
+			font.draw(batch, printVel, camX + 2.5f*cam.viewportWidth/12, camY - 8*cam.viewportHeight/20);
+			font.draw(batch, printAcc, camX + 2.5f*cam.viewportWidth/12, camY - 9*cam.viewportHeight/20);
 			
 			font.draw(batch, "ORBITAL SIMULATION", camX - 0.97f*cam.viewportWidth/2, camY + 0.93f*cam.viewportHeight/2);	
 			

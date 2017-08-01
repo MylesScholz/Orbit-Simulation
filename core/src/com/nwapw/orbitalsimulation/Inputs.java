@@ -64,7 +64,7 @@ public class Inputs implements InputProcessor {
 			RunSimulation.zF = 10f;
 		}
 		
-		RunSimulation.camTransition = 1;
+
 		return false;
 	}
 

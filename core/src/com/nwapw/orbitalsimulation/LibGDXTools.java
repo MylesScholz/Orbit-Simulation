@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Vector3;
 
 public class LibGDXTools {
 	
@@ -159,6 +160,12 @@ public class LibGDXTools {
 		}
 		return border;
 	}
-	
-	
+	static float calculateDefaultZoom(float spriteWidth){
+		//float zF = spriteWidth/500;
+		float zF = 1;
+		
+		//System.out.println(zF);
+		return zF;
+	}
+
 }
