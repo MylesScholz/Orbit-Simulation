@@ -542,7 +542,8 @@ public class RunSimulation extends ApplicationAdapter {
 			font.draw(batch, printAcc, frameX + 2.5f*cam.viewportWidth/12, frameY - 9*cam.viewportHeight/20);
 			
 			font.draw(batch, "ORBITAL SIMULATION", frameX - 0.97f*cam.viewportWidth/2, frameY + 0.93f*cam.viewportHeight/2);	
-			
+			font.draw(batch, "(press ESC for full screen)", frameX  - 0.91f*cam.viewportWidth/12 - cam.viewportWidth/6, frameY - 0.93f*cam.viewportHeight/2);	
+
 		}
 		else {
 			font.draw(batch, "ORBITAL SIMULATION", frameX  - 0.9f*cam.viewportWidth/12, frameY + 0.93f*cam.viewportHeight/2);	
