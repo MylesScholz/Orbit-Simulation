@@ -96,22 +96,8 @@ public class OrbitalPhysics {
 		Vector3 diffOfPosVect = new Vector3();
 		diffOfPosVect.add(pullingPos);
 		diffOfPosVect.scl(-1);
-
-		/*
->>>>>>> 9a9fefd90d52d49a5e2e816078174ce108eff0fb
-		if (!(RunSimulation.listOfBodies.size() % 2 == 0)) {
-			//System.out.println("Scale Position Negative");
-			currentPos.scl(-1);
-		}
-		*/
-
 		diffOfPosVect.add(currentPos);
-		
-		
-		
 		Vector3 calculatedAcc = new Vector3(0,0,0);	
-		
-		
 		calculatedAcc.add(diffOfPosVect);
 		
 		calculatedAcc.scl((float) (-1*gravConst * pullingBody.mass / Math.pow(currentPos.dst(pullingPos), 3)));	
