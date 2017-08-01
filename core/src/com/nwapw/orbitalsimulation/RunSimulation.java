@@ -388,7 +388,7 @@ public class RunSimulation extends ApplicationAdapter {
 			float spriteX = (float) renderBody.posVect.x * zF - (spriteWidth / 2);
 			float spriteY = (float) renderBody.posVect.y * zF - (spriteWidth / 2);
 			
-			font.draw(batch, renderBody.name, spriteX + 10, spriteY);
+			font.draw(batch, renderBody.name, spriteX + 0.7f*spriteWidth*zF/2, spriteY + 1.5f*spriteWidth*zF/10);
 
 			Texture spriteTexture = renderBody.texture;
 			batch.draw(spriteTexture, spriteX, spriteY, (float) (spriteWidth * zF), (float) (spriteWidth * zF));
@@ -452,6 +452,8 @@ public class RunSimulation extends ApplicationAdapter {
 			String printFocusPlanet = "FOCUS: " + listOfBodies.get(n).name;			
 			String printMostAttraction = "Most Grav. Attraction: " + listOfBodies.get(n).mostPullingBodyName;
 			
+			font.draw(batch, "CONTROLS", camX + 2.5f*cam.viewportWidth/12, camY + 9*cam.viewportHeight/20);			
+			font.draw(batch, LibGDXTools.underlineCalculation("CONTROLS") + "_", camX + 2.5f*cam.viewportWidth/12,  camY + 8.9f*cam.viewportHeight/20);
 			font.draw(batch, "(Scroll) Zoom", camX + 2.5f*cam.viewportWidth/12, camY + 8*cam.viewportHeight/20);
 			font.draw(batch, "(Left Click) Create new planet", camX + 2.5f*cam.viewportWidth/12, camY + 7*cam.viewportHeight/20);
 			font.draw(batch, "(Right Click) Create new star", camX + 2.5f*cam.viewportWidth/12, camY + 6*cam.viewportHeight/20);			
