@@ -97,6 +97,59 @@ public class LibGDXTools {
 	static void bodyRender() {
 		
 	}
+
+	static String nameGen() {
+	    Random rand = new Random();
+        String[] consonants = new String[21];
+        String[] vowels = new String[6];
+        String[] syllables = new String[126];
+        int iteration = -1;
+        String name = "";
+
+        consonants[0] = "b";
+        consonants[1] = "c";
+        consonants[2] = "d";
+        consonants[3] = "f";
+        consonants[4] = "g";
+        consonants[5] = "h";
+        consonants[6] = "j";
+        consonants[7] = "k";
+        consonants[8] = "l";
+        consonants[9] = "m";
+        consonants[10] = "n";
+        consonants[11] = "p";
+        consonants[12] = "q";
+        consonants[13] = "r";
+        consonants[14] = "s";
+        consonants[15] = "t";
+        consonants[16] = "v";
+        consonants[17] = "w";
+        consonants[18] = "x";
+        consonants[19] = "y";
+        consonants[20] = "z";
+
+        vowels[0] = "a";
+        vowels[1] = "e";
+        vowels[2] = "i";
+        vowels[3] = "o";
+        vowels[4] = "u";
+        vowels[5] = "y";
+
+        for (int i = 0; i < consonants.length; i++) {
+            for (int j = 0; j < vowels.length; j++) {
+                iteration++;
+                syllables[iteration] = consonants[i] + vowels[j];
+            }
+        }
+
+        for (int i = 0; i < (rand.nextInt(4) + 2); i++) {
+            name = name + syllables[rand.nextInt(126)];
+        }
+
+        name = name.substring(0,1).toUpperCase() + name.substring(1);
+
+        return name;
+    }
 		
 	static Texture bodyTextureChooser(float mass) {
 		Texture newTexture;

@@ -215,8 +215,7 @@ public class RunSimulation extends ApplicationAdapter {
 		
 			int randomMass = 1 + (int)(Math.random() * 4);
 			
-			String planetName = "New Planet " + placedPlanetCounter;	
-			placedPlanetCounter++;
+			String planetName = LibGDXTools.nameGen();
 			
 			LibGDXTools.bodyCreate(planetName, randomMass, clickLeftPositionX , clickLeftPositionY, unclickLeftPositionX - clickLeftPositionX, unclickLeftPositionY - clickLeftPositionY);
 			newPlanet = false;
@@ -243,8 +242,7 @@ public class RunSimulation extends ApplicationAdapter {
 				
 			int randomMass = 10000 + (int)(Math.random() * 40000);
 			
-			String sunName = "New Sun " + placedSunCounter;	
-			placedSunCounter++;
+			String sunName = LibGDXTools.nameGen();
 			
 			LibGDXTools.bodyCreate(sunName, randomMass, clickRightPositionX, clickRightPositionY, unclickRightPositionX - clickRightPositionX, -(unclickRightPositionY - clickRightPositionY));
 			newSun = false;
@@ -359,10 +357,11 @@ public class RunSimulation extends ApplicationAdapter {
         
 
 		
-		
+		/*
         if (listOfBodies.size() == 0){
         	LibGDXTools.bodyInitialize("Star", 10000, 25, 0, 0, 0, 0, 40);
 		}
+		*/
 
         if (Gdx.input.isButtonPressed(Buttons.MIDDLE)){
             zF = 1;
