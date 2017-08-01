@@ -39,7 +39,7 @@ public class OrbitalPhysics {
 	
 	static void iterateSimulation(float deltaTime) {
 
-        checkAllCollisions();
+       
 
 		// 1. Calculate net force and acceleration from acting on each body.
 		
@@ -85,6 +85,8 @@ public class OrbitalPhysics {
 			currentBody.iterateVelThenPos(deltaTime);
 			
 		}	
+		
+		 checkAllCollisions();
 	}	
 	
 	static Vector3 cowellsFormulation(OrbitalBody currentBody, OrbitalBody pullingBody) {
@@ -135,7 +137,7 @@ public class OrbitalPhysics {
 		//float distance = Math.sqrt((Math.pow(body1.posVect.x - body2.posVect.x, 2))+(Math.pow(body1.posVect.y - body2.posVect.y, 2)));
         float distance = body1.posVect.dst(body2.posVect);
     	
-    	if (distance <= body1.radius + body2.radius) {
+    	if (distance*RunSimulation.zF <= body1.radius + body2.radius) {
             return true;
         } else {
             return false;
@@ -158,6 +160,10 @@ public class OrbitalPhysics {
                         listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
                         listOfBodies.get(i).spriteWidth = listOfBodies.get(i).radius * 2;
                     }
+                    
+                    checkAllCollisions();
+                    break;
+                    
                 }
             }
 

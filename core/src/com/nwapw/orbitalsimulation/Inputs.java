@@ -49,6 +49,7 @@ public class Inputs implements InputProcessor {
 
 	@Override
 	public boolean scrolled(int amount) {
+		
 		if (amount == 1){
 			 RunSimulation.zF += -.05f;
 		}
@@ -56,10 +57,14 @@ public class Inputs implements InputProcessor {
 			 RunSimulation.zF += .05f;
 		}
 		
-		if (RunSimulation.zF < 0){
-			RunSimulation.zF = 0f;
+		if (RunSimulation.zF <= 0.05){
+			RunSimulation.zF = 0.05f;
+		}
+		else if (RunSimulation.zF >= 10){
+			RunSimulation.zF = 10f;
 		}
 		
+		RunSimulation.camTransition = 1;
 		return false;
 	}
 
