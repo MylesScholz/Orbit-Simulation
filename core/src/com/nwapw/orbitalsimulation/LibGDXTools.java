@@ -75,8 +75,23 @@ public class LibGDXTools {
 		return body;
 	}	
 	
-	static void bodyCreate() {
-		
+	static void bodyCreate(String name, float mass, float posX, float posY, float velX, float velY) {
+		OrbitalBody body = new OrbitalBody();
+
+		body.setName(name);
+		body.setMass(mass);
+
+		body.setRadius((int) Math.sqrt((mass * 10) / Math.PI));
+		body.spriteWidth = (int) Math.sqrt((mass * 10) / Math.PI) * 2;
+
+		body.posVect.x = posX;
+		body.posVect.y = posY;
+
+		body.velVect.x = velX;
+		body.velVect.y = velY;
+
+		RunSimulation.listOfBodies.add(body);
+		body.setTexture(bodyTextureChooser(mass));
 	}
 	
 	static void bodyRender() {

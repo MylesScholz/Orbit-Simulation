@@ -35,7 +35,7 @@ public class RunSimulation extends ApplicationAdapter {
 	
 	// Specifies time used to calculate numerical integration
 	// TODO Adaptive step-size control
-	final static float deltaTime = (float) 0.01;
+	final static float deltaTime = (float) 0.1;
 	
 	// The max number of iterations that the simulation runs
 	final static int numOfIterations = 100000000;
@@ -151,8 +151,8 @@ public class RunSimulation extends ApplicationAdapter {
 		// Name, Mass, posx, posy, velx, vely, spritewidth
 		
 
-        LibGDXTools.bodyInitialize("Sun", 10000, 25, 0, 0, 100, 100, 50);
-        LibGDXTools.bodyInitialize("Planet", 1, 5, 100, 0, 200, 50, 10);
+        LibGDXTools.bodyCreate("Sun", 10000, 0,0, 0, 0);
+        LibGDXTools.bodyCreate("Planet", 1, 250,250, 40, -40);
 
 		//LibGDXTools.bodyInitialize("Star 1", 10000, 25, 100, 100, 0, 0, 50);
 		//LibGDXTools.bodyInitialize("Star 2", 10000, 25, -100, -100, 0, 0, 50);
@@ -208,12 +208,11 @@ public class RunSimulation extends ApplicationAdapter {
 
 		
 			int randomMass = 1 + (int)(Math.random() * 4);
-			int randomRadius = randomMass * 5;
 			
 			String planetName = "New Planet " + placedPlanetCounter;	
 			placedPlanetCounter++;
 			
-			LibGDXTools.bodyInitialize(planetName, randomMass, randomRadius, clickLeftPositionX , clickLeftPositionY, unclickLeftPositionX - clickLeftPositionX, -(unclickLeftPositionY - clickLeftPositionY), randomRadius * 2);			
+			LibGDXTools.bodyCreate(planetName, randomMass, clickLeftPositionX , clickLeftPositionY, unclickLeftPositionX - clickLeftPositionX, unclickLeftPositionY - clickLeftPositionY);
 			newPlanet = false;
 		}
 		
@@ -237,12 +236,11 @@ public class RunSimulation extends ApplicationAdapter {
 			unclickRightPositionY = (int) (mousePos.y / zF);	
 				
 			int randomMass = 10000 + (int)(Math.random() * 40000);
-			int randomRadius = randomMass / 800;
 			
 			String sunName = "New Sun " + placedSunCounter;	
 			placedSunCounter++;
 			
-			LibGDXTools.bodyInitialize(sunName, randomMass, randomRadius, clickRightPositionX, clickRightPositionY, unclickRightPositionX - clickRightPositionX, -(unclickRightPositionY - clickRightPositionY), randomRadius * 2);
+			LibGDXTools.bodyCreate(sunName, randomMass, clickRightPositionX, clickRightPositionY, unclickRightPositionX - clickRightPositionX, -(unclickRightPositionY - clickRightPositionY));
 			newSun = false;
 		}
 	}
@@ -255,13 +253,9 @@ public class RunSimulation extends ApplicationAdapter {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
-		int listLength = listOfBodies.size();
-
-		
-		
 		if(Gdx.input.isKeyPressed(Input.Keys.N) && !focusShift){
 			n++;
-			if (n % listLength == 0) {
+			if (n >= listOfBodies.size()) {
 				n -= n;
 			}
 			focusShift = true;
@@ -273,7 +267,7 @@ public class RunSimulation extends ApplicationAdapter {
 	    }
 		
 		if(Gdx.input.isKeyPressed(Input.Keys.B)){
-			if (n % listLength == 0) {
+			if (n >= listOfBodies.size()) {
 				n -= n;
 			}
 			listOfBodies.get(n).posVect.set(100, 100, 100);
@@ -281,7 +275,7 @@ public class RunSimulation extends ApplicationAdapter {
 	    }
 
 		if(Gdx.input.isKeyPressed(Input.Keys.BACKSPACE) && !deleteBody){
-			if (n % listLength == 0) {
+			if (n >= listOfBodies.size()) {
 				n -= n;
 			}
 			listOfBodies.remove(n);
@@ -322,28 +316,28 @@ public class RunSimulation extends ApplicationAdapter {
 	    }
 		
         if(Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)){
-        	if (n % listLength == 0) {
+        	if (n >= listOfBodies.size()) {
 				n -= n;
 			}
         	listOfBodies.get(n).velVect.y += 3;
         }
 		
         if(Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)){
-        	if (n % listLength == 0) {
+        	if (n >= listOfBodies.size()) {
 				n -= n;
 			}
         	listOfBodies.get(n).velVect.y -= 3;
         }
         
         if(Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)){
-        	if (n % listLength == 0) {
+        	if (n >= listOfBodies.size()) {
 				n -= n;
 			}
         	listOfBodies.get(n).velVect.x -= 3;
         }
         
         if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)){
-        	if (n % listLength == 0) {
+        	if (n >= listOfBodies.size()) {
 				n -= n;
 			}
         	listOfBodies.get(n).velVect.x += 3;
@@ -351,7 +345,7 @@ public class RunSimulation extends ApplicationAdapter {
        
 
         if(Gdx.input.isKeyPressed(Input.Keys.M)){
-        	if (n % listLength == 0) {
+        	if (n >= listOfBodies.size()) {
 				n -= n;
 			}
         	listOfBodies.get(n).velVect.set(0,0,0);
@@ -397,9 +391,14 @@ public class RunSimulation extends ApplicationAdapter {
 			
 		}
 
+        float focusX = 0;
+		float focusY = 0;
 
-		float focusX = (float) listOfBodies.get(n).posVect.x * zF - (listOfBodies.get(n).spriteWidth / 2);
-		float focusY = (float) listOfBodies.get(n).posVect.y * zF - (listOfBodies.get(n).spriteWidth  / 2);
+        if (n >= listOfBodies.size()) {
+            n -= n;
+        }
+        focusX = (float) listOfBodies.get(n).posVect.x * zF - (listOfBodies.get(n).spriteWidth / 2);
+        focusY = (float) listOfBodies.get(n).posVect.y * zF - (listOfBodies.get(n).spriteWidth / 2);
 		
 		if (sidePanelState == true){
 			focusX += sidePanelWidth;
@@ -438,6 +437,9 @@ public class RunSimulation extends ApplicationAdapter {
 
 		
 		if (iterationCounter % 6 == 0 || pauseState == true ) {
+            if (n >= listOfBodies.size()) {
+                n -= n;
+            }
 			printPosVelAcc = "";
 	
 			printPosVelAcc += "Most Pull: " + listOfBodies.get(n).mostPullingBodyName + " ";
@@ -446,15 +448,24 @@ public class RunSimulation extends ApplicationAdapter {
 			for (int p = 0; p < 3; p++){
 				
 				if (p == 0){
+                    if (n >= listOfBodies.size()) {
+                        n -= n;
+                    }
 					printPosVelAcc += "Pos: ";
 					currentVect = listOfBodies.get(n).posVect;
 				}
 				
 				if (p == 1){
+                    if (n >= listOfBodies.size()) {
+                        n -= n;
+                    }
 					printPosVelAcc += "  Vel: ";
 					currentVect = listOfBodies.get(n).velVect;
 				}
 				if (p == 2){
+                    if (n >= listOfBodies.size()) {
+                        n -= n;
+                    }
 					printPosVelAcc += "  Acc: ";
 					currentVect = listOfBodies.get(n).accVect;
 				}		
@@ -489,8 +500,11 @@ public class RunSimulation extends ApplicationAdapter {
 	
 		}
 		
-		font.draw(batch, printPosVelAcc, frameX + 15, frameY + 60);	
-		
+		font.draw(batch, printPosVelAcc, frameX + 15, frameY + 60);
+
+        if (n >= listOfBodies.size()) {
+            n -= n;
+        }
 		String printNumOfBodies = "Number of bodies: " + String.valueOf(listOfBodies.size());
 		String printDeltaTime = "dt: " + String.valueOf(deltaTime);
 		String printIterationStep = "step: " + String.valueOf(iterationCounter);
