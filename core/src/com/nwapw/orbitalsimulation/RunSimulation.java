@@ -1,6 +1,7 @@
 package com.nwapw.orbitalsimulation;
 import java.util.ArrayList;
 import java.util.Random;
+import java.io.*;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -151,14 +152,66 @@ public class RunSimulation extends ApplicationAdapter {
         }
 
 		// INITIALIZE IN ORDER OF MASS SMALLEST TO LARGEST
-		// Name, Mass, posx, posy, velx, vely, spritewidth
-		
+		// Name, Mass, posx, posy, velx, vely
 
-        LibGDXTools.bodyCreate("Sun", 10000, 0,0, 0, 0);
-        LibGDXTools.bodyCreate("Planet", 1, 250,250, 40, -40);
+        //LibGDXTools.bodyCreate("Sun", 10000, 0,0, 0, 0);
+        //LibGDXTools.bodyCreate("Planet", 1, 250,250, 40, -40);
 
 		//LibGDXTools.bodyInitialize("Star 1", 10000, 25, 100, 100, 0, 0, 50);
 		//LibGDXTools.bodyInitialize("Star 2", 10000, 25, -100, -100, 0, 0, 50);
+
+        if (listOfBodies.size() == 0) {
+            String filePath = this.getClass().getClassLoader().getResource("").getPath();   // The path of the running file
+            filePath = filePath.substring(0, filePath.indexOf("/desktop")) + "/core/assets/systems/system1.txt";    //Navigate to system file
+            filePath = filePath.replaceAll("%20", " ");
+
+            File systemFile;
+            FileReader in;
+            BufferedReader readFile;
+            String textLine;
+            boolean fileLoaded = false;
+            int i = 0;
+
+            String nameStr;
+            float massFlt, posXFlt, posYFlt, velXFlt, velYFlt;
+
+            while (fileLoaded == false && i < 2) {
+                try {
+                    systemFile = new File(filePath);
+                    in = new FileReader(systemFile);
+                    readFile = new BufferedReader(in);
+
+                    while ((textLine = readFile.readLine()) != null) {
+                        nameStr = textLine.substring(0, textLine.indexOf(","));
+                        textLine = textLine.substring(textLine.indexOf(",") + 1);
+                        massFlt = Integer.parseInt(textLine.substring(0, textLine.indexOf(",")));
+                        textLine = textLine.substring(textLine.indexOf(",") + 1);
+                        posXFlt = Integer.parseInt(textLine.substring(0, textLine.indexOf(",")));
+                        textLine = textLine.substring(textLine.indexOf(",") + 1);
+                        posYFlt = Integer.parseInt(textLine.substring(0, textLine.indexOf(",")));
+                        textLine = textLine.substring(textLine.indexOf(",") + 1);
+                        velXFlt = Integer.parseInt(textLine.substring(0, textLine.indexOf(",")));
+                        textLine = textLine.substring(textLine.indexOf(",") + 1);
+                        velYFlt = Integer.parseInt(textLine.substring(0, textLine.length()));
+
+                        LibGDXTools.bodyCreate(nameStr, massFlt, posXFlt, posYFlt, velXFlt, velYFlt);
+                    }
+                    readFile.close();
+                    in.close();
+
+                    fileLoaded = true;
+                } catch (FileNotFoundException e) {
+                    System.out.println("File Not Found: " + e.getMessage());
+                    System.out.println("Loading Default File...");
+
+                    filePath = filePath.substring(0, filePath.lastIndexOf("/"));
+                    filePath = filePath + "/default.txt";
+                    i++;
+                } catch (IOException e) {
+                    System.out.println("Problem Reading File: " + e.getMessage());
+                }
+            }
+        }
 
 		shapeRenderer = new ShapeRenderer();
 		batch = new SpriteBatch();
@@ -369,16 +422,11 @@ public class RunSimulation extends ApplicationAdapter {
         
 		batch.setProjectionMatrix(cam.combined);
 		shapeRenderer.setProjectionMatrix(cam.combined);
-		
-		
-		
 
-
-		
 		batch.begin();
 		batch.draw(backgroundTexture, -cam.viewportWidth/2 + camX, -cam.viewportHeight/2 + camY, (int) camX, (int) -camY, (int) cam.viewportWidth, (int) cam.viewportHeight);
-		
-		
+
+
 		for (int i = 0; i < listOfBodies.size(); i++) {
 
 			OrbitalBody renderBody = listOfBodies.get(i);
@@ -392,8 +440,6 @@ public class RunSimulation extends ApplicationAdapter {
 
 			Texture spriteTexture = renderBody.texture;
 			batch.draw(spriteTexture, spriteX, spriteY, (float) (spriteWidth * zF), (float) (spriteWidth * zF));
-
-			
 		}
 
         float focusX = 0;
