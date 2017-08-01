@@ -86,6 +86,8 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 	float sourceY = 0;
 	// zoom factor
 	static float zF = 1;
+	// Makes camera transition either smooth (for moving focus) or fast (for zooming)
+	static float camTransition = 1/6;
 	
 	Texture textures;
 	static ArrayList<Texture> availablePlanetTextures = new ArrayList<Texture>();
@@ -138,8 +140,8 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 		// Name, Mass, posx, posy, velx, vely, spritewidth
 		
 
-        LibGDXTools.bodyInitialize("Sun", 10000, 25, 0, 0, 0, 0, 50);
-		
+        LibGDXTools.bodyInitialize("Sun", 10000, 25, 0, 0, 100, 100, 50);
+        LibGDXTools.bodyInitialize("Planet", 1, 5, 100, 0, 200, 50, 10);
 
 		//LibGDXTools.bodyInitialize("Star 1", 10000, 25, 100, 100, 0, 0, 50);
 		//LibGDXTools.bodyInitialize("Star 2", 10000, 25, -100, -100, 0, 0, 50);
@@ -170,6 +172,7 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 		
 		camX = 0;		
 		camY = 0;
+
 		
 		InputProcessor inputProcessor = new Inputs();
 		Gdx.input.setInputProcessor(inputProcessor);
@@ -179,44 +182,61 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 	public void place() {		
 		
 		if (Gdx.input.isButtonPressed(0) && !newPlanet) {
-			clickLeftPositionX = (int) (Gdx.input.getX() - cam.viewportWidth/2f + camX);
-			clickLeftPositionY = (int) (Gdx.input.getY() - cam.viewportHeight/2f + camY);
+			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
+		    cam.unproject(mousePos); 
+	    
+		    clickLeftPositionX = (int) (mousePos.x / zF);
+			clickLeftPositionY = (int) (mousePos.y / zF);		
+
+
 			newPlanet = true;
 		}
 		
 		else if (!Gdx.input.isButtonPressed(0) && newPlanet) {
 			
-			unclickLeftPositionX = (int) (Gdx.input.getX() - cam.viewportWidth/2f + camX);
-			unclickLeftPositionY = (int) (Gdx.input.getY() - cam.viewportHeight/2f + camY);
-			
+			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
+		    cam.unproject(mousePos); 
+	    
+		    unclickLeftPositionX = (int) (mousePos.x / zF);
+			unclickLeftPositionY = (int) (mousePos.y / zF);		
+
+		
 			int randomMass = 1 + (int)(Math.random() * 4);
 			int randomRadius = randomMass * 5;
 			
 			String planetName = "New Planet " + placedPlanetCounter;	
 			placedPlanetCounter++;
 			
-			LibGDXTools.bodyInitialize(planetName, randomMass, randomRadius, clickLeftPositionX , -(clickLeftPositionY), unclickLeftPositionX - clickLeftPositionX, -(unclickLeftPositionY - clickLeftPositionY), randomRadius * 2);
+			LibGDXTools.bodyInitialize(planetName, randomMass, randomRadius, clickLeftPositionX , clickLeftPositionY, unclickLeftPositionX - clickLeftPositionX, -(unclickLeftPositionY - clickLeftPositionY), randomRadius * 2);			
 			newPlanet = false;
 		}
 		
 		if (Gdx.input.isButtonPressed(1) && !newSun) {
-			clickRightPositionX = Gdx.input.getX();
-			clickRightPositionY = Gdx.input.getY();
+			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
+		    cam.unproject(mousePos); 
+	    
+		    clickRightPositionX = (int) (mousePos.x / zF);
+			clickRightPositionY = (int) (mousePos.y / zF);		
+		
+		  
 			newSun = true;
 		}
 		
 		else if (!Gdx.input.isButtonPressed(1) && newSun) {
 			
-			unclickRightPositionX = Gdx.input.getX();
-			unclickRightPositionY = Gdx.input.getY();
-			
+			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
+		    cam.unproject(mousePos); 
+	    
+		    unclickRightPositionX = (int) (mousePos.x / zF);
+			unclickRightPositionY = (int) (mousePos.y / zF);	
+				
 			int randomMass = 10000 + (int)(Math.random() * 40000);
 			int randomRadius = randomMass / 800;
 			
 			String sunName = "New Sun " + placedSunCounter;	
 			placedSunCounter++;
 			
-			LibGDXTools.bodyInitialize(sunName, randomMass, randomRadius, clickRightPositionX - cam.viewportWidth/4f, -(clickRightPositionY - cam.viewportHeight/4f), unclickRightPositionX - clickRightPositionX, -(unclickRightPositionY - clickRightPositionY), randomRadius * 2);
+			LibGDXTools.bodyInitialize(sunName, randomMass, randomRadius, clickRightPositionX, clickRightPositionY, unclickRightPositionX - clickRightPositionX, -(unclickRightPositionY - clickRightPositionY), randomRadius * 2);
 			newSun = false;
 		}
 	}
@@ -231,12 +251,15 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 		
 		int listLength = listOfBodies.size();
 
+		
+		
 		if(Gdx.input.isKeyPressed(Input.Keys.N) && !focusShift){
 			n++;
 			if (n % listLength == 0) {
 				n -= n;
 			}
 			focusShift = true;
+			camTransition = 2/3;
 	    }
 		
 		else if(!Gdx.input.isKeyPressed(Input.Keys.N) && focusShift){
@@ -312,7 +335,7 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
         }
 
         if (listOfBodies.size() == 0){
-        	LibGDXTools.bodyInitialize("Star", 10000, 25, 0.001f, 0.001f, 0.001f, 0.001f, 40);
+        	LibGDXTools.bodyInitialize("Star", 10000, 25, 0, 0, 0, 0, 40);
 		}
 
         

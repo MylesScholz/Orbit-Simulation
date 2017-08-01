@@ -39,7 +39,7 @@ public class OrbitalPhysics {
 	
 	static void iterateSimulation(float deltaTime) {
 
-        checkAllCollisions();
+       
 
 		// 1. Calculate net force and acceleration from acting on each body.
 		
@@ -85,6 +85,8 @@ public class OrbitalPhysics {
 			currentBody.iterateVelThenPos(deltaTime);
 			
 		}	
+		
+		 checkAllCollisions();
 	}	
 	
 	static Vector3 cowellsFormulation(OrbitalBody currentBody, OrbitalBody pullingBody) {
@@ -172,6 +174,10 @@ public class OrbitalPhysics {
                         listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
                         listOfBodies.get(i).spriteWidth = listOfBodies.get(i).radius * 2;
                     }
+                    
+                    checkAllCollisions();
+                    break;
+                    
                 }
             }
 
