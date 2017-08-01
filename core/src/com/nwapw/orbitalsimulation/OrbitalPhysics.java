@@ -151,7 +151,7 @@ public class OrbitalPhysics {
 		//float distance = Math.sqrt((Math.pow(body1.posVect.x - body2.posVect.x, 2))+(Math.pow(body1.posVect.y - body2.posVect.y, 2)));
         float distance = body1.posVect.dst(body2.posVect);
     	
-    	if (distance <= body1.radius + body2.radius) {
+    	if (distance*RunSimulation.zF <= body1.radius + body2.radius) {
             return true;
         } else {
             return false;
