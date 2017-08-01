@@ -357,6 +357,7 @@ public class RunSimulation extends ApplicationAdapter {
 			}
         	listOfBodies.get(n).velVect.set(0,0,0);
         }
+        
 
 		
 		/*
@@ -393,16 +394,18 @@ public class RunSimulation extends ApplicationAdapter {
 			float frameX = 0;
 			float frameY = 0;
 			
-			if (pauseState == true){
+			if (pauseState == false){
+			
+			frameX = spriteX - 0.1f*listOfBodies.get(n).velVect.x*zF;
+			frameY = spriteY - 0.1f*listOfBodies.get(n).velVect.y*zF;
+			}
+			else {
 				frameX = spriteX;
 				frameY = spriteY;
 			}
-			else {
-				frameX = spriteX - 0.1f*listOfBodies.get(n).velVect.x*zF;
-				frameY = spriteY - 0.1f*listOfBodies.get(n).velVect.y*zF;
-			}
 			
-			font.draw(batch, renderBody.name, frameX + 0.7f*spriteWidth*zF/2, frameY + 1.5f*spriteWidth*zF/10);
+			
+			font.draw(batch, renderBody.name, frameX + 0.7f*spriteWidth*zF/2, spriteY + 1.5f*spriteWidth*zF/10);
 
 			Texture spriteTexture = renderBody.texture;
 			batch.draw(spriteTexture, frameX, frameY, (float) (spriteWidth * zF), (float) (spriteWidth * zF));
@@ -429,26 +432,27 @@ public class RunSimulation extends ApplicationAdapter {
 			focusX += sidePanelWidth;
 		}		
 		
-		//float velCheck = listOfBodies.get(n).velVect.x * listOfBodies.get(n).velVect.x + listOfBodies.get(n).velVect.y * listOfBodies.get(n).velVect.y;
-		
-		float moveX = (camX - focusX) * 0.7f;
-		float moveY = (camY - focusY) * 0.7f;
+
+		float moveX = (camX - focusX) * 2/3;
+		float moveY = (camY - focusY) * 2/3;
 		
 		camX -= moveX;
 		camY -= moveY;
 	
 		camX += 1.1f*cam.viewportHeight/40;
+
 		
 		float frameX = 0;
 		float frameY = 0;
 		
-		if (pauseState == true){
-			frameX = camX;
-			frameY = camY;
-		}
-		else {
+		if (pauseState == false){
+			
 			frameX = camX - 0.1f*listOfBodies.get(n).velVect.x*zF;
 			frameY = camY - 0.1f*listOfBodies.get(n).velVect.y*zF;
+		}
+		else {
+			frameX = camX;
+			frameY = camY;
 		}
 		
 	
