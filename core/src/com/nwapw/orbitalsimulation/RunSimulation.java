@@ -5,6 +5,7 @@ import java.util.Random;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -17,8 +18,10 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
-public class RunSimulation extends ApplicationAdapter implements InputProcessor {
+public class RunSimulation extends ApplicationAdapter {
 		
 	// Constant for the force of gravity, affects how much bodies accelerate
 	final static int gravConst = 100; 
@@ -56,6 +59,7 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 	
 	boolean focusShift;
 	boolean pauseIteration;
+	boolean panelShift;
 	boolean deleteBody;
 	
 	// Booleans for mouse input edge detection
@@ -78,16 +82,20 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 	
 	SpriteBatch batch;
 	Texture backgroundTexture;
+	ShapeRenderer shapeRenderer;
 	
 	static OrthographicCamera cam;
 	float camX = 0;
 	float camY = 0;
 	float sourceX = 0;
 	float sourceY = 0;
+	
 	// zoom factor
 	static float zF = 1;
+	
 	// Makes camera transition either smooth (for moving focus) or fast (for zooming)
 	static float camTransition = 1/6;
+	
 	
 	Texture textures;
 	static ArrayList<Texture> availablePlanetTextures = new ArrayList<Texture>();
@@ -100,6 +108,9 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 	BitmapFont font;
 	String printPosVelAcc = "";
 	
+	boolean sidePanelState = false;
+	int sidePanelWidth = 200;
+
 	
 	boolean pauseState = false;
 	
@@ -146,7 +157,7 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 		//LibGDXTools.bodyInitialize("Star 1", 10000, 25, 100, 100, 0, 0, 50);
 		//LibGDXTools.bodyInitialize("Star 2", 10000, 25, -100, -100, 0, 0, 50);
 
-		
+		shapeRenderer = new ShapeRenderer();
 		batch = new SpriteBatch();
 
 		int i = 1 + (int)(Math.random() * 8); 
@@ -164,15 +175,10 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 
 		// Constructs a new OrthographicCamera, using the given viewport width and height
 		// Height is multiplied by aspect ratio.
-		
+
 		cam = new OrthographicCamera(30, 30 * (h / w));
-
 		cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
-
 		
-		camX = 0;		
-		camY = 0;
-
 		
 		InputProcessor inputProcessor = new Inputs();
 		Gdx.input.setInputProcessor(inputProcessor);
@@ -296,6 +302,21 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 			pauseIteration = true;
 	    }
 		
+		if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE) && !panelShift){
+        	if (sidePanelState == true){
+        		sidePanelState = false;
+        	}
+        	else {
+        		sidePanelState = true;
+        	}
+        	panelShift = true;
+        	// camTransition = 1/6;
+	    }
+		else if(!Gdx.input.isKeyPressed(Input.Keys.ESCAPE) && panelShift){
+			panelShift = false;
+		}
+		
+		
 		else if(!Gdx.input.isKeyPressed(Input.Keys.P) && pauseIteration){
 			pauseIteration = false;
 	    }
@@ -327,18 +348,34 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 			}
         	listOfBodies.get(n).velVect.x += 3;
         }
+       
+
         if(Gdx.input.isKeyPressed(Input.Keys.M)){
         	if (n % listLength == 0) {
 				n -= n;
 			}
         	listOfBodies.get(n).velVect.set(0,0,0);
         }
+        
 
+		
+		
         if (listOfBodies.size() == 0){
         	LibGDXTools.bodyInitialize("Star", 10000, 25, 0, 0, 0, 0, 40);
 		}
 
+        if (Gdx.input.isButtonPressed(Buttons.MIDDLE)){
+            zF = 1;
+        }
         
+		batch.setProjectionMatrix(cam.combined);
+		shapeRenderer.setProjectionMatrix(cam.combined);
+		
+		
+		
+
+
+		
 		batch.begin();
 		batch.draw(backgroundTexture, -cam.viewportWidth/2 + camX, -cam.viewportHeight/2 + camY, (int) camX, (int) -camY, (int) cam.viewportWidth, (int) cam.viewportHeight);
 		
@@ -362,7 +399,11 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 
 
 		float focusX = (float) listOfBodies.get(n).posVect.x * zF - (listOfBodies.get(n).spriteWidth / 2);
-		float focusY = (float) listOfBodies.get(n).posVect.y * zF - (listOfBodies.get(n).spriteWidth  / 2);	
+		float focusY = (float) listOfBodies.get(n).posVect.y * zF - (listOfBodies.get(n).spriteWidth  / 2);
+		
+		if (sidePanelState == true){
+			focusX += sidePanelWidth;
+		}
 		
 		float moveX = (camX - focusX) * 2/3;
 		float moveY = (camY - focusY) * 2/3;
@@ -372,27 +413,29 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 		sourceX -= moveX;
 		sourceY -= moveY;
 		
-		//System.out.println("moveX " + moveX);
-		//System.out.println("moveY " + moveY);
-		//System.out.println("");
-
-		cam.position.set(camX, camY, 0);
 		
-		
-		
-		
-		//System.out.println("Width " + cam.viewportWidth);
-		//System.out.println("Height " + cam.viewportHeight);
-		cam.update();
-		batch.setProjectionMatrix(cam.combined);
-		
-		float frameX = camX - 470;
+		float frameX = camX - 425;
 		float frameY = camY - 250;
 		
+		System.out.println(frameX);
+		System.out.println(frameY);
+		
+		if (sidePanelState == true){
+	
+			
+		}
+		
+		cam.position.set(camX, camY, 0);
+		cam.update();	
+
+
+
+
+		
 		font.draw(batch, "Orbital Simulation", frameX + 15, frameY + 20);
-		
+				
 		font.draw(batch, "(p) pause (n) focus  (d) delete (s) set pos/vel (arrow keys) vel  (0) vel = 0", frameX + 155, frameY + 40);
-		
+
 		
 		if (iterationCounter % 6 == 0 || pauseState == true ) {
 			printPosVelAcc = "";
@@ -458,10 +501,19 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 		font.draw(batch, printIterationStep, frameX + 360, frameY + 20);
 		font.draw(batch, printFocusPlanet, frameX + 440, frameY + 20);
 		
+		if (sidePanelState == true){
+			 
+			 shapeRenderer.begin(ShapeType.Filled);
+			 shapeRenderer.setColor(0.05f, 0.05f, 0.1f, 0.8f);
+			 shapeRenderer.rect(camX + cam.viewportWidth/6, camY - cam.viewportHeight/2, cam.viewportWidth/3, cam.viewportHeight);
+			 shapeRenderer.end();		 
+		}
 		
-		
-		batch.end();	
+		batch.end();
 
+
+		
+		
 		OrbitalPhysics.passList(listOfBodies);
 		//System.out.println(pauseState);
 
@@ -483,8 +535,9 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 	}
 	public void resize(int width, int height) {
 		cam.viewportWidth = 1000f;
-		cam.viewportHeight = 1000f * height/width;
+		cam.viewportHeight = cam.viewportWidth * height/width;
 		cam.update();
+
 	}
 	@Override
 	public void dispose () {
@@ -496,50 +549,5 @@ public class RunSimulation extends ApplicationAdapter implements InputProcessor 
 		
 	}
 
-	@Override
-	public boolean keyDown(int keycode) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
-	@Override
-	public boolean keyUp(int keycode) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean keyTyped(char character) {
-		System.out.println("yes");
-		return false;
-	}
-
-	@Override
-	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		return false;
-	}
-
-	@Override
-	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean mouseMoved(int screenX, int screenY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean scrolled(int amount) {
-		System.out.println("scrolled");
-		return false;
-	}
 }
