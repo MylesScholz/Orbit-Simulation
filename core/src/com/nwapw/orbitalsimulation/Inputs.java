@@ -51,14 +51,14 @@ public class Inputs implements InputProcessor {
 	public boolean scrolled(int amount) {
 		
 		if (amount == 1){
-			 RunSimulation.zF += -.05f;
+			 RunSimulation.zF += -.01f;
 		}
 		else {
-			 RunSimulation.zF += .05f;
+			 RunSimulation.zF += .01f;
 		}
 		
-		if (RunSimulation.zF <= 0.05){
-			RunSimulation.zF = 0.05f;
+		if (RunSimulation.zF <= 0.01){
+			RunSimulation.zF = 0.01f;
 		}
 		else if (RunSimulation.zF >= 10){
 			RunSimulation.zF = 10f;
