@@ -137,7 +137,7 @@ public class OrbitalPhysics {
 		//float distance = Math.sqrt((Math.pow(body1.posVect.x - body2.posVect.x, 2))+(Math.pow(body1.posVect.y - body2.posVect.y, 2)));
         float distance = body1.posVect.dst(body2.posVect);
     	
-    	if (distance*RunSimulation.zF <= body1.radius*RunSimulation.zF + body2.radius*RunSimulation.zF) {
+    	if (distance*RunSimulation.zF*1.2f <= body1.radius*RunSimulation.zF + body2.radius*RunSimulation.zF) {
             return true;
         } else {
             return false;
@@ -158,8 +158,11 @@ public class OrbitalPhysics {
                     	listOfBodies.get(j).velVect.set(sumVel);
                     	
                     	listOfBodies.get(j).mass += listOfBodies.get(i).mass;                      
-                       // listOfBodies.get(j).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
-                      //  listOfBodies.get(j).spriteWidth = listOfBodies.get(i).radius * 2;
+                    	listOfBodies.get(j).radius = (int) Math.sqrt((listOfBodies.get(j).mass * 10) / Math.PI);
+                    	listOfBodies.get(j).spriteWidth = (int) Math.sqrt((listOfBodies.get(j).mass * 10) / Math.PI) * 2;
+                    	
+                    	// listOfBodies.get(j).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
+                        // listOfBodies.get(j).spriteWidth = listOfBodies.get(i).radius * 2;
                     	
                     	listOfBodies.remove(i);
                     	
@@ -170,7 +173,10 @@ public class OrbitalPhysics {
                     	sumVel.scl(1/(listOfBodies.get(i).mass + listOfBodies.get(j).mass));
                     	listOfBodies.get(i).velVect.set(sumVel);
                         
-                    	listOfBodies.get(i).mass += listOfBodies.get(j).mass;  
+                    	listOfBodies.get(i).mass += listOfBodies.get(j).mass;                   
+                    	listOfBodies.get(i).radius = (int) Math.sqrt((listOfBodies.get(i).mass * 10) / Math.PI);
+                    	listOfBodies.get(i).spriteWidth = (int) Math.sqrt((listOfBodies.get(i).mass * 10) / Math.PI) * 2;
+                    	
                     	//listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(j).radius, 2) * 2));
                        // listOfBodies.get(i).spriteWidth = listOfBodies.get(j).radius * 2;
                     	listOfBodies.remove(j);

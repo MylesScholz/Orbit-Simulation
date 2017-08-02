@@ -206,7 +206,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		fTitle.shadowOffsetY = 2;
 		
 		fHeader.size = 18;
-		fHeader.color = Color.WHITE;
+		fHeader.color = Color.GOLDENROD;
 		
 		//fHeader.color = new Color(28, 25, 54, 1f);
 		
@@ -525,10 +525,10 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		cam.update();	
 
 		if (sidePanelState == true && pauseState == true){
-			fontHeader.draw(batch, "PAUSED", frameX - 0.97f*cam.viewportWidth/2, frameY + 8.5f*cam.viewportHeight/20);
+			fontHeader.draw(batch, "PAUSED & SAVED", frameX - 0.97f*cam.viewportWidth/2, frameY + 8.3f*cam.viewportHeight/20);
 		} 
 		else if (sidePanelState == false && pauseState == true){
-			fontHeader.draw(batch, "PAUSED", frameX - 0.6f*cam.viewportWidth/20, frameY + 8.5f*cam.viewportHeight/20);
+			fontHeader.draw(batch, "PAUSED & SAVED", frameX - 1.4f*cam.viewportWidth/20, frameY + 8.3f*cam.viewportHeight/20);
 		}
 				
 		batch.end();
@@ -594,7 +594,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			fontText.draw(batch, "(LEFT CLICK) Create new planet", frameX + 2.5f*cam.viewportWidth/12, frameY + 7*cam.viewportHeight/20);
 			fontText.draw(batch, "(RIGHT CLICK) Create new star", frameX + 2.5f*cam.viewportWidth/12, frameY + 6*cam.viewportHeight/20);			
 			fontText.draw(batch, "(ARROW KEYS) Move Focused Body", frameX + 2.5f*cam.viewportWidth/12, frameY + 5*cam.viewportHeight/20);
-			fontText.draw(batch, "(P) Pause   (N) Change Focus", frameX + 2.5f*cam.viewportWidth/12, frameY + 4*cam.viewportHeight/20);
+			fontText.draw(batch, "(P) Pause & Save (N) Change Focus", frameX + 2.5f*cam.viewportWidth/12, frameY + 4*cam.viewportHeight/20);
 			fontText.draw(batch, "(M) Reset Current Body's Velocity", frameX + 2.5f*cam.viewportWidth/12, frameY + 3*cam.viewportHeight/20);
 		
 	
