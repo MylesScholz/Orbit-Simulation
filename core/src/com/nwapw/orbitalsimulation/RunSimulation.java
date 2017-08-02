@@ -143,7 +143,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	
 	@Override
 	public void create () {
-		
+
 		
 		
         /* SCENE2D*/
@@ -271,64 +271,12 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
         
         /* INITIAL BODIES */
 		// Name, Mass, radius, posx, posy, velx, vely, spritewidth
-        
-        LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 1, 250 , 250, 35, -35);
-        LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 10000, 0, 0, 0, 0);
-        
-        
-        /* FILES */
-        
+
+        //LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 10000, 0,0, 0, 0);
+        //LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 1, 250 , 250, 35, -35);
+
         if (listOfBodies.size() == 0) {
-            String filePath = this.getClass().getClassLoader().getResource("").getPath();   // The path of the running file
-            filePath = filePath.substring(0, filePath.indexOf("/desktop")) + "/core/assets/systems/system1.txt";    //Navigate to system file
-            filePath = filePath.replaceAll("%20", " ");
-
-            File systemFile;
-            FileReader in;
-            BufferedReader readFile;
-            String textLine;
-            boolean fileLoaded = false;
-            int i = 0;
-
-            String nameStr;
-            float massFlt, posXFlt, posYFlt, velXFlt, velYFlt;
-
-            while (fileLoaded == false && i < 2) {
-                try {
-                    systemFile = new File(filePath);
-                    in = new FileReader(systemFile);
-                    readFile = new BufferedReader(in);
-
-                    while ((textLine = readFile.readLine()) != null) {
-                        nameStr = textLine.substring(0, textLine.indexOf(","));
-                        textLine = textLine.substring(textLine.indexOf(",") + 1);
-                        massFlt = Integer.parseInt(textLine.substring(0, textLine.indexOf(",")));
-                        textLine = textLine.substring(textLine.indexOf(",") + 1);
-                        posXFlt = Integer.parseInt(textLine.substring(0, textLine.indexOf(",")));
-                        textLine = textLine.substring(textLine.indexOf(",") + 1);
-                        posYFlt = Integer.parseInt(textLine.substring(0, textLine.indexOf(",")));
-                        textLine = textLine.substring(textLine.indexOf(",") + 1);
-                        velXFlt = Integer.parseInt(textLine.substring(0, textLine.indexOf(",")));
-                        textLine = textLine.substring(textLine.indexOf(",") + 1);
-                        velYFlt = Integer.parseInt(textLine.substring(0, textLine.length()));
-
-                        LibGDXTools.bodyCreate(nameStr, massFlt, posXFlt, posYFlt, velXFlt, velYFlt);
-                    }
-                    readFile.close();
-                    in.close();
-
-                    fileLoaded = true;
-                } catch (FileNotFoundException e) {
-                    System.out.println("File Not Found: " + e.getMessage());
-                    System.out.println("Loading Default File...");
-
-                    filePath = filePath.substring(0, filePath.lastIndexOf("/"));
-                    filePath = filePath + "/default.txt";
-                    i++;
-                } catch (IOException e) {
-                    System.out.println("Problem Reading File: " + e.getMessage());
-                }
-            }
+            loadFile();
         }
         
 
@@ -336,6 +284,130 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	
         
 	}
+
+	public void loadFile() {
+        String filePath = this.getClass().getClassLoader().getResource("").getPath();   // The path of the running file
+        filePath = filePath.substring(0, filePath.indexOf("/desktop")) + "/core/assets/systems/count.txt";    //Navigate to system file
+        filePath = filePath.replaceAll("%20", " ");
+
+        File systemFile;
+        FileReader in;
+        BufferedReader readFile;
+        String textLine;
+
+        boolean fileLoaded = false;
+        int i = 0;
+        int fileCount = 0;
+
+        try {
+            systemFile = new File(filePath);
+            in = new FileReader(systemFile);
+            readFile = new BufferedReader(in);
+
+            fileCount = Integer.parseInt(readFile.readLine().trim());
+        } catch (FileNotFoundException e) {
+            System.out.println("File Not Found: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("Problem Reading File: " + e.getMessage());
+        }
+
+        String nameStr;
+        float massFlt, posXFlt, posYFlt, velXFlt, velYFlt;
+
+        filePath = filePath.substring(0, filePath.lastIndexOf("/"));
+        filePath = filePath + "/system" + fileCount + ".txt";
+
+        while (fileLoaded == false && i < 2) {
+            try {
+                systemFile = new File(filePath);
+                in = new FileReader(systemFile);
+                readFile = new BufferedReader(in);
+
+                while ((textLine = readFile.readLine()) != null) {
+                    nameStr = textLine.substring(0, textLine.indexOf(","));
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);
+                    massFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);
+                    posXFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);
+                    posYFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);
+                    velXFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);
+                    velYFlt = (float) Double.parseDouble(textLine.substring(0, textLine.length()));
+
+                    LibGDXTools.bodyCreate(nameStr, massFlt, posXFlt, posYFlt, velXFlt, velYFlt);
+                }
+                readFile.close();
+                in.close();
+
+                fileLoaded = true;
+            } catch (FileNotFoundException e) {
+                System.out.println("File Not Found: " + e.getMessage());
+                System.out.println("Loading Default File...");
+
+                filePath = filePath.substring(0, filePath.lastIndexOf("/"));
+                filePath = filePath + "/default.txt";
+                i++;
+            } catch (IOException e) {
+                System.out.println("Problem Reading File: " + e.getMessage());
+            }
+        }
+    }
+
+    public void loadFile(String fileName) {
+        String filePath = this.getClass().getClassLoader().getResource("").getPath();   // The path of the running file
+        filePath = filePath.substring(0, filePath.indexOf("/desktop")) + "/core/assets/systems/" + fileName;    //Navigate to system file
+        filePath = filePath.replaceAll("%20", " ");
+
+        File systemFile;
+        FileReader in;
+        BufferedReader readFile;
+        String textLine;
+
+        boolean fileLoaded = false;
+        int i = 0;
+
+        String nameStr;
+        float massFlt, posXFlt, posYFlt, velXFlt, velYFlt;
+
+        while (fileLoaded == false && i < 2) {
+            try {
+                systemFile = new File(filePath);
+                in = new FileReader(systemFile);
+                readFile = new BufferedReader(in);
+
+                while ((textLine = readFile.readLine()) != null) {
+                    nameStr = textLine.substring(0, textLine.indexOf(","));
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);
+                    massFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);
+                    posXFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);
+                    posYFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);
+                    velXFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);
+                    velYFlt = (float) Double.parseDouble(textLine.substring(0, textLine.length()));
+
+                    LibGDXTools.bodyCreate(nameStr, massFlt, posXFlt, posYFlt, velXFlt, velYFlt);
+                }
+                readFile.close();
+                in.close();
+
+                fileLoaded = true;
+            } catch (FileNotFoundException e) {
+                System.out.println("File Not Found: " + e.getMessage());
+                System.out.println("Loading Default File...");
+
+                filePath = filePath.substring(0, filePath.lastIndexOf("/"));
+                filePath = filePath + "/default.txt";
+                i++;
+            } catch (IOException e) {
+                System.out.println("Problem Reading File: " + e.getMessage());
+            }
+        }
+    }
 
 	public void place() {		
 		if (Gdx.input.isButtonPressed(0) && !newPlanet) {
@@ -398,7 +470,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		}
 		
 
-		
+
 		if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)){
 			 if (RunSimulation.n >= RunSimulation.listOfBodies.size()) {
 				 RunSimulation.n -= RunSimulation.n;
@@ -435,7 +507,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			}
        	RunSimulation.listOfBodies.get(RunSimulation.n).velVect.set(0,0,0);
 	   }
-	   
+
         if (Gdx.input.isButtonPressed(Buttons.MIDDLE)){
             zF = 1;
         }
@@ -458,7 +530,11 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			
 			float frameX = 0;
 			float frameY = 0;
-			
+
+            if (n >= listOfBodies.size()) {
+                n -= n;
+            }
+
 			if (pauseState == false){
 		        if (n >= listOfBodies.size()) {
 		            n -= n;
@@ -557,7 +633,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 						shapeRenderer.setColor(1, 0, 0, x / drawLimit);
 						//System.outystem.out.println(shapeRenderer.getColor().a);
 						shapeRenderer.line(potOldX.get(x)*zF, potOldY.get(x)*zF, potNewX.get(x)*zF, potNewY.get(x)*zF);
-						
+
 					}	
 				} else {
 					potOldX.remove(0);
@@ -669,6 +745,132 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
 		
 	}
+
+	public void saveFile() {
+        String filePath = this.getClass().getClassLoader().getResource("").getPath();   //The path of the running file
+        filePath = filePath.substring(0, filePath.indexOf("/desktop")) + "/core/assets/systems/count.txt";    //Navigate to system file
+        filePath = filePath.replaceAll("%20", " ");
+
+        File systemFile;
+        FileWriter out;
+        FileReader in;
+        BufferedWriter writeFile;
+        BufferedReader readFile;
+
+        Boolean fileWritten = false;
+        int i = 0;
+        String textLine = "";
+        int fileCount = 0;
+
+        try {
+            //Read count.txt to get file count, increment it, and write it to the file
+            systemFile = new File(filePath);
+            in = new FileReader(systemFile);
+            readFile = new BufferedReader(in);
+
+            fileCount = Integer.parseInt(readFile.readLine().trim()) + 1;
+
+            out = new FileWriter(systemFile);
+            writeFile = new BufferedWriter(out);
+
+            writeFile.write(String.valueOf(fileCount));
+
+            writeFile.close();
+            out.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("File Not Found: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("Problem Reading File: " + e.getMessage());
+        }
+
+        //Switch to system.txt
+        filePath = filePath.substring(0, filePath.lastIndexOf("/"));
+        filePath = filePath + "/system" + fileCount + ".txt";
+
+        while (fileWritten == false && i < 2) {
+            try {
+                //Write data to system file
+                systemFile = new File(filePath);
+                out = new FileWriter(systemFile);
+                writeFile = new BufferedWriter(out);
+
+                for (int j = 0; j < listOfBodies.size(); j++) {
+                    textLine = listOfBodies.get(j).name + "," + listOfBodies.get(j).mass + "," + listOfBodies.get(j).posVect.x + "," + listOfBodies.get(j).posVect.y;
+                    textLine = textLine + "," + listOfBodies.get(j).velVect.x + "," + listOfBodies.get(j).velVect.y;
+
+                    writeFile.write(textLine);
+                    writeFile.newLine();
+                }
+                writeFile.close();
+                out.close();
+
+                fileWritten = true;
+            } catch (FileNotFoundException e) {
+                System.out.println("File Not Found: " + e.getMessage());
+                System.out.println("Creating New File...");
+
+                try {
+                    systemFile = new File(filePath);
+                    systemFile.createNewFile();
+                } catch (IOException err) {
+                    System.out.println("Problem Creating File: " + e.getMessage());
+                }
+
+                i++;
+            } catch (IOException e) {
+                System.out.println("Problem Writing to File: " + e.getMessage());
+            }
+        }
+    }
+
+    public void saveFile(String fileName) {
+        String filePath = this.getClass().getClassLoader().getResource("").getPath();   //The path of the running file
+        filePath = filePath.substring(0, filePath.indexOf("/desktop")) + "/core/assets/systems/" + fileName;    //Navigate to system file
+        filePath = filePath.replaceAll("%20", " ");
+
+        File systemFile;
+        FileWriter out;
+        BufferedWriter writeFile;
+
+        Boolean fileWritten = false;
+        int i = 0;
+        String textLine = "";
+
+        while (fileWritten == false && i < 2) {
+            try {
+                //Write data to system file
+                systemFile = new File(filePath);
+                out = new FileWriter(systemFile);
+                writeFile = new BufferedWriter(out);
+
+                for (int j = 0; j < listOfBodies.size(); j++) {
+                    textLine = listOfBodies.get(j).name + "," + listOfBodies.get(j).mass + "," + listOfBodies.get(j).posVect.x + "," + listOfBodies.get(j).posVect.y;
+                    textLine = textLine + "," + listOfBodies.get(j).velVect.x + "," + listOfBodies.get(j).velVect.y;
+
+                    writeFile.write(textLine);
+                    writeFile.newLine();
+                }
+                writeFile.close();
+                out.close();
+
+                fileWritten = true;
+            } catch (FileNotFoundException e) {
+                System.out.println("File Not Found: " + e.getMessage());
+                System.out.println("Creating New File...");
+
+                try {
+                    systemFile = new File(filePath);
+                    systemFile.createNewFile();
+                } catch (IOException err) {
+                    System.out.println("Problem Creating File: " + e.getMessage());
+                }
+
+                i++;
+            } catch (IOException e) {
+                System.out.println("Problem Writing to File: " + e.getMessage());
+            }
+        }
+    }
 	
 	public void resize(int width, int height) {
 		//stage.getViewport().update(width, height, true);
