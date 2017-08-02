@@ -36,6 +36,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import sun.font.ScriptRunData;
 
 public class RunSimulation extends ApplicationAdapter implements ApplicationListener {
 		
@@ -746,9 +747,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		
 	}
 
-	public void saveFile() {
-        String filePath = this.getClass().getClassLoader().getResource("").getPath();   //The path of the running file
-        filePath = filePath.substring(0, filePath.indexOf("/desktop")) + "/core/assets/systems/count.txt";    //Navigate to system file
+	public static void saveFile() {
+        String filePath = RunSimulation.class.getProtectionDomain().getCodeSource().getLocation().getPath();    //The path of the RunSimulation
+        filePath = filePath.substring(0, filePath.indexOf("/build")) + "/assets/systems/count.txt";    //Navigate to system file
         filePath = filePath.replaceAll("%20", " ");
 
         File systemFile;
@@ -823,9 +824,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
         }
     }
 
-    public void saveFile(String fileName) {
-        String filePath = this.getClass().getClassLoader().getResource("").getPath();   //The path of the running file
-        filePath = filePath.substring(0, filePath.indexOf("/desktop")) + "/core/assets/systems/" + fileName;    //Navigate to system file
+    public static void saveFile(String fileName) {
+        String filePath = RunSimulation.class.getProtectionDomain().getCodeSource().getLocation().getPath();   //The path of the RunSimulation
+        filePath = filePath.substring(0, filePath.indexOf("/build")) + "/assets/systems/" + fileName;    //Navigate to system file
         filePath = filePath.replaceAll("%20", " ");
 
         File systemFile;

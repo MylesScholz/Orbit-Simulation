@@ -44,6 +44,7 @@ public class Inputs implements InputProcessor {
 	    }
 	
 		if(keycode == Input.Keys.P){
+		    RunSimulation.saveFile();
 			if (RunSimulation.pauseState == false){
 				RunSimulation.pauseState = true;
 			}
