@@ -102,7 +102,7 @@ public class OrbitalPhysics {
 		Vector3 calculatedAcc = new Vector3(0,0,0);	
 		calculatedAcc.add(diffOfPosVect);
 		
-		calculatedAcc.scl((float) (-1*gravConst * pullingBody.mass / Math.pow(currentPos.dst(pullingPos), 3)));	
+		calculatedAcc.scl((float) (-1*gravConst * pullingBody.mass / (Math.pow(currentPos.dst(pullingPos), 3) * currentBody.mass)));	
 		//calculatedAcc.scl(1/currentBody.mass);
 		
 		//System.out.println(calculatedAcc);
@@ -137,7 +137,7 @@ public class OrbitalPhysics {
 		//float distance = Math.sqrt((Math.pow(body1.posVect.x - body2.posVect.x, 2))+(Math.pow(body1.posVect.y - body2.posVect.y, 2)));
         float distance = body1.posVect.dst(body2.posVect);
     	
-    	if (distance*RunSimulation.zF <= body1.radius + body2.radius) {
+    	if (distance*RunSimulation.zF <= body1.radius*RunSimulation.zF + body2.radius*RunSimulation.zF) {
             return true;
         } else {
             return false;

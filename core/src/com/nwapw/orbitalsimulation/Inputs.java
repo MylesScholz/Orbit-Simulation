@@ -9,6 +9,18 @@ public class Inputs implements InputProcessor {
 
 	@Override
 	public boolean keyDown(int keycode) {
+		
+		if(keycode == Input.Keys.ESCAPE){
+			
+        	if (RunSimulation.sidePanelState == true){
+        		RunSimulation.sidePanelState = false;
+        	}
+        	else {
+        		RunSimulation.sidePanelState = true;
+        	}
+        	
+	    }   
+	
 		if (keycode == Input.Keys.N){
 			RunSimulation.n++;
 			if (RunSimulation.n >= RunSimulation.listOfBodies.size()) {
@@ -31,6 +43,16 @@ public class Inputs implements InputProcessor {
 			RunSimulation.listOfBodies.remove(RunSimulation.n);
 	    }
 	
+		if(keycode == Input.Keys.P){
+			if (RunSimulation.pauseState == false){
+				RunSimulation.pauseState = true;
+			}
+			else {
+				RunSimulation.pauseState = false;
+			}
+	    }
+		
+
 		
 		
 		return false;
@@ -50,7 +72,9 @@ public class Inputs implements InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		// TODO Auto-generated method stub
+		
+		
+		
 		return false;
 	}
 
