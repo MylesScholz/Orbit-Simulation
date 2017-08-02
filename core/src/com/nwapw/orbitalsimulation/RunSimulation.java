@@ -1,6 +1,7 @@
 package com.nwapw.orbitalsimulation;
 import java.util.ArrayList;
 import java.util.Random;
+import java.io.*;
 
 import javax.management.openmbean.SimpleType;
 
@@ -38,9 +39,8 @@ public class RunSimulation extends ApplicationAdapter {
 	
 	// Specifies time used to calculate numerical integration
 	// TODO Adaptive step-size control
-
 	final static float deltaTime = (float) 0.1;
-
+	
 	// The max number of iterations that the simulation runs
 	final static int numOfIterations = 100000000;
 	
@@ -52,7 +52,7 @@ public class RunSimulation extends ApplicationAdapter {
 	// To debug
 	double timeCounter = 0;
 	int iterationCounter = 0;
-	int dataDivision = 1;
+	int dataDivision = 1000;
 	
 	// Cycle through focus
 	int n = 0;
@@ -103,8 +103,7 @@ public class RunSimulation extends ApplicationAdapter {
 	// zoom factor
 	static float zF = 1;
 	
-	// Makes camera transition either smooth (for moving focus) or fast (for zooming)
-	static float camTransition = 1/6;
+	static float placedBodySpeed = 0.5f;
 	
 	
 	Texture textures;
@@ -164,6 +163,59 @@ public class RunSimulation extends ApplicationAdapter {
         LibGDXTools.bodyCreate("Sun", 10000, 0,0, 0, 0);
         LibGDXTools.bodyCreate("Planet", 1, 250 , 250, 35, -35);
 
+        if (listOfBodies.size() == 0) {
+            String filePath = this.getClass().getClassLoader().getResource("").getPath();   // The path of the running file
+            filePath = filePath.substring(0, filePath.indexOf("/desktop")) + "/core/assets/systems/system1.txt";    //Navigate to system file
+            filePath = filePath.replaceAll("%20", " ");
+
+            File systemFile;
+            FileReader in;
+            BufferedReader readFile;
+            String textLine;
+            boolean fileLoaded = false;
+            int i = 0;
+
+            String nameStr;
+            float massFlt, posXFlt, posYFlt, velXFlt, velYFlt;
+
+            while (fileLoaded == false && i < 2) {
+                try {
+                    systemFile = new File(filePath);
+                    in = new FileReader(systemFile);
+                    readFile = new BufferedReader(in);
+
+                    while ((textLine = readFile.readLine()) != null) {
+                        nameStr = textLine.substring(0, textLine.indexOf(","));
+                        textLine = textLine.substring(textLine.indexOf(",") + 1);
+                        massFlt = Integer.parseInt(textLine.substring(0, textLine.indexOf(",")));
+                        textLine = textLine.substring(textLine.indexOf(",") + 1);
+                        posXFlt = Integer.parseInt(textLine.substring(0, textLine.indexOf(",")));
+                        textLine = textLine.substring(textLine.indexOf(",") + 1);
+                        posYFlt = Integer.parseInt(textLine.substring(0, textLine.indexOf(",")));
+                        textLine = textLine.substring(textLine.indexOf(",") + 1);
+                        velXFlt = Integer.parseInt(textLine.substring(0, textLine.indexOf(",")));
+                        textLine = textLine.substring(textLine.indexOf(",") + 1);
+                        velYFlt = Integer.parseInt(textLine.substring(0, textLine.length()));
+
+                        LibGDXTools.bodyCreate(nameStr, massFlt, posXFlt, posYFlt, velXFlt, velYFlt);
+                    }
+                    readFile.close();
+                    in.close();
+
+                    fileLoaded = true;
+                } catch (FileNotFoundException e) {
+                    System.out.println("File Not Found: " + e.getMessage());
+                    System.out.println("Loading Default File...");
+
+                    filePath = filePath.substring(0, filePath.lastIndexOf("/"));
+                    filePath = filePath + "/default.txt";
+                    i++;
+                } catch (IOException e) {
+                    System.out.println("Problem Reading File: " + e.getMessage());
+                }
+            }
+        }
+
 		shapeRenderer = new ShapeRenderer();
 		batch = new SpriteBatch();
 
@@ -189,7 +241,7 @@ public class RunSimulation extends ApplicationAdapter {
 		printAcc = "Acc: (0.0, 0.0, 0.0)";
 		
 		InputProcessor inputProcessor = new Inputs();
-		Gdx.input.setInputProcessor(inputProcessor);		
+		Gdx.input.setInputProcessor(inputProcessor);
 	}
 
 	public void place() {		
@@ -213,7 +265,7 @@ public class RunSimulation extends ApplicationAdapter {
 			
 			String planetName = LibGDXTools.nameGen();
 			
-			LibGDXTools.bodyCreate(planetName, randomMass, clickLeftPositionX , clickLeftPositionY, unclickLeftPositionX - clickLeftPositionX, unclickLeftPositionY - clickLeftPositionY);
+			LibGDXTools.bodyCreate(planetName, randomMass, clickLeftPositionX , clickLeftPositionY, (unclickLeftPositionX - clickLeftPositionX)*placedBodySpeed, (unclickLeftPositionY - clickLeftPositionY)*placedBodySpeed);
 			newPlanet = false;
 		}
 		if (Gdx.input.isButtonPressed(1) && !newSun) {
@@ -235,8 +287,9 @@ public class RunSimulation extends ApplicationAdapter {
 			
 			String sunName = LibGDXTools.nameGen();
 			
-			LibGDXTools.bodyCreate(sunName, randomMass, clickRightPositionX, clickRightPositionY, unclickRightPositionX - clickRightPositionX, -(unclickRightPositionY - clickRightPositionY));
+			LibGDXTools.bodyCreate(sunName, randomMass, clickRightPositionX , clickRightPositionY, (unclickRightPositionX - clickRightPositionX)*placedBodySpeed, (unclickRightPositionY - clickRightPositionY)*placedBodySpeed);
 			newSun = false;
+
 		}
 	}
 	
@@ -251,8 +304,9 @@ public class RunSimulation extends ApplicationAdapter {
 				n -= n;
 			}
 			focusShift = true;
-			camTransition = 2/3;
-	    } else if (!Gdx.input.isKeyPressed(Input.Keys.N) && focusShift){
+			zF = LibGDXTools.calculateDefaultZoom(listOfBodies.get(n).spriteWidth);
+	    }
+		else if(!Gdx.input.isKeyPressed(Input.Keys.N) && focusShift){
 			focusShift = false;
 	    }
 		
@@ -294,7 +348,7 @@ public class RunSimulation extends ApplicationAdapter {
         		sidePanelState = true;
         	}
         	panelShift = true;
-        	// camTransition = 1/6;
+ 
 	    }
 		else if(!Gdx.input.isKeyPressed(Input.Keys.ESCAPE) && panelShift){
 			panelShift = false;
@@ -341,10 +395,14 @@ public class RunSimulation extends ApplicationAdapter {
         	listOfBodies.get(n).velVect.set(0,0,0);
         }
         
+
+		
+		/*
         if (listOfBodies.size() == 0){
-        	LibGDXTools.bodyInitialize("Star", 10000, 25, 0, 0, 0, 0, 50);
+        	LibGDXTools.bodyInitialize("Star", 10000, 25, 0, 0, 0, 0, 40);
 		}
-        
+		*/
+
         if (Gdx.input.isButtonPressed(Buttons.MIDDLE)){
             zF = 1;
         }
@@ -354,7 +412,8 @@ public class RunSimulation extends ApplicationAdapter {
 		
 		batch.begin();
 		batch.draw(backgroundTexture, -cam.viewportWidth/2 + camX, -cam.viewportHeight/2 + camY, (int) camX, (int) -camY, (int) cam.viewportWidth, (int) cam.viewportHeight);
-				
+
+
 		for (int i = 0; i < listOfBodies.size(); i++) {
 			OrbitalBody renderBody = listOfBodies.get(i);
 
@@ -363,47 +422,80 @@ public class RunSimulation extends ApplicationAdapter {
 			float spriteX = (float) renderBody.posVect.x * zF - (spriteWidth / 2);
 			float spriteY = (float) renderBody.posVect.y * zF - (spriteWidth / 2);
 			
-			font.draw(batch, renderBody.name, spriteX + 0.7f*spriteWidth*zF/2, spriteY + 1.5f*spriteWidth*zF/10);
+			float frameX = 0;
+			float frameY = 0;
+			
+			if (pauseState == false){
+			
+			frameX = spriteX - 0.1f*listOfBodies.get(n).velVect.x*zF;
+			frameY = spriteY - 0.1f*listOfBodies.get(n).velVect.y*zF;
+			}
+			else {
+				frameX = spriteX;
+				frameY = spriteY;
+			}
+			
+			
+			font.draw(batch, renderBody.name, frameX + 0.7f*spriteWidth*zF/2, spriteY + 1.5f*spriteWidth*zF/10);
 
 			Texture spriteTexture = renderBody.texture;
-			batch.draw(spriteTexture, spriteX, spriteY, (float) (spriteWidth * zF), (float) (spriteWidth * zF));	
+			batch.draw(spriteTexture, spriteX, spriteY, (float) (spriteWidth * zF), (float) (spriteWidth * zF));
 		}
+
 		
-		float focusX = 0;
+        float focusX = 0;
 		float focusY = 0;
 
         if (n >= listOfBodies.size()) {
             n -= n;
         }
-        
-        focusX = (float) listOfBodies.get(n).posVect.x * zF - (listOfBodies.get(n).spriteWidth / 2);
-        focusY = (float) listOfBodies.get(n).posVect.y * zF - (listOfBodies.get(n).spriteWidth / 2);
+        /*
+        focusX = (float) listOfBodies.get(n).posVect.x * zF - zF*(listOfBodies.get(n).spriteWidth / 2);
+        focusY = (float) listOfBodies.get(n).posVect.y * zF - zF*(listOfBodies.get(n).spriteWidth / 2);
+		*/
+		focusX = (float) listOfBodies.get(n).posVect.x * zF - (listOfBodies.get(n).spriteWidth / 8);
+        focusY = (float) listOfBodies.get(n).posVect.y * zF - (listOfBodies.get(n).spriteWidth / 8);
 		
 		if (sidePanelState == true){
 			focusX += sidePanelWidth;
-		}
+		}		
 
-		float moveX = (camX - focusX) * 1/3;
-		float moveY = (camY - focusY) * 1/3;
+		float moveX = (camX - focusX) * 2/3;
+		float moveY = (camY - focusY) * 2/3;
 		
 		camX -= moveX;
 		camY -= moveY;
-		sourceX -= moveX;
-		sourceY -= moveY;
-		
+	
 		camX += 1.1f*cam.viewportHeight/40;
-		if (sidePanelState == true){
-			
+		float frameX = 0;
+		float frameY = 0;
+		
+		if (pauseState == false){
+			frameX = camX - 0.1f*listOfBodies.get(n).velVect.x*zF;
+			frameY = camY - 0.1f*listOfBodies.get(n).velVect.y*zF;
 		}
+		else {
+			frameX = camX;
+			frameY = camY;
+		}
+
 		cam.position.set(camX, camY, 0);
-		cam.update();		
+		cam.update();	
+
+		if (sidePanelState == true && pauseState == true){
+			font.draw(batch, "PAUSED", frameX - 0.97f*cam.viewportWidth/2, frameY + 8.5f*cam.viewportHeight/20);
+		} 
+		else if (sidePanelState == false && pauseState == true){
+			font.draw(batch, "PAUSED", frameX - 0.6f*cam.viewportWidth/20, frameY + 8.5f*cam.viewportHeight/20);
+		}
+				
 		batch.end();
 		if (sidePanelState == true){
 			Gdx.gl.glEnable(GL30.GL_BLEND);
 			Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
 			 shapeRenderer.begin(ShapeType.Filled);
 			 shapeRenderer.setColor(0.05f, 0.05f, 0.1f, 0.8f);
-			 shapeRenderer.rect(camX + cam.viewportWidth/6, camY - cam.viewportHeight/2, cam.viewportWidth/2, cam.viewportHeight);
+			 shapeRenderer.rect(frameX + cam.viewportWidth/6, frameY - cam.viewportHeight/2, cam.viewportWidth/2, cam.viewportHeight);
 			 shapeRenderer.end();	
 			 Gdx.gl.glDisable(GL30.GL_BLEND);
 		}
@@ -506,11 +598,14 @@ public class RunSimulation extends ApplicationAdapter {
 				timeCounter += deltaTime;
 				OrbitalPhysics.iterateSimulation(deltaTime);	
 				place();
-				if ((iterationCounter % dataDivision) == 0);				
+				if ((iterationCounter % dataDivision) == 0){							
+	
 				}
 			}	
 			iterationCounter += 1;
 		}
+
+		
 	}
 	
 	public void resize(int width, int height) {
