@@ -101,9 +101,10 @@ public class LibGDXTools {
 
 	static String nameGen() {
 	    Random rand = new Random();
-        String[] consonants = new String[21];
-        String[] vowels = new String[6];
-        String[] syllables = new String[126];
+        String[] consonants = new String[29];
+        String[] vowels = new String[20];
+        String[] syllables = new String[580];
+        String[] suffix = new String[20];
         int iteration = -1;
         String name = "";
 
@@ -119,7 +120,7 @@ public class LibGDXTools {
         consonants[9] = "m";
         consonants[10] = "n";
         consonants[11] = "p";
-        consonants[12] = "q";
+        consonants[12] = "qu";
         consonants[13] = "r";
         consonants[14] = "s";
         consonants[15] = "t";
@@ -128,27 +129,108 @@ public class LibGDXTools {
         consonants[18] = "x";
         consonants[19] = "y";
         consonants[20] = "z";
+        consonants[21] = "ch";
+        consonants[22] = "ph";
+        consonants[23] = "kn";
+        consonants[24] = "wr";
+        consonants[25] = "sh";
+        consonants[26] = "wh";
+        consonants[27] = "th";
+        consonants[28] = "ng";
 
+        
+        
         vowels[0] = "a";
         vowels[1] = "e";
         vowels[2] = "i";
         vowels[3] = "o";
         vowels[4] = "u";
         vowels[5] = "y";
-
+        vowels[6] = "oo";
+        vowels[7] = "ee";
+        vowels[8] = "ea";
+        vowels[9] = "ie";
+        vowels[10] = "ei";
+        vowels[11] = "ue";
+        vowels[12] = "oi";
+        vowels[13] = "ir";
+        vowels[14] = "ei";
+        vowels[15] = "an";
+        vowels[16] = "en";
+        vowels[17] = "in";
+        vowels[18] = "un";
+        vowels[19] = "yn";
+        
+        
+        suffix[0] = "Alpha ";
+        suffix[1] = "Beta ";
+        suffix[2] = "Gamma ";
+        suffix[3] = "Delta ";
+        suffix[4] = "Epsilon ";
+        suffix[5] = "Zeta ";
+        suffix[6] = "Eta ";
+        suffix[7] = "Theta ";
+        suffix[8] = "Iota ";     
+        suffix[9] = "Kappa ";
+        suffix[10] = "Lambda ";
+        suffix[11] = "Mu ";
+        suffix[12] = "Nu ";
+        suffix[13] = "Malahupitin ";
+        suffix[14] = "Pi ";    
+        suffix[15] = "Zeta ";
+        suffix[16] = "Eta ";
+        suffix[17] = "Theta ";
+        suffix[18] = "Iota ";     
+        suffix[19] = "Kappa ";       
+        
+        
         for (int i = 0; i < consonants.length; i++) {
             for (int j = 0; j < vowels.length; j++) {
                 iteration++;
                 syllables[iteration] = consonants[i] + vowels[j];
             }
         }
-
-        for (int i = 0; i < (rand.nextInt(4) + 2); i++) {
-            name = name + syllables[rand.nextInt(126)];
+       
+       
+        int randomSyllableLength = (int) Math.floor(Math.abs(Math.random() - Math.random()) * (1 + 6 - 1) + 1);
+        
+        String hyphenSpaceInput[] = new String[randomSyllableLength];
+        
+        hyphenSpaceInput[randomSyllableLength-1] = "";
+        for (int j = 0; j < randomSyllableLength - 1; j++){
+        	hyphenSpaceInput[j] = "";
+        	if (Math.random() < 0.1){     		
+        		if (Math.random() < 0.4){
+        			hyphenSpaceInput[j] = "-";
+        		}
+        		else {
+        			hyphenSpaceInput[j] = " ";
+        		}
+        		
+        	}
+        }
+        
+        
+        for (int i = 0; i < randomSyllableLength; i++) {
+            name += syllables[rand.nextInt(580)];
+            name += hyphenSpaceInput[i];
+            
         }
 
         name = name.substring(0,1).toUpperCase() + name.substring(1);
 
+        if (Math.random() < 0.02){
+        	int randInt =  random.nextInt(19) + 0;
+        	name = suffix[randInt] + name;
+        	
+        	
+        	
+        }
+        
+        
+        
+        
+        
         return name;
     }
 		
