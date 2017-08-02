@@ -446,8 +446,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
             float spriteWidth = renderBody.spriteWidth;
 
-			float spriteX = (float) renderBody.posVect.x * zF - (spriteWidth / 2);
-			float spriteY = (float) renderBody.posVect.y * zF - (spriteWidth / 2);
+			float spriteX = (float) renderBody.posVect.x * zF - zF*(spriteWidth / 2);
+			float spriteY = (float) renderBody.posVect.y * zF - zF*(spriteWidth / 2);
 			
 			float frameX = 0;
 			float frameY = 0;
@@ -541,7 +541,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 					for (int x = 0; x < potOldX.size(); x++) {
 						shapeRenderer.setColor(1, 0, 0, x / drawLimit);
 						//System.outystem.out.println(shapeRenderer.getColor().a);
-						shapeRenderer.line(potOldX.get(x), potOldY.get(x), potNewX.get(x), potNewY.get(x));
+						shapeRenderer.line(potOldX.get(x)*zF, potOldY.get(x)*zF, potNewX.get(x)*zF, potNewY.get(x)*zF);
+						
 					}	
 				} else {
 					potOldX.remove(0);
@@ -552,7 +553,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 						//System.out.println("2");
 						for (int x = 0; x < potOldX.size(); x++) {
 							shapeRenderer.setColor(1, 0, 0, x / drawLimit);
-							shapeRenderer.line(potOldX.get(x), potOldY.get(x), potNewX.get(x), potNewY.get(x));
+							shapeRenderer.line(potOldX.get(x)*zF, potOldY.get(x)*zF, potNewX.get(x)*zF, potNewY.get(x)*zF);
 						}
 					} else {
 						//System.out.println("4");
