@@ -65,7 +65,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	int dataDivision = 1000;
 	
 	// Cycle through focus
-	int n = 0;
+	static int n = 0;
 	
 	int placedPlanetCounter = 0;
 	int placedSunCounter = 0;
@@ -144,16 +144,19 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	@Override
 	public void create () {
 		
-		
-		for (int i = 0; i < 200; i++){
+		/*
+		for (int i = 0; i < 100000; i++){
 			System.out.println(LibGDXTools.nameGen());
 			
 		}
 		
+		*/
 		
 		
-		/*
 		 stage = new Stage(); 
+		 Gdx.input.setInputProcessor(stage);
+		 
+		 /*
 		 skin = new Skin(Gdx.files.internal("data/uiskin.json"));
 		 final TextButton button = new TextButton("Click me", skin, "default");
 		 button.setWidth(200f);
@@ -168,7 +171,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	        });
 	     
 	    stage.addActor(button);
-	    Gdx.input.setInputProcessor(stage);
+	   
 		*/
 	    font = new BitmapFont();
 		font.setUseIntegerPositions(false);
@@ -387,37 +390,10 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
-		if(Gdx.input.isKeyPressed(Input.Keys.N) && !focusShift){
-			n++;
-			if (n >= listOfBodies.size()) {
-				n -= n;
-			}
-			focusShift = true;
-			zF = LibGDXTools.calculateDefaultZoom(listOfBodies.get(n).spriteWidth);
-	    }
-		else if(!Gdx.input.isKeyPressed(Input.Keys.N) && focusShift){
-			focusShift = false;
-	    }
-		
-		if(Gdx.input.isKeyPressed(Input.Keys.B)){
-			if (n >= listOfBodies.size()) {
-				n -= n;
-			}
-			listOfBodies.get(n).posVect.set(100, 100, 100);
-			listOfBodies.get(n).velVect.set(0, 0, 0);
-	    }
 
-		if(Gdx.input.isKeyPressed(Input.Keys.BACKSPACE) && !deleteBody){
-			if (n >= listOfBodies.size()) {
-				n -= n;
-			}
-			listOfBodies.remove(n);
-			deleteBody = true;
-	    }
-		
-		else if(!Gdx.input.isKeyPressed(Input.Keys.BACKSPACE) && deleteBody){
-			deleteBody = false;
-	    }
+
+
+
 		
 		if(Gdx.input.isKeyPressed(Input.Keys.P) && !pauseIteration){
 			if (pauseState == false){
@@ -500,7 +476,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		shapeRenderer.setProjectionMatrix(cam.combined);
 		
 		batch.begin();
-		// stage.draw();
+		stage.draw();
 		batch.draw(backgroundTexture, -cam.viewportWidth/2 + camX, -cam.viewportHeight/2 + camY, (int) camX, (int) -camY, (int) cam.viewportWidth, (int) cam.viewportHeight);
 
 
@@ -600,10 +576,10 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
 				shapeRenderer.begin(ShapeType.Line);
 				if (potOldX.size() < drawLimit) {
-					System.out.println("1");
+					//System.out.println("1");
 					for (int x = 0; x < potOldX.size(); x++) {
 						shapeRenderer.setColor(1, 0, 0, x / drawLimit);
-						System.out.println(shapeRenderer.getColor().a);
+						//System.outystem.out.println(shapeRenderer.getColor().a);
 						shapeRenderer.line(potOldX.get(x), potOldY.get(x), potNewX.get(x), potNewY.get(x));
 					}	
 				} else {
@@ -612,13 +588,13 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 					potNewX.remove(0);
 					potNewY.remove(0);
 					if (potOldX.size() < drawLimit) {
-						System.out.println("2");
+						//System.out.println("2");
 						for (int x = 0; x < potOldX.size(); x++) {
 							shapeRenderer.setColor(1, 0, 0, x / drawLimit);
 							shapeRenderer.line(potOldX.get(x), potOldY.get(x), potNewX.get(x), potNewY.get(x));
 						}
 					} else {
-						System.out.println("4");
+						//System.out.println("4");
 					}
 				}
 				shapeRenderer.end();	

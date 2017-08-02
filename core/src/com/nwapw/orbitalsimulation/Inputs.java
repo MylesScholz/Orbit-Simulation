@@ -1,5 +1,7 @@
 package com.nwapw.orbitalsimulation;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
@@ -7,19 +9,42 @@ public class Inputs implements InputProcessor {
 
 	@Override
 	public boolean keyDown(int keycode) {
-		// TODO Auto-generated method stub
+		if (keycode == Input.Keys.N){
+			RunSimulation.n++;
+			if (RunSimulation.n >= RunSimulation.listOfBodies.size()) {
+				RunSimulation.n -= RunSimulation.n;
+			}
+			RunSimulation.zF = LibGDXTools.calculateDefaultZoom(RunSimulation.listOfBodies.get(RunSimulation.n).spriteWidth);
+		}
+		if (keycode == Input.Keys.B){
+			if (RunSimulation.n >= RunSimulation.listOfBodies.size()) {
+				RunSimulation.n -= RunSimulation.n;
+			}
+			RunSimulation.listOfBodies.get(RunSimulation.n).posVect.set(100, 100, 100);
+			RunSimulation.listOfBodies.get(RunSimulation.n).velVect.set(0, 0, 0);
+	    }
+		
+		if(keycode == Input.Keys.BACKSPACE){
+			if (RunSimulation.n >= RunSimulation.listOfBodies.size()) {
+				RunSimulation.n -= RunSimulation.n;
+			}
+			RunSimulation.listOfBodies.remove(RunSimulation.n);
+	    }
+	
+		
+		
 		return false;
 	}
 
 	@Override
 	public boolean keyUp(int keycode) {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
 	@Override
 	public boolean keyTyped(char character) {
-		// TODO Auto-generated method stub
+	
 		return false;
 	}
 
