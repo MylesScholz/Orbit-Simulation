@@ -10,6 +10,7 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -32,6 +33,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -76,11 +78,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	public static ArrayList<Float> potOldY = new ArrayList<Float>();
 	public static ArrayList<Float> potNewX = new ArrayList<Float>();
 	public static ArrayList<Float> potNewY = new ArrayList<Float>();
-	
-	boolean focusShift;
-	boolean pauseIteration;
-	boolean panelShift;
-	boolean deleteBody;
+
 	
 	// Booleans for mouse input edge detection
 	boolean newPlanet = false;
@@ -134,30 +132,24 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	String printVel;
 	String printAcc;
 	
-	boolean sidePanelState = false;
+	static boolean sidePanelState = false;
 	int sidePanelWidth = 200;
 
 	Skin skin;
 	Stage stage;
-	boolean pauseState = false;
+	static boolean pauseState = false;
+	InputMultiplexer multiplexer;
 	
 	@Override
 	public void create () {
 		
+		
+		
+        /* SCENE2D*/
+		stage = new Stage(new ExtendViewport(640, 840)); 
+
 		/*
-		for (int i = 0; i < 100000; i++){
-			System.out.println(LibGDXTools.nameGen());
-			
-		}
-		
-		*/
-		
-		
-		 stage = new Stage(); 
-		 Gdx.input.setInputProcessor(stage);
-		 
-		 /*
-		 skin = new Skin(Gdx.files.internal("data/uiskin.json"));
+		skin = new Skin(Gdx.files.internal("data/uiskin.json"));
 		 final TextButton button = new TextButton("Click me", skin, "default");
 		 button.setWidth(200f);
 	     button.setHeight(20f);
@@ -170,16 +162,37 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	            }
 	        });
 	     
-	    stage.addActor(button);
-	   
-		*/
-	    font = new BitmapFont();
+	    stage.addActor(button);		  
+*/
+		/* GRAPHICS & INPUTS*/
+		shapeRenderer = new ShapeRenderer();
+		batch = new SpriteBatch();
+		
+		InputProcessor inputProcessor = new Inputs();
+		
+		// Allows chaining of multiple inputProcessors
+		multiplexer = new InputMultiplexer();
+		multiplexer.addProcessor(inputProcessor);
+		multiplexer.addProcessor(stage);
+		Gdx.input.setInputProcessor(multiplexer);
+
+					
+		/* CAMERA */
+		float w = Gdx.graphics.getWidth();
+		float h = Gdx.graphics.getHeight();
+		
+		cam = new OrthographicCamera(30, 30 * (h / w));
+		cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
+		
+		printPos = "Pos: (0.0, 0.0, 0.0)";
+		printVel = "Vel: (0.0, 0.0, 0.0)";
+		printAcc = "Acc: (0.0, 0.0, 0.0)";
+		
+		/* FONTS */ 		 
+		font = new BitmapFont();
 		font.setUseIntegerPositions(false);
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Roboto-Bold.ttf"));
-		
-		
-		
-		
+			
 		FreeTypeFontParameter fTitle = new FreeTypeFontParameter();
 		FreeTypeFontParameter fHeader = new FreeTypeFontParameter();
 		FreeTypeFontParameter fSubtitle = new FreeTypeFontParameter();
@@ -214,14 +227,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		fontSubtitle.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		fontText.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		
-		
-		
-		
 		generator.dispose();
-		
-		
-		
-		
+			
+		/* TEXTURES */
 		
         starColors[0] = "blue";
         starColors[1] = "orange";
@@ -248,12 +256,21 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
                 availableStarTextures.add(textures);
             }
         }
-		// INITIALIZE IN ORDER OF MASS SMALLEST TO LARGEST
+        
+		int j = 1 + (int)(Math.random() * 8); 
+        String backgroundFileName = "backgrounds/" + j + ".jpg";
+        backgroundTexture = new Texture(backgroundFileName);		
+        backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+        
+        /* INITIAL BODIES */
 		// Name, Mass, radius, posx, posy, velx, vely, spritewidth
         
-        LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 10000, 0,0, 0, 0);
         LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 1, 250 , 250, 35, -35);
-
+        LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 10000, 0, 0, 0, 0);
+        
+        
+        /* FILES */
+        
         if (listOfBodies.size() == 0) {
             String filePath = this.getClass().getClassLoader().getResource("").getPath();   // The path of the running file
             filePath = filePath.substring(0, filePath.indexOf("/desktop")) + "/core/assets/systems/system1.txt";    //Navigate to system file
@@ -306,33 +323,11 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
                 }
             }
         }
+        
 
-		shapeRenderer = new ShapeRenderer();
-		batch = new SpriteBatch();
-
-		int i = 1 + (int)(Math.random() * 8); 
-        String backgroundFileName = "backgrounds/" + i + ".jpg";
-        backgroundTexture = new Texture(backgroundFileName);
-		//backgroundTexture = new Texture("background/3.jpg");
-		
-        backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
-		//backgroundTexture.setTextureWrap(TextureWrap.GL_REPEAT);
-		
-		float w = Gdx.graphics.getWidth();
-		float h = Gdx.graphics.getHeight();
-
-		// Constructs a new OrthographicCamera, using the given viewport width and height
-		// Height is multiplied by aspect ratio.
-
-		cam = new OrthographicCamera(30, 30 * (h / w));
-		cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
-		
-		printPos = "Pos: (0.0, 0.0, 0.0)";
-		printVel = "Vel: (0.0, 0.0, 0.0)";
-		printAcc = "Acc: (0.0, 0.0, 0.0)";
-		
-		InputProcessor inputProcessor = new Inputs();
-		Gdx.input.setInputProcessor(inputProcessor);
+	
+	
+        
 	}
 
 	public void place() {		
@@ -389,85 +384,51 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		
-
-
-
 
 		
-		if(Gdx.input.isKeyPressed(Input.Keys.P) && !pauseIteration){
-			if (pauseState == false){
-				pauseState = true;
-			}
-			else {
-				pauseState = false;
-			}
-			pauseIteration = true;
-	    }
-		
-		if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE) && !panelShift){
-        	if (sidePanelState == true){
-        		sidePanelState = false;
-        	}
-        	else {
-        		sidePanelState = true;
-        	}
-        	panelShift = true;
- 
-	    }
-		else if(!Gdx.input.isKeyPressed(Input.Keys.ESCAPE) && panelShift){
-			panelShift = false;
-		}
-		
-		
-		else if(!Gdx.input.isKeyPressed(Input.Keys.P) && pauseIteration){
-			pauseIteration = false;
-	    }
-		
-        if(Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)){
-        	if (n >= listOfBodies.size()) {
-				n -= n;
-			}
-        	listOfBodies.get(n).velVect.y += 3;
-        }
-		
-        if(Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)){
-        	if (n >= listOfBodies.size()) {
-				n -= n;
-			}
-        	listOfBodies.get(n).velVect.y -= 3;
-        }
-        
-        if(Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)){
-        	if (n >= listOfBodies.size()) {
-				n -= n;
-			}
-        	listOfBodies.get(n).velVect.x -= 3;
-        }
-        
-        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)){
-        	if (n >= listOfBodies.size()) {
-				n -= n;
-			}
-        	listOfBodies.get(n).velVect.x += 3;
-        }
-       
-
-        if(Gdx.input.isKeyPressed(Input.Keys.M)){
-        	if (n >= listOfBodies.size()) {
-				n -= n;
-			}
-        	listOfBodies.get(n).velVect.set(0,0,0);
-        }
-        
-
-		
-		/*
         if (listOfBodies.size() == 0){
         	LibGDXTools.bodyInitialize("Star", 10000, 25, 0, 0, 0, 0, 40);
 		}
-		*/
+		
 
+		
+		if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)){
+			 if (RunSimulation.n >= RunSimulation.listOfBodies.size()) {
+				 RunSimulation.n -= RunSimulation.n;
+			 }
+			 RunSimulation.listOfBodies.get(RunSimulation.n).velVect.y += 3;
+	     }
+			
+	    if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)){
+	        	if (RunSimulation.n >= RunSimulation.listOfBodies.size()) {
+	        		RunSimulation.n -= RunSimulation.n;
+				
+	        	}
+	        	RunSimulation.listOfBodies.get(RunSimulation.n).velVect.y -= 3;
+	    }
+	        
+	   if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)){
+	      if (RunSimulation.n >= RunSimulation.listOfBodies.size()) {
+	    	  RunSimulation.n -= RunSimulation.n;
+		 }
+	        RunSimulation.listOfBodies.get(RunSimulation.n).velVect.x -= 3;
+	   }
+	        
+	   if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)){
+	      
+		   if (RunSimulation.n >= RunSimulation.listOfBodies.size()) {
+	        	RunSimulation.n -= RunSimulation.n;
+	      }
+	        RunSimulation.listOfBodies.get(RunSimulation.n).velVect.x += 3;
+	   }
+		
+	   if (Gdx.input.isKeyPressed(Input.Keys.M)){
+       	if (RunSimulation.n >= RunSimulation.listOfBodies.size()) {
+       		RunSimulation.n -= RunSimulation.n;
+			}
+       	RunSimulation.listOfBodies.get(RunSimulation.n).velVect.set(0,0,0);
+	   }
+	   
         if (Gdx.input.isButtonPressed(Buttons.MIDDLE)){
             zF = 1;
         }
@@ -476,7 +437,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		shapeRenderer.setProjectionMatrix(cam.combined);
 		
 		batch.begin();
-		stage.draw();
+		
 		batch.draw(backgroundTexture, -cam.viewportWidth/2 + camX, -cam.viewportHeight/2 + camY, (int) camX, (int) -camY, (int) cam.viewportWidth, (int) cam.viewportHeight);
 
 
@@ -663,12 +624,20 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		else {
 			fontTitle.draw(batch, "ORBITAL SIMULATION", frameX  - 1.3f*cam.viewportWidth/12, frameY + 0.93f*cam.viewportHeight/2);	
 			fontText.draw(batch, "(press ESC for more INFO)", frameX  - 1.1f*cam.viewportWidth/12, frameY - 0.93f*cam.viewportHeight/2);	
-
-			
-
-			
+		
 		}
 		batch.end();
+		
+		// Set the viewport to the whole screen.
+		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+		// Draw anywhere on the screen.
+		stage.act(0.01f);
+		stage.draw();
+		
+		// Restore the stage's viewport.
+		stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+		
 		OrbitalPhysics.passList(listOfBodies);
 		if (pauseState == false){
 			if (iterationCounter <= numOfIterations){
@@ -686,6 +655,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	}
 	
 	public void resize(int width, int height) {
+		//stage.getViewport().update(width, height, true);
 		cam.viewportWidth = 1000f;
 		cam.viewportHeight = cam.viewportWidth * height/width;
 		cam.update();
