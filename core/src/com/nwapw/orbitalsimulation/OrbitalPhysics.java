@@ -137,7 +137,7 @@ public class OrbitalPhysics {
 		//float distance = Math.sqrt((Math.pow(body1.posVect.x - body2.posVect.x, 2))+(Math.pow(body1.posVect.y - body2.posVect.y, 2)));
         float distance = body1.posVect.dst(body2.posVect);
     	
-    	if (distance*RunSimulation.zF <= body1.radius + body2.radius) {
+    	if (distance*RunSimulation.zF <= body1.radius*RunSimulation.zF + body2.radius*RunSimulation.zF) {
             return true;
         } else {
             return false;
@@ -151,14 +151,43 @@ public class OrbitalPhysics {
             	
                 if (i != j && checkCollision(listOfBodies.get(i), listOfBodies.get(j))) {
                     if (listOfBodies.get(i).mass < listOfBodies.get(j).mass) {
-                        listOfBodies.remove(i);
+                    	
+                    	// Conservation of Momentum
+                    	Vector3 sumVel = listOfBodies.get(i).velVect.scl(listOfBodies.get(i).mass).add(listOfBodies.get(j).velVect.scl(listOfBodies.get(j).mass));
+                    	sumVel.scl(1/(listOfBodies.get(i).mass + listOfBodies.get(j).mass));
+                    	listOfBodies.get(j).velVect.set(sumVel);
+                    	
+                    	listOfBodies.get(j).mass += listOfBodies.get(i).mass;                      
+                       // listOfBodies.get(j).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
+                      //  listOfBodies.get(j).spriteWidth = listOfBodies.get(i).radius * 2;
+                    	
+                    	listOfBodies.remove(i);
+                    	
                     } else if (listOfBodies.get(i).mass > listOfBodies.get(j).mass) {
-                        listOfBodies.remove(j);
+                    	
+                    	// Conservation of Momentum
+                    	Vector3 sumVel = listOfBodies.get(i).velVect.scl(listOfBodies.get(i).mass).add(listOfBodies.get(j).velVect.scl(listOfBodies.get(j).mass));
+                    	sumVel.scl(1/(listOfBodies.get(i).mass + listOfBodies.get(j).mass));
+                    	listOfBodies.get(i).velVect.set(sumVel);
+                        
+                    	listOfBodies.get(i).mass += listOfBodies.get(j).mass;  
+                    	//listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(j).radius, 2) * 2));
+                       // listOfBodies.get(i).spriteWidth = listOfBodies.get(j).radius * 2;
+                    	listOfBodies.remove(j);
+                    	
                     } else {
+                    	
+                    	// Conservation of Momentum
+                    	Vector3 sumVel = listOfBodies.get(i).velVect.scl(listOfBodies.get(i).mass).add(listOfBodies.get(j).velVect.scl(listOfBodies.get(j).mass));
+                    	sumVel.scl(1/(listOfBodies.get(i).mass + listOfBodies.get(j).mass));
+                   
+                    	listOfBodies.get(i).velVect.set(sumVel);
+                    	
                         listOfBodies.get(i).mass += listOfBodies.get(j).mass;
-                        listOfBodies.get(i).velVect.add(listOfBodies.get(j).velVect);
-                        listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
-                        listOfBodies.get(i).spriteWidth = listOfBodies.get(i).radius * 2;
+
+                        //listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
+                        //listOfBodies.get(i).spriteWidth = listOfBodies.get(i).radius * 2;
+                        listOfBodies.remove(j);
                     }
                     
                     checkAllCollisions();
