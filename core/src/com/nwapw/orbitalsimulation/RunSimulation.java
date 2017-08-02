@@ -1,6 +1,9 @@
 package com.nwapw.orbitalsimulation;
 import java.util.ArrayList;
 import java.util.Random;
+import java.io.*;
+
+import javax.management.openmbean.SimpleType;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.ApplicationListener;
@@ -51,6 +54,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	// The max number of iterations that the simulation runs
 	final static int numOfIterations = 100000000;
 	
+	final static float drawLimit = 25;
+	
 	// 0 = Focus on a particular body, 1 = free movement
 	static int cameraMode = 0;
 	
@@ -67,6 +72,10 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	
 	// List of currently running bodies in the simulation
 	public static ArrayList<OrbitalBody> listOfBodies = new ArrayList<OrbitalBody>();
+	public static ArrayList<Float> potOldX = new ArrayList<Float>();
+	public static ArrayList<Float> potOldY = new ArrayList<Float>();
+	public static ArrayList<Float> potNewX = new ArrayList<Float>();
+	public static ArrayList<Float> potNewY = new ArrayList<Float>();
 	
 	boolean focusShift;
 	boolean pauseIteration;
@@ -236,16 +245,64 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
                 availableStarTextures.add(textures);
             }
         }
-
 		// INITIALIZE IN ORDER OF MASS SMALLEST TO LARGEST
-		// Name, Mass, posx, posy, velx, vely, spritewidth
-		
-        LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 1, 250,250, 40, -40);
+		// Name, Mass, radius, posx, posy, velx, vely, spritewidth
+        
         LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 10000, 0,0, 0, 0);
-       
+        LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 1, 250 , 250, 35, -35);
 
-		//LibGDXTools.bodyInitialize("Star 1", 10000, 25, 100, 100, 0, 0, 50);
-		//LibGDXTools.bodyInitialize("Star 2", 10000, 25, -100, -100, 0, 0, 50);
+        if (listOfBodies.size() == 0) {
+            String filePath = this.getClass().getClassLoader().getResource("").getPath();   // The path of the running file
+            filePath = filePath.substring(0, filePath.indexOf("/desktop")) + "/core/assets/systems/system1.txt";    //Navigate to system file
+            filePath = filePath.replaceAll("%20", " ");
+
+            File systemFile;
+            FileReader in;
+            BufferedReader readFile;
+            String textLine;
+            boolean fileLoaded = false;
+            int i = 0;
+
+            String nameStr;
+            float massFlt, posXFlt, posYFlt, velXFlt, velYFlt;
+
+            while (fileLoaded == false && i < 2) {
+                try {
+                    systemFile = new File(filePath);
+                    in = new FileReader(systemFile);
+                    readFile = new BufferedReader(in);
+
+                    while ((textLine = readFile.readLine()) != null) {
+                        nameStr = textLine.substring(0, textLine.indexOf(","));
+                        textLine = textLine.substring(textLine.indexOf(",") + 1);
+                        massFlt = Integer.parseInt(textLine.substring(0, textLine.indexOf(",")));
+                        textLine = textLine.substring(textLine.indexOf(",") + 1);
+                        posXFlt = Integer.parseInt(textLine.substring(0, textLine.indexOf(",")));
+                        textLine = textLine.substring(textLine.indexOf(",") + 1);
+                        posYFlt = Integer.parseInt(textLine.substring(0, textLine.indexOf(",")));
+                        textLine = textLine.substring(textLine.indexOf(",") + 1);
+                        velXFlt = Integer.parseInt(textLine.substring(0, textLine.indexOf(",")));
+                        textLine = textLine.substring(textLine.indexOf(",") + 1);
+                        velYFlt = Integer.parseInt(textLine.substring(0, textLine.length()));
+
+                        LibGDXTools.bodyCreate(nameStr, massFlt, posXFlt, posYFlt, velXFlt, velYFlt);
+                    }
+                    readFile.close();
+                    in.close();
+
+                    fileLoaded = true;
+                } catch (FileNotFoundException e) {
+                    System.out.println("File Not Found: " + e.getMessage());
+                    System.out.println("Loading Default File...");
+
+                    filePath = filePath.substring(0, filePath.lastIndexOf("/"));
+                    filePath = filePath + "/default.txt";
+                    i++;
+                } catch (IOException e) {
+                    System.out.println("Problem Reading File: " + e.getMessage());
+                }
+            }
+        }
 
 		shapeRenderer = new ShapeRenderer();
 		batch = new SpriteBatch();
@@ -253,8 +310,6 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		int i = 1 + (int)(Math.random() * 8); 
         String backgroundFileName = "backgrounds/" + i + ".jpg";
         backgroundTexture = new Texture(backgroundFileName);
-        
-		
 		//backgroundTexture = new Texture("background/3.jpg");
 		
         backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
@@ -275,24 +330,18 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		
 		InputProcessor inputProcessor = new Inputs();
 		Gdx.input.setInputProcessor(inputProcessor);
-		
-
 	}
-	
+
 	public void place() {		
-		
 		if (Gdx.input.isButtonPressed(0) && !newPlanet) {
 			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
 		    cam.unproject(mousePos); 
 	    
 		    clickLeftPositionX = (int) (mousePos.x / zF);
 			clickLeftPositionY = (int) (mousePos.y / zF);		
-
-
+			
 			newPlanet = true;
-		}
-		
-		else if (!Gdx.input.isButtonPressed(0) && newPlanet) {
+		} else if (!Gdx.input.isButtonPressed(0) && newPlanet) {
 			
 			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
 		    cam.unproject(mousePos); 
@@ -300,7 +349,6 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		    unclickLeftPositionX = (int) (mousePos.x / zF);
 			unclickLeftPositionY = (int) (mousePos.y / zF);		
 
-		
 			int randomMass = 1 + (int)(Math.random() * 4);
 			
 			String planetName = LibGDXTools.nameGen();
@@ -308,7 +356,6 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			LibGDXTools.bodyCreate(planetName, randomMass, clickLeftPositionX , clickLeftPositionY, (unclickLeftPositionX - clickLeftPositionX)*placedBodySpeed, (unclickLeftPositionY - clickLeftPositionY)*placedBodySpeed);
 			newPlanet = false;
 		}
-		
 		if (Gdx.input.isButtonPressed(1) && !newSun) {
 			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
 		    cam.unproject(mousePos); 
@@ -316,12 +363,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		    clickRightPositionX = (int) (mousePos.x / zF);
 			clickRightPositionY = (int) (mousePos.y / zF);		
 		
-		  
 			newSun = true;
-		}
-		
-		else if (!Gdx.input.isButtonPressed(1) && newSun) {
-			
+		} else if (!Gdx.input.isButtonPressed(1) && newSun) {		
 			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
 		    cam.unproject(mousePos); 
 	    
@@ -338,8 +381,6 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		}
 	}
 	
-
-	
 	@Override
 	public void render () {
 
@@ -353,10 +394,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			}
 			focusShift = true;
 			zF = LibGDXTools.calculateDefaultZoom(listOfBodies.get(n).spriteWidth);
-			
-
 	    }
-		
 		else if(!Gdx.input.isKeyPressed(Input.Keys.N) && focusShift){
 			focusShift = false;
 	    }
@@ -461,25 +499,12 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		batch.setProjectionMatrix(cam.combined);
 		shapeRenderer.setProjectionMatrix(cam.combined);
 		
-
-		for (int i = 0; i < listOfBodies.size(); i++) {
-			Gdx.gl.glEnable(GL30.GL_BLEND);
-			Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
-			shapeRenderer.begin(ShapeType.Line);
-			shapeRenderer.setColor(0, 0, 0, 0);
-			shapeRenderer.line(listOfBodies.get(i).posVect.x, listOfBodies.get(i).posVect.y, listOfBodies.get(i).oldPosVect.x, listOfBodies.get(i).oldPosVect.y);
-			shapeRenderer.end();	
-			Gdx.gl.glDisable(GL30.GL_BLEND);	
-		}
-
-		
 		batch.begin();
 		// stage.draw();
 		batch.draw(backgroundTexture, -cam.viewportWidth/2 + camX, -cam.viewportHeight/2 + camY, (int) camX, (int) -camY, (int) cam.viewportWidth, (int) cam.viewportHeight);
-		
-		
-		for (int i = 0; i < listOfBodies.size(); i++) {
 
+
+		for (int i = 0; i < listOfBodies.size(); i++) {
 			OrbitalBody renderBody = listOfBodies.get(i);
 
             float spriteWidth = renderBody.spriteWidth;
@@ -505,8 +530,6 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
 			Texture spriteTexture = renderBody.texture;
 			batch.draw(spriteTexture, frameX, frameY, (float) (spriteWidth * zF), (float) (spriteWidth * zF));
-
-			
 		}
 
 		
@@ -523,11 +546,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		focusX = (float) listOfBodies.get(n).posVect.x * zF - (listOfBodies.get(n).spriteWidth / 8);
         focusY = (float) listOfBodies.get(n).posVect.y * zF - (listOfBodies.get(n).spriteWidth / 8);
 		
-		
 		if (sidePanelState == true){
 			focusX += sidePanelWidth;
 		}		
-		
 
 		float moveX = (camX - focusX) * 2/3;
 		float moveY = (camY - focusY) * 2/3;
@@ -536,13 +557,10 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		camY -= moveY;
 	
 		camX += 1.1f*cam.viewportHeight/40;
-
-		
 		float frameX = 0;
 		float frameY = 0;
 		
 		if (pauseState == false){
-			
 			frameX = camX - 0.1f*listOfBodies.get(n).velVect.x*zF;
 			frameY = camY - 0.1f*listOfBodies.get(n).velVect.y*zF;
 		}
@@ -550,8 +568,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			frameX = camX;
 			frameY = camY;
 		}
-		
-	
+
 		cam.position.set(camX, camY, 0);
 		cam.update();	
 
@@ -563,7 +580,6 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		}
 				
 		batch.end();
-
 		if (sidePanelState == true){
 			Gdx.gl.glEnable(GL30.GL_BLEND);
 			Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
@@ -573,19 +589,52 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			 shapeRenderer.end();	
 			 Gdx.gl.glDisable(GL30.GL_BLEND);
 		}
-		
-
+		for (int i = 0; i < listOfBodies.size(); i++) {
+			if (listOfBodies.get(i).oldPosVect.isZero()) {
+			} else {
+				potOldX.add(listOfBodies.get(i).oldPosVect.x);
+				potOldY.add(listOfBodies.get(i).oldPosVect.y);
+				potNewX.add(listOfBodies.get(i).posVect.x);
+				potNewY.add(listOfBodies.get(i).posVect.y);
+				Gdx.gl.glEnable(GL30.GL_BLEND);
+				Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
+				shapeRenderer.begin(ShapeType.Line);
+				if (potOldX.size() < drawLimit) {
+					System.out.println("1");
+					for (int x = 0; x < potOldX.size(); x++) {
+						shapeRenderer.setColor(1, 0, 0, x / drawLimit);
+						System.out.println(shapeRenderer.getColor().a);
+						shapeRenderer.line(potOldX.get(x), potOldY.get(x), potNewX.get(x), potNewY.get(x));
+					}	
+				} else {
+					potOldX.remove(0);
+					potOldY.remove(0);
+					potNewX.remove(0);
+					potNewY.remove(0);
+					if (potOldX.size() < drawLimit) {
+						System.out.println("2");
+						for (int x = 0; x < potOldX.size(); x++) {
+							shapeRenderer.setColor(1, 0, 0, x / drawLimit);
+							shapeRenderer.line(potOldX.get(x), potOldY.get(x), potNewX.get(x), potNewY.get(x));
+						}
+					} else {
+						System.out.println("4");
+					}
+				}
+				shapeRenderer.end();	
+				Gdx.gl.glDisable(GL30.GL_BLEND);
+			}
+		}
 		// Workaround to make side panel items appear above shapeRenderer transparent rectangle
 		batch.begin();
 		if (sidePanelState == true) {
-
-			
 			String printNumOfBodies = "# of bodies: " + String.valueOf(listOfBodies.size());
 			String printDeltaTime = "dt: " + String.valueOf(deltaTime);
 			String printIterationStep = "step: " + String.valueOf(iterationCounter);
 			String printFocusPlanet = "FOCUS: " + listOfBodies.get(n).name;			
+			String printFocusNumber = "focused body: " + n;
 			String printMostAttraction = "Most Grav. Attraction: " + listOfBodies.get(n).mostPullingBodyName;
-			
+
 			fontHeader.draw(batch, "CONTROLS", frameX + 2.5f*cam.viewportWidth/12, frameY + 9*cam.viewportHeight/20);			
 			fontSubtitle.draw(batch, LibGDXTools.underlineCalculation("CONTROLS") + "__", frameX + 2.5f*cam.viewportWidth/12,  frameY + 8.9f*cam.viewportHeight/20);
 			fontText.draw(batch, "(SCROLL) Zoom", frameX + 2.5f*cam.viewportWidth/12, frameY + 8*cam.viewportHeight/20);
@@ -606,11 +655,11 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			fontSubtitle.draw(batch, LibGDXTools.underlineCalculation(printFocusPlanet), frameX + 2.5f*cam.viewportWidth/12, frameY - 4.1f*cam.viewportHeight/20);
 			fontText.draw(batch, printMostAttraction, frameX + 2.5f*cam.viewportWidth/12, frameY - 5*cam.viewportHeight/20);
 			fontText.draw(batch, "Mass: " + listOfBodies.get(n).mass, frameX + 2.5f*cam.viewportWidth/12, frameY - 6*cam.viewportHeight/20);
+
 			if (iterationCounter % 6 == 0 || pauseState == true ) {
 				printPos = "Pos: ";
 				printVel = "Vel: ";
 				printAcc = "Acc: ";
-
 				Vector3 currentVect = new Vector3();
 				
 				currentVect.set(listOfBodies.get(n).posVect);
@@ -624,6 +673,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				currentVect.set(listOfBodies.get(n).accVect);
 				currentVect.set(Math.round(currentVect.x*100f)/100f, Math.round(currentVect.y*100f)/100f, Math.round(currentVect.z*100f)/100f);
 				printAcc += currentVect;
+
 						
 			} 
 			fontText.draw(batch, printPos, frameX + 2.5f*cam.viewportWidth/12, frameY - 7*cam.viewportHeight/20);
@@ -639,45 +689,37 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			fontText.draw(batch, "(press ESC for more INFO)", frameX  - 1.1f*cam.viewportWidth/12, frameY - 0.93f*cam.viewportHeight/2);	
 
 			
+
 			
 		}
 		batch.end();
-		
-		
 		OrbitalPhysics.passList(listOfBodies);
-		//System.out.println(pauseState);
-
 		if (pauseState == false){
 			if (iterationCounter <= numOfIterations){
 				timeCounter += deltaTime;
 				OrbitalPhysics.iterateSimulation(deltaTime);	
 				place();
-				// DEBUG
-				if ((iterationCounter % dataDivision) == 0){
-							
+				if ((iterationCounter % dataDivision) == 0){							
 	
-				}				
+				}
 			}	
 			iterationCounter += 1;
 		}
 
 		
 	}
+	
 	public void resize(int width, int height) {
 		cam.viewportWidth = 1000f;
 		cam.viewportHeight = cam.viewportWidth * height/width;
 		cam.update();
-
 	}
+	
 	@Override
 	public void dispose () {
 		batch.dispose();
-		
 		for (int i = 0; i < runningTextures.size(); i++){
 			runningTextures.get(i).dispose();
-		}
-		
+		}	
 	}
-
-
 }

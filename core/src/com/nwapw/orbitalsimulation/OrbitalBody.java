@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector3;
 
+import java.util.ArrayList;
+
 public class OrbitalBody {
 	
 	// 0 = Rectangular, 1 = Euler's, 2 = Range-Kutta
@@ -20,8 +22,7 @@ public class OrbitalBody {
 	static float[] currentPos = new float[3];
 	float[] currentVel = new float[3];
 	float[] currentAcc = new float[3];
-	
-	
+
 	// x = 0, y = 1, z = 2, stored as float
 	Vector3 oldPosVect = new Vector3();
 	Vector3 posVect = new Vector3();
@@ -82,17 +83,16 @@ public class OrbitalBody {
 		if (integrationMethod == 0){
 			//rectangular method
 		}
-		
-		
 		return value;
 	}
 	
 	void iterateVelThenPos(float deltaTime) {
-		oldPosVect.set(currentPos);
 		
 		float[] currentPos = {posVect.x, posVect.y, posVect.z};
 		float[] currentVel = {velVect.x, velVect.y, velVect.z};
 		float[] currentAcc = {accVect.x, accVect.y, accVect.z};
+		
+		oldPosVect.set(currentPos);
 		
 		//TODO change to integrator choice
 		
@@ -107,7 +107,7 @@ public class OrbitalBody {
 		currentVel[2] = NumericalIntegration.integrateRect(currentVel[2], currentAcc[2], deltaTime);
 	
 		velVect.set(currentVel);
-	
+
 		// Integrates Velocity to Position
 		
 		currentPos[0] = NumericalIntegration.integrateRect(currentPos[0], currentVel[0], deltaTime);
