@@ -37,6 +37,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+
 public class RunSimulation extends ApplicationAdapter implements ApplicationListener {
 		
 	// Constant for the force of gravity, affects how much bodies accelerate
@@ -691,6 +692,135 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
 		
 	}
+
+
+	public static void saveFile() {
+        String filePath = RunSimulation.class.getProtectionDomain().getCodeSource().getLocation().getPath();    //The path of the RunSimulation
+        
+        filePath = filePath.substring(0, filePath.indexOf("/bin")) + "/assets/systems/count.txt";    //Navigate to system file
+        filePath = filePath.replaceAll("%20", " ");
+
+        File systemFile;
+        FileWriter out;
+        FileReader in;
+        BufferedWriter writeFile;
+        BufferedReader readFile;
+
+        Boolean fileWritten = false;
+        int i = 0;
+        String textLine = "";
+        int fileCount = 0;
+
+        try {
+            //Read count.txt to get file count, increment it, and write it to the file
+            systemFile = new File(filePath);
+            in = new FileReader(systemFile);
+            readFile = new BufferedReader(in);
+
+            fileCount = Integer.parseInt(readFile.readLine().trim()) + 1;
+
+            out = new FileWriter(systemFile);
+            writeFile = new BufferedWriter(out);
+
+            writeFile.write(String.valueOf(fileCount));
+
+            writeFile.close();
+            out.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("File Not Found: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("Problem Reading File: " + e.getMessage());
+        }
+
+        //Switch to system.txt
+        filePath = filePath.substring(0, filePath.lastIndexOf("/"));
+        filePath = filePath + "/system" + fileCount + ".txt";
+
+        while (fileWritten == false && i < 2) {
+            try {
+                //Write data to system file
+                systemFile = new File(filePath);
+                out = new FileWriter(systemFile);
+                writeFile = new BufferedWriter(out);
+
+                for (int j = 0; j < listOfBodies.size(); j++) {
+                    textLine = listOfBodies.get(j).name + "," + listOfBodies.get(j).mass + "," + listOfBodies.get(j).posVect.x + "," + listOfBodies.get(j).posVect.y;
+                    textLine = textLine + "," + listOfBodies.get(j).velVect.x + "," + listOfBodies.get(j).velVect.y;
+
+                    writeFile.write(textLine);
+                    writeFile.newLine();
+                }
+                writeFile.close();
+                out.close();
+
+                fileWritten = true;
+            } catch (FileNotFoundException e) {
+                System.out.println("File Not Found: " + e.getMessage());
+                System.out.println("Creating New File...");
+
+                try {
+                    systemFile = new File(filePath);
+                    systemFile.createNewFile();
+                } catch (IOException err) {
+                    System.out.println("Problem Creating File: " + e.getMessage());
+                }
+
+                i++;
+            } catch (IOException e) {
+                System.out.println("Problem Writing to File: " + e.getMessage());
+            }
+        }
+    }
+
+    public static void saveFile(String fileName) {
+        String filePath = RunSimulation.class.getProtectionDomain().getCodeSource().getLocation().getPath();   //The path of the RunSimulation
+        filePath = filePath.substring(0, filePath.indexOf("/build")) + "/assets/systems/" + fileName;    //Navigate to system file
+        filePath = filePath.replaceAll("%20", " ");
+
+        File systemFile;
+        FileWriter out;
+        BufferedWriter writeFile;
+
+        Boolean fileWritten = false;
+        int i = 0;
+        String textLine = "";
+
+        while (fileWritten == false && i < 2) {
+            try {
+                //Write data to system file
+                systemFile = new File(filePath);
+                out = new FileWriter(systemFile);
+                writeFile = new BufferedWriter(out);
+
+                for (int j = 0; j < listOfBodies.size(); j++) {
+                    textLine = listOfBodies.get(j).name + "," + listOfBodies.get(j).mass + "," + listOfBodies.get(j).posVect.x + "," + listOfBodies.get(j).posVect.y;
+                    textLine = textLine + "," + listOfBodies.get(j).velVect.x + "," + listOfBodies.get(j).velVect.y;
+
+                    writeFile.write(textLine);
+                    writeFile.newLine();
+                }
+                writeFile.close();
+                out.close();
+
+                fileWritten = true;
+            } catch (FileNotFoundException e) {
+                System.out.println("File Not Found: " + e.getMessage());
+                System.out.println("Creating New File...");
+
+                try {
+                    systemFile = new File(filePath);
+                    systemFile.createNewFile();
+                } catch (IOException err) {
+                    System.out.println("Problem Creating File: " + e.getMessage());
+                }
+
+                i++;
+            } catch (IOException e) {
+                System.out.println("Problem Writing to File: " + e.getMessage());
+            }
+        }
+    }
+
 	
 	public void resize(int width, int height) {
 		//stage.getViewport().update(width, height, true);
