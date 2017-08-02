@@ -127,6 +127,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	BitmapFont fontHeader;
 	BitmapFont fontText;
 	BitmapFont fontSubtitle;
+	BitmapFont fontFocus;
 	
 	String printPos;
 	String printVel;
@@ -197,6 +198,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		FreeTypeFontParameter fHeader = new FreeTypeFontParameter();
 		FreeTypeFontParameter fSubtitle = new FreeTypeFontParameter();
 		FreeTypeFontParameter fText = new FreeTypeFontParameter();
+		FreeTypeFontParameter fFocus = new FreeTypeFontParameter();
 		
 		fTitle.size = 20;
 		fTitle.shadowColor = Color.BLACK;
@@ -214,6 +216,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		fText.size = 14;
 		fText.color = Color.LIGHT_GRAY;
 		
+		fFocus.size = 16;
+		fText.color = Color.WHITE;
+		
 		fontTitle = generator.generateFont(fTitle); 
 		
 		generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Roboto-Regular.ttf"));
@@ -221,11 +226,13 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		fontHeader = generator.generateFont(fHeader);
 		fontSubtitle = generator.generateFont(fSubtitle);
 		fontText = generator.generateFont(fText);
+		fontFocus = generator.generateFont(fFocus);
 		
 		fontTitle.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		fontHeader.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		fontSubtitle.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		fontText.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		fontFocus.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		
 		generator.dispose();
 			
@@ -453,7 +460,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			float frameY = 0;
 			
 			if (pauseState == false){
-			
+		        if (n >= listOfBodies.size()) {
+		            n -= n;
+		        }
 			frameX = spriteX - 0.15f*listOfBodies.get(n).velVect.x*zF;
 			frameY = spriteY - 0.15f*listOfBodies.get(n).velVect.y*zF;
 			}
@@ -461,10 +470,16 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				frameX = spriteX;
 				frameY = spriteY;
 			}
-			
-			
-			fontSubtitle.draw(batch, renderBody.name, frameX + 0.7f*spriteWidth*zF/2, frameY + 1.5f*spriteWidth*zF/10);
+					
+			if (i == n){
+				fontFocus.draw(batch, renderBody.name, frameX + 0.7f*spriteWidth*zF/2, frameY + 1.5f*spriteWidth*zF/10);
 
+			}
+			else {
+				fontSubtitle.draw(batch, renderBody.name, frameX + 0.7f*spriteWidth*zF/2, frameY + 1.5f*spriteWidth*zF/10);
+
+			}
+			
 			Texture spriteTexture = renderBody.texture;
 			batch.draw(spriteTexture, frameX, frameY, (float) (spriteWidth * zF), (float) (spriteWidth * zF));
 		}

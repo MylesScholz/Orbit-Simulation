@@ -113,7 +113,7 @@ public class Inputs implements InputProcessor {
 			RunSimulation.zF = 10f;
 		}
 		
-
+		//System.out.println(RunSimulation.zF);
 		return false;
 	}
 
