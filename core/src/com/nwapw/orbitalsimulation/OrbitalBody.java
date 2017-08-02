@@ -82,17 +82,16 @@ public class OrbitalBody {
 		if (integrationMethod == 0){
 			//rectangular method
 		}
-		
-		
 		return value;
 	}
 	
 	void iterateVelThenPos(float deltaTime) {
-		oldPosVect.set(currentPos);
 		
 		float[] currentPos = {posVect.x, posVect.y, posVect.z};
 		float[] currentVel = {velVect.x, velVect.y, velVect.z};
 		float[] currentAcc = {accVect.x, accVect.y, accVect.z};
+		
+		oldPosVect.set(currentPos);
 		
 		//TODO change to integrator choice
 		

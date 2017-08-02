@@ -2,6 +2,8 @@ package com.nwapw.orbitalsimulation;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javax.management.openmbean.SimpleType;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -42,6 +44,8 @@ public class RunSimulation extends ApplicationAdapter {
 	// The max number of iterations that the simulation runs
 	final static int numOfIterations = 100000000;
 	
+	final static float drawLimit = 25;
+	
 	// 0 = Focus on a particular body, 1 = free movement
 	static int cameraMode = 0;
 	
@@ -58,6 +62,10 @@ public class RunSimulation extends ApplicationAdapter {
 	
 	// List of currently running bodies in the simulation
 	public static ArrayList<OrbitalBody> listOfBodies = new ArrayList<OrbitalBody>();
+	public static ArrayList<Float> potOldX = new ArrayList<Float>();
+	public static ArrayList<Float> potOldY = new ArrayList<Float>();
+	public static ArrayList<Float> potNewX = new ArrayList<Float>();
+	public static ArrayList<Float> potNewY = new ArrayList<Float>();
 	
 	boolean focusShift;
 	boolean pauseIteration;
@@ -150,68 +158,11 @@ public class RunSimulation extends ApplicationAdapter {
                 availableStarTextures.add(textures);
             }
         }
-
 		// INITIALIZE IN ORDER OF MASS SMALLEST TO LARGEST
 		// Name, Mass, radius, posx, posy, velx, vely, spritewidth
-		
-        //LibGDXTools.bodyInitialize("Mercury", 330f, 2f, 57900f, 0f, 0f, 474f, 4f);
-        //LibGDXTools.bodyInitialize("Earth", 5972f, 6f, 149600f, 0f, 0f, 298f, 12f);
-        //LibGDXTools.bodyInitialize("Moon", 73f, 2f, 149984f, 0f, 0f, 338f, 4f);
-        //LibGDXTools.bodyInitialize("Sun", 198850000f, 696f, 0f, 0f, 0f, 0f, 1392f);
-        
-        // Multiply given velocity by 10
-        // Both mercury and moon seem to deviate from this rule
-        
-        //LibGDXTools.bodyInitialize("Moon", 730f, 17f, 149984f, 0f, 0f, 1f, 34f);
-        //LibGDXTools.bodyInitialize("Earth", 59724f, 64f, 149600f, 0f, 0f, 29.8f, 128f);
-        //LibGDXTools.bodyInitialize("Sun", 19885000000f, 6957f, 0f, 0f, 0f, 0f, 13914f);
-        
-        //LibGDXTools.bodyInitialize("Moon", 73000000f, 1.7375f, 1499840f, 0f, 0f, 1f, 3.475f);
-        //LibGDXTools.bodyInitialize("Earth", 5972400000f, 6.378f, 1496000f, 0f, 0f, 29.8f, 12.756f);
-        //LibGDXTools.bodyInitialize("Sun", 1988500000000000f, 695.7f, 0f, 0f, 0f, 0f, 1391.4f);
-        
-        //LibGDXTools.bodyInitialize("Sun", 19885000000f, 695.7f, 0f, 0f, 0f, 0f, 1391.4f);
-        //LibGDXTools.bodyInitialize("Mercury", 3301.1f, 2.4397f, 579100f, 0f, 0f, 260f, 4.8794f);
-        //LibGDXTools.bodyInitialize("Venus", 48675f, 6.0518f, 1499840f, 0f, 0f, 350f, 12.1036f);
-        //LibGDXTools.bodyInitialize("Earth", 59723f, 6.371008f, 1496000f, 0f, 0f, 298f, 12.742016f);
-        //LibGDXTools.bodyInitialize("Moon", 734.6f, 1.7374f, 1499844f, 0f, 0f, 338f, 3.4748f);
-        //LibGDXTools.bodyInitialize("Mars", 6417.1f, 3.389f, 2279200f, 0f, 0f, 241f, 6.778f);
-        //LibGDXTools.bodyInitialize("Jupiter", 18981900f, 69.911f, 7785700f, 0f, 0f, 131f, 139.822f);
-        //LibGDXTools.bodyInitialize("Saturn", 5683400f, 58.232f, 14335300f, 0f, 0f, 97f, 116.464f);
-        //LibGDXTools.bodyInitialize("Uranus", 868130f, 25.362f, 28724600f, 0f, 0f, 68f, 50.724f);
-        //LibGDXTools.bodyInitialize("Neptune", 1024130f, 24.622f, 44950600f, 0f, 0f, 54f, 49.244f);
-        //LibGDXTools.bodyInitialize("Pluto", 130.3f, 1.187f, 59063800f, 0f, 0f, 47f, 2.374f);
-        
-        //LibGDXTools.bodyInitialize("Sun", 19885000000f, 695.7f, 0f, 0f, 0f, 0f, 1391.4f);
-        //LibGDXTools.bodyInitialize("Mercury", 3301.1f, 2.4397f, 579100f, 0f, 0f, 474f, 4.8794f);
-        //LibGDXTools.bodyInitialize("Venus", 48675f, 6.0518f, 1499840f, 0f, 0f, 350f, 12.1036f);
-        //LibGDXTools.bodyInitialize("Earth", 59723f, 6.371008f, 1496000f, 0f, 0f, 298f, 12.742016f);
-        //LibGDXTools.bodyInitialize("Moon", 734.6f, 1.7374f, 1499844f, 0f, 0f, 308f, 3.4748f);
-        //LibGDXTools.bodyInitialize("Mars", 6417.1f, 3.389f, 2279200f, 0f, 0f, 241f, 6.778f);
-        //LibGDXTools.bodyInitialize("Jupiter", 18981900f, 69.911f, 7785700f, 0f, 0f, 131f, 139.822f);
-        //LibGDXTools.bodyInitialize("Saturn", 5683400f, 58.232f, 14335300f, 0f, 0f, 97f, 116.464f);
-        //LibGDXTools.bodyInitialize("Uranus", 868130f, 25.362f, 28724600f, 0f, 0f, 68f, 50.724f);
-        //LibGDXTools.bodyInitialize("Neptune", 1024130f, 24.622f, 44950600f, 0f, 0f, 54f, 49.244f);
-        //LibGDXTools.bodyInitialize("Pluto", 130.3f, 1.187f, 59063800f, 0f, 0f, 47f, 2.374f);
-        
-        // Mass divided by 100000000000000000000 [10^20] | Everything else divided by 1000 [10^3]
-        
-        //LibGDXTools.bodyInitialize("Moon", 73000000000000000000000f, 1737.5f, 1499840000f, 0f, 0f, 1f, 3475f);
-        //LibGDXTools.bodyInitialize("Earth", 5972400000000000000000000f, 6378f, 1496000000f, 0f, 0f, 29.8f, 12756f);
-        //LibGDXTools.bodyInitialize("Sun", 1988500000000000000000000000000f, 695700f, 0f, 0f, 0f, 0f, 1391400f);
-        
-        //LibGDXTools.bodyInitialize("Moon", 7f, 1, 9324, 0, 0, 200f, 2);
-        //LibGDXTools.bodyInitialize("Earth", 600f, 4, 9300, 0, 0, 186f, 8);
-        //LibGDXTools.bodyInitialize("Sun", 200000000f, 430, 0, 0, 0, 0, 860);
-        
-		//LibGDXTools.bodyInitialize("Star 1", 10000, 25, 100, 100, 0, 0, 50);
-		//LibGDXTools.bodyInitialize("Star 2", 10000, 25, -100, -100, 0, 0, 50);
         
         LibGDXTools.bodyCreate("Sun", 10000, 0,0, 0, 0);
-        LibGDXTools.bodyCreate("Planet", 1, 250,250, 40, -40);
-
-		//LibGDXTools.bodyInitialize("Star 1", 10000, 25, 100, 100, 0, 0, 50);
-		//LibGDXTools.bodyInitialize("Star 2", 10000, 25, -100, -100, 0, 0, 50);
+        LibGDXTools.bodyCreate("Planet", 1, 250 , 250, 35, -35);
 
 		shapeRenderer = new ShapeRenderer();
 		batch = new SpriteBatch();
@@ -219,8 +170,6 @@ public class RunSimulation extends ApplicationAdapter {
 		int i = 1 + (int)(Math.random() * 8); 
         String backgroundFileName = "backgrounds/" + i + ".jpg";
         backgroundTexture = new Texture(backgroundFileName);
-        
-		
 		//backgroundTexture = new Texture("background/3.jpg");
 		
         backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
@@ -240,24 +189,19 @@ public class RunSimulation extends ApplicationAdapter {
 		printAcc = "Acc: (0.0, 0.0, 0.0)";
 		
 		InputProcessor inputProcessor = new Inputs();
-		Gdx.input.setInputProcessor(inputProcessor);
-		
+		Gdx.input.setInputProcessor(inputProcessor);		
 	}
-	
+
 	public void place() {		
-		
 		if (Gdx.input.isButtonPressed(0) && !newPlanet) {
 			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
 		    cam.unproject(mousePos); 
 	    
 		    clickLeftPositionX = (int) (mousePos.x / zF);
 			clickLeftPositionY = (int) (mousePos.y / zF);		
-
-
+			
 			newPlanet = true;
-		}
-		
-		else if (!Gdx.input.isButtonPressed(0) && newPlanet) {
+		} else if (!Gdx.input.isButtonPressed(0) && newPlanet) {
 			
 			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
 		    cam.unproject(mousePos); 
@@ -265,7 +209,6 @@ public class RunSimulation extends ApplicationAdapter {
 		    unclickLeftPositionX = (int) (mousePos.x / zF);
 			unclickLeftPositionY = (int) (mousePos.y / zF);		
 
-		
 			int randomMass = 1 + (int)(Math.random() * 4);
 			
 			String planetName = LibGDXTools.nameGen();
@@ -273,7 +216,6 @@ public class RunSimulation extends ApplicationAdapter {
 			LibGDXTools.bodyCreate(planetName, randomMass, clickLeftPositionX , clickLeftPositionY, unclickLeftPositionX - clickLeftPositionX, unclickLeftPositionY - clickLeftPositionY);
 			newPlanet = false;
 		}
-		
 		if (Gdx.input.isButtonPressed(1) && !newSun) {
 			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
 		    cam.unproject(mousePos); 
@@ -281,12 +223,8 @@ public class RunSimulation extends ApplicationAdapter {
 		    clickRightPositionX = (int) (mousePos.x / zF);
 			clickRightPositionY = (int) (mousePos.y / zF);		
 		
-		  
 			newSun = true;
-		}
-		
-		else if (!Gdx.input.isButtonPressed(1) && newSun) {
-			
+		} else if (!Gdx.input.isButtonPressed(1) && newSun) {		
 			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
 		    cam.unproject(mousePos); 
 	    
@@ -302,11 +240,8 @@ public class RunSimulation extends ApplicationAdapter {
 		}
 	}
 	
-
-	
 	@Override
 	public void render () {
-		
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
@@ -317,9 +252,7 @@ public class RunSimulation extends ApplicationAdapter {
 			}
 			focusShift = true;
 			camTransition = 2/3;
-	    }
-		
-		else if(!Gdx.input.isKeyPressed(Input.Keys.N) && focusShift){
+	    } else if (!Gdx.input.isKeyPressed(Input.Keys.N) && focusShift){
 			focusShift = false;
 	    }
 		
@@ -419,21 +352,10 @@ public class RunSimulation extends ApplicationAdapter {
 		batch.setProjectionMatrix(cam.combined);
 		shapeRenderer.setProjectionMatrix(cam.combined);
 		
-		for (int i = 0; i < listOfBodies.size(); i++) {
-			Gdx.gl.glEnable(GL30.GL_BLEND);
-			Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
-			shapeRenderer.begin(ShapeType.Line);
-			shapeRenderer.setColor(0, 0, 0, 0);
-			shapeRenderer.line(listOfBodies.get(i).posVect.x, listOfBodies.get(i).posVect.y, listOfBodies.get(i).oldPosVect.x, listOfBodies.get(i).oldPosVect.y);
-			shapeRenderer.end();	
-			Gdx.gl.glDisable(GL30.GL_BLEND);	
-		}
-		
 		batch.begin();
 		batch.draw(backgroundTexture, -cam.viewportWidth/2 + camX, -cam.viewportHeight/2 + camY, (int) camX, (int) -camY, (int) cam.viewportWidth, (int) cam.viewportHeight);
 				
 		for (int i = 0; i < listOfBodies.size(); i++) {
-
 			OrbitalBody renderBody = listOfBodies.get(i);
 
             float spriteWidth = renderBody.spriteWidth;
@@ -453,6 +375,7 @@ public class RunSimulation extends ApplicationAdapter {
         if (n >= listOfBodies.size()) {
             n -= n;
         }
+        
         focusX = (float) listOfBodies.get(n).posVect.x * zF - (listOfBodies.get(n).spriteWidth / 2);
         focusY = (float) listOfBodies.get(n).posVect.y * zF - (listOfBodies.get(n).spriteWidth / 2);
 		
@@ -469,16 +392,12 @@ public class RunSimulation extends ApplicationAdapter {
 		sourceY -= moveY;
 		
 		camX += 1.1f*cam.viewportHeight/40;
-		
 		if (sidePanelState == true){
-	
 			
 		}
-		
 		cam.position.set(camX, camY, 0);
 		cam.update();		
 		batch.end();
-
 		if (sidePanelState == true){
 			Gdx.gl.glEnable(GL30.GL_BLEND);
 			Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
@@ -488,16 +407,50 @@ public class RunSimulation extends ApplicationAdapter {
 			 shapeRenderer.end();	
 			 Gdx.gl.glDisable(GL30.GL_BLEND);
 		}
-		
-
+		for (int i = 0; i < listOfBodies.size(); i++) {
+			if (listOfBodies.get(i).oldPosVect.isZero()) {
+			} else {
+				potOldX.add(listOfBodies.get(i).oldPosVect.x);
+				potOldY.add(listOfBodies.get(i).oldPosVect.y);
+				potNewX.add(listOfBodies.get(i).posVect.x);
+				potNewY.add(listOfBodies.get(i).posVect.y);
+				Gdx.gl.glEnable(GL30.GL_BLEND);
+				Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
+				shapeRenderer.begin(ShapeType.Line);
+				if (potOldX.size() < drawLimit) {
+					System.out.println("1");
+					for (int x = 0; x < potOldX.size(); x++) {
+						shapeRenderer.setColor(1, 0, 0, x / drawLimit);
+						System.out.println(shapeRenderer.getColor().a);
+						shapeRenderer.line(potOldX.get(x), potOldY.get(x), potNewX.get(x), potNewY.get(x));
+					}	
+				} else {
+					potOldX.remove(0);
+					potOldY.remove(0);
+					potNewX.remove(0);
+					potNewY.remove(0);
+					if (potOldX.size() < drawLimit) {
+						System.out.println("2");
+						for (int x = 0; x < potOldX.size(); x++) {
+							shapeRenderer.setColor(1, 0, 0, x / drawLimit);
+							shapeRenderer.line(potOldX.get(x), potOldY.get(x), potNewX.get(x), potNewY.get(x));
+						}
+					} else {
+						System.out.println("4");
+					}
+				}
+				shapeRenderer.end();	
+				Gdx.gl.glDisable(GL30.GL_BLEND);
+			}
+		}
 		// Workaround to make side panel items appear above shapeRenderer transparent rectangle
 		batch.begin();
 		if (sidePanelState == true) {
-			
 			String printNumOfBodies = "# of bodies: " + String.valueOf(listOfBodies.size());
 			String printDeltaTime = "dt: " + String.valueOf(deltaTime);
 			String printIterationStep = "step: " + String.valueOf(iterationCounter);
 			String printFocusPlanet = "FOCUS: " + listOfBodies.get(n).name;			
+			String printFocusNumber = "focused body: " + n;
 			String printMostAttraction = "Most Grav. Attraction: " + listOfBodies.get(n).mostPullingBodyName;
 			
 			font.draw(batch, "CONTROLS", camX + 2.5f*cam.viewportWidth/12, camY + 9*cam.viewportHeight/20);			
@@ -514,16 +467,15 @@ public class RunSimulation extends ApplicationAdapter {
 			font.draw(batch, printNumOfBodies, camX + 2.5f*cam.viewportWidth/12, camY);
 			font.draw(batch, printIterationStep, camX + 2.5f*cam.viewportWidth/12, camY - cam.viewportHeight/20);
 			font.draw(batch, printDeltaTime, camX + 2.5f*cam.viewportWidth/12, camY - 2*cam.viewportHeight/20);
-
-			font.draw(batch, printFocusPlanet, camX + 2.5f*cam.viewportWidth/12, camY - 4*cam.viewportHeight/20);
-			font.draw(batch, LibGDXTools.underlineCalculation(printFocusPlanet), camX + 2.5f*cam.viewportWidth/12, camY - 4.1f*cam.viewportHeight/20);
-			font.draw(batch, printMostAttraction, camX + 2.5f*cam.viewportWidth/12, camY - 5*cam.viewportHeight/20);
-		
+			font.draw(batch, printFocusNumber, camX + 2.5f*cam.viewportWidth/12, camY - 3*cam.viewportHeight/20);
+			
+			font.draw(batch, printFocusPlanet, camX + 2.5f*cam.viewportWidth/12, camY - 5*cam.viewportHeight/20);
+			font.draw(batch, LibGDXTools.underlineCalculation(printFocusPlanet), camX + 2.5f*cam.viewportWidth/12, camY - 5.1f*cam.viewportHeight/20);
+			font.draw(batch, printMostAttraction, camX + 2.5f*cam.viewportWidth/12, camY - 6*cam.viewportHeight/20);
 			if (iterationCounter % 6 == 0 || pauseState == true ) {
 				printPos = "Pos: ";
 				printVel = "Vel: ";
 				printAcc = "Acc: ";
-
 				Vector3 currentVect = new Vector3();
 				
 				currentVect.set(listOfBodies.get(n).posVect);
@@ -537,84 +489,41 @@ public class RunSimulation extends ApplicationAdapter {
 				currentVect.set(listOfBodies.get(n).accVect);
 				currentVect.set(Math.round(currentVect.x*100f)/100f, Math.round(currentVect.y*100f)/100f, Math.round(currentVect.z*100f)/100f);
 				printAcc += currentVect;
-						
 			}
-			font.draw(batch, printPos, camX + 2.5f*cam.viewportWidth/12, camY - 6*cam.viewportHeight/20);
-			font.draw(batch, printVel, camX + 2.5f*cam.viewportWidth/12, camY - 7*cam.viewportHeight/20);
-			font.draw(batch, printAcc, camX + 2.5f*cam.viewportWidth/12, camY - 8*cam.viewportHeight/20);
-			
+			font.draw(batch, printPos, camX + 2.5f*cam.viewportWidth/12, camY - 7*cam.viewportHeight/20);
+			font.draw(batch, printVel, camX + 2.5f*cam.viewportWidth/12, camY - 8*cam.viewportHeight/20);
+			font.draw(batch, printAcc, camX + 2.5f*cam.viewportWidth/12, camY - 9*cam.viewportHeight/20);
 			font.draw(batch, "ORBITAL SIMULATION", camX - 0.97f*cam.viewportWidth/2, camY + 0.93f*cam.viewportHeight/2);	
-			
-		}
-		else {
+		} else {
 			font.draw(batch, "ORBITAL SIMULATION", camX  - 0.9f*cam.viewportWidth/12, camY + 0.93f*cam.viewportHeight/2);	
 			font.draw(batch, "(press ESC for more info)", camX  - 0.91f*cam.viewportWidth/12, camY - 0.93f*cam.viewportHeight/2);	
 			
 		}
 		batch.end();
-		
 		OrbitalPhysics.passList(listOfBodies);
-		//System.out.println(pauseState);
-
 		if (pauseState == false){
 			if (iterationCounter <= numOfIterations){
 				timeCounter += deltaTime;
 				OrbitalPhysics.iterateSimulation(deltaTime);	
 				place();
-				// DEBUG
-				if ((iterationCounter % dataDivision) == 0){
-					/*
-					float sunMercuryDist = listOfBodies.get(0).posVect.dst(listOfBodies.get(1).posVect);
-					float sunVenusDist = listOfBodies.get(0).posVect.dst(listOfBodies.get(2).posVect);
-					float sunEarthDist = listOfBodies.get(0).posVect.dst(listOfBodies.get(3).posVect);
-					float earthMoonDist = listOfBodies.get(3).posVect.dst(listOfBodies.get(4).posVect);
-					float sunMarsDist = listOfBodies.get(0).posVect.dst(listOfBodies.get(5).posVect);
-					float sunJupiterDist = listOfBodies.get(0).posVect.dst(listOfBodies.get(5).posVect);
-					float sunSaturnDist = listOfBodies.get(0).posVect.dst(listOfBodies.get(6).posVect);
-					float sunUranusDist = listOfBodies.get(0).posVect.dst(listOfBodies.get(7).posVect);
-					float sunNeptuneDist = listOfBodies.get(0).posVect.dst(listOfBodies.get(8).posVect);
-					float sunPlutoDist = listOfBodies.get(0).posVect.dst(listOfBodies.get(9).posVect);
-					System.out.println("sunMercuryDist: " + sunMercuryDist);
-					System.out.println("sunVenusDist: " + sunVenusDist);
-					System.out.println("sunEarthDist: " + sunEarthDist);
-					System.out.println("earthMoonDist: " + earthMoonDist);
-					System.out.println("sunMarsDist: " + sunMarsDist);
-					System.out.println("sunJupiterDist: " + sunJupiterDist);
-					System.out.println("sunSaturnDist: " + sunSaturnDist);
-					System.out.println("sunUranusDist: " + sunUranusDist);
-					System.out.println("sunNeptuneDist: " + sunNeptuneDist);
-					System.out.println("sunPlutoDist: " + sunPlutoDist);
-					//System.out.println("");
-					//System.out.println(listOfBodies.get(0).name);
-					//System.out.println(listOfBodies.get(0).posVect.x);
-					//System.out.println(listOfBodies.get(0).posVect.y);
-					//System.out.println("");
-					//System.out.println(listOfBodies.get(1).name);
-					//System.out.println(listOfBodies.get(1).posVect.x);
-					//System.out.println(listOfBodies.get(1).posVect.y);
-					//System.out.println("");
-					System.out.println("");
-					*/
+				if ((iterationCounter % dataDivision) == 0);				
 				}
 			}	
 			iterationCounter += 1;
 		}
 	}
+	
 	public void resize(int width, int height) {
 		cam.viewportWidth = 1000f;
 		cam.viewportHeight = cam.viewportWidth * height/width;
 		cam.update();
-
 	}
+	
 	@Override
 	public void dispose () {
 		batch.dispose();
-		
 		for (int i = 0; i < runningTextures.size(); i++){
 			runningTextures.get(i).dispose();
-		}
-		
+		}	
 	}
-
-
 }
