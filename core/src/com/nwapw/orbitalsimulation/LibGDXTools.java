@@ -221,16 +221,8 @@ public class LibGDXTools {
 
         if (Math.random() < 0.02){
         	int randInt =  random.nextInt(19) + 0;
-        	name = suffix[randInt] + name;
-        	
-        	
-        	
+        	name = suffix[randInt] + name;   	
         }
-        
-        
-        
-        
-        
         return name;
     }
 		

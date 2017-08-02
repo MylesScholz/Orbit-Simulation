@@ -26,7 +26,7 @@ public class Inputs implements InputProcessor {
 			if (RunSimulation.n >= RunSimulation.listOfBodies.size()) {
 				RunSimulation.n -= RunSimulation.n;
 			}
-			RunSimulation.zF = LibGDXTools.calculateDefaultZoom(RunSimulation.listOfBodies.get(RunSimulation.n).spriteWidth);
+			//RunSimulation.zF = LibGDXTools.calculateDefaultZoom(RunSimulation.listOfBodies.get(RunSimulation.n).spriteWidth);
 		}
 		if (keycode == Input.Keys.B){
 			if (RunSimulation.n >= RunSimulation.listOfBodies.size()) {
@@ -43,7 +43,8 @@ public class Inputs implements InputProcessor {
 			RunSimulation.listOfBodies.remove(RunSimulation.n);
 	    }
 	
-		if(keycode == Input.Keys.P){
+		if(keycode == Input.Keys.SPACE){
+		
 			if (RunSimulation.pauseState == false){
 				RunSimulation.pauseState = true;
 			}
