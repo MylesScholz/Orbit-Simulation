@@ -81,8 +81,8 @@ public class LibGDXTools {
 		body.setMass(mass);
 		body.setName(name);
 		
-		body.setRadius((int) Math.sqrt(mass / Math.PI));
-		body.spriteWidth = (int) Math.sqrt(mass / Math.PI) * 2;
+		body.setRadius((int) Math.sqrt(mass * 10/ Math.PI));
+		body.spriteWidth = (int) Math.sqrt(mass * 10/ Math.PI) * 2;
 
 		body.posVect.x = posX;
 		body.posVect.y = posY;

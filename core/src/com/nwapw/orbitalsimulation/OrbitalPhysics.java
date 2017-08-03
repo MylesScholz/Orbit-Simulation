@@ -114,7 +114,6 @@ public class OrbitalPhysics {
 		calculatedAcc.y = fy;
 		*/
 		return calculatedAcc;
-	
 	}
 	static void passList(ArrayList<OrbitalBody> list) {
 		listOfBodies = list;
@@ -139,7 +138,7 @@ public class OrbitalPhysics {
     	for (int i = 0; i < listOfBodies.size(); i++) {
     		if (listOfBodies.get(i).gravity) {
     			for (int j = 0; j < listOfBodies.size(); j++) {
-    				if(listOfBodies.get(i).gravity) {
+    				if(listOfBodies.get(j).gravity) {
     					if (i != j && checkCollision(listOfBodies.get(i), listOfBodies.get(j))) {
     						if (listOfBodies.get(i).mass < listOfBodies.get(j).mass) {
     							// Conservation of Momentum
@@ -149,7 +148,7 @@ public class OrbitalPhysics {
     							
     							listOfBodies.get(j).mass += listOfBodies.get(i).mass;                      
     							listOfBodies.get(j).radius = (int) Math.sqrt((listOfBodies.get(j).mass * 10) / Math.PI);
-    							listOfBodies.get(j).spriteWidth = (int) Math.sqrt((listOfBodies.get(j).mass * 10) / Math.PI) * 2;
+    							listOfBodies.get(j).spriteWidth = listOfBodies.get(j).radius * 2;
                     	
     							// listOfBodies.get(j).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
     							// listOfBodies.get(j).spriteWidth = listOfBodies.get(i).radius * 2;
@@ -167,7 +166,7 @@ public class OrbitalPhysics {
     							
     							listOfBodies.get(i).mass += listOfBodies.get(j).mass;                   
     							listOfBodies.get(i).radius = (int) Math.sqrt((listOfBodies.get(i).mass * 10) / Math.PI);
-    							listOfBodies.get(i).spriteWidth = (int) Math.sqrt((listOfBodies.get(i).mass * 10) / Math.PI) * 2;
+    							listOfBodies.get(i).spriteWidth = listOfBodies.get(i).radius * 2;
     							
     							//listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(j).radius, 2) * 2));
     							// listOfBodies.get(i).spriteWidth = listOfBodies.get(j).radius * 2;

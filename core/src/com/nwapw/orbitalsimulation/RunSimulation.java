@@ -13,6 +13,7 @@ import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -65,13 +66,15 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	// To debug
 	double timeCounter = 0;
 	int iterationCounter = 0;
-	int dataDivision = 1000;
+	int dataDivision = 10;
 	
 	// Cycle through focus
 	public static int n = 0;
 	
 	int placedPlanetCounter = 0;
 	int placedSunCounter = 0;
+	
+	FPSLogger fpsLogger = new FPSLogger();
 	
 	// List of currently running bodies in the simulation
 	public static ArrayList<OrbitalBody> listOfBodies = new ArrayList<OrbitalBody>();
@@ -277,8 +280,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
         /* INITIAL BODIES */
 		// Name, Mass, radius, posx, posy, velx, vely, spritewidth
         LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 1, 250 , 250, 35, -35);
-        LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 10000, 0, 0, 0, 0);
-        
+        LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 10000, 0, 0, 0, 0);        
         
         /* FILES */
         
@@ -534,8 +536,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 							POTNewY.remove(x);
 							POTBody.remove(x);
 						}
-						//System.out.println(listOfBodies.get(POTBody.get(x)).name);
-						shapeRenderer.setColor(1, 1, 1, x / drawLimit);
+						shapeRenderer.setColor(1, 1, 1, (float) x / (float) POTOldX.size());
 						shapeRenderer.line(POTOldX.get(x)*zF - 0.15f*listOfBodies.get(POTBody.get(x)).velVect.x*zF, POTOldY.get(x)*zF - 0.15f*listOfBodies.get(POTBody.get(x)).velVect.y*zF, POTNewX.get(x)*zF - 0.15f*listOfBodies.get(POTBody.get(x)).velVect.x*zF, POTNewY.get(x)*zF - 0.15f*listOfBodies.get(POTBody.get(x)).velVect.y*zF);
 					}	
 				} else {
@@ -544,7 +545,6 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 					POTNewX.remove(0);
 					POTNewY.remove(0);
 					POTBody.remove(0);
-					
 					if (POTOldX.size() < drawLimit) {
 						for (int x = 0; x < POTOldX.size(); x++) {
 							while (POTBody.get(x) >= listOfBodies.size()) {
@@ -739,7 +739,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 					n -= n;
 				}
 				place();
-				if((iterationCounter % dataDivision) == 0) {/*DEBUG*/}
+				if((iterationCounter % dataDivision) == 0) {fpsLogger.log();}
 			iterationCounter += 1;
 			}	
 		}
