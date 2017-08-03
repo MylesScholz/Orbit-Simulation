@@ -10,6 +10,7 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -32,8 +33,10 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+
 
 public class RunSimulation extends ApplicationAdapter implements ApplicationListener {
 		
@@ -54,7 +57,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	// The max number of iterations that the simulation runs
 	final static int numOfIterations = 100000000;
 	
-	final static float drawLimit = 100;
+	final static float drawLimit = 1000;
 	
 	// 0 = Focus on a particular body, 1 = free movement
 	static int cameraMode = 0;
@@ -101,7 +104,6 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	float focusedBodyOldX;
 	float focusedBodyOldY;
 	
-	
 	OrbitalBody planet = new OrbitalBody();	
 	OrbitalBody sun = new OrbitalBody();
 	
@@ -114,6 +116,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	float camY = 0;
 	float sourceX = 0;
 	float sourceY = 0;
+	
+	float adjustX = 0;
+	float adjustY = 0;
 	
 	// zoom factor
 	static float zF = 1;
@@ -134,23 +139,26 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	BitmapFont fontHeader;
 	BitmapFont fontText;
 	BitmapFont fontSubtitle;
+	BitmapFont fontFocus;
 	
 	String printPos;
 	String printVel;
 	String printAcc;
 	
-	boolean sidePanelState = false;
+	static boolean sidePanelState = false;
 	int sidePanelWidth = 200;
 
 	Skin skin;
 	Stage stage;
-	boolean pauseState = false;
+	static boolean pauseState = false;
+	InputMultiplexer multiplexer;
 	
 	@Override
 	public void create () {
+        /* SCENE2D*/
+		stage = new Stage(new ExtendViewport(640, 840)); 
 		/*
-		 stage = new Stage(); 
-		 skin = new Skin(Gdx.files.internal("data/uiskin.json"));
+		skin = new Skin(Gdx.files.internal("data/uiskin.json"));
 		 final TextButton button = new TextButton("Click me", skin, "default");
 		 button.setWidth(200f);
 	     button.setHeight(20f);
@@ -163,16 +171,41 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	            }
 	        });
 	     
-	    stage.addActor(button);
-	    Gdx.input.setInputProcessor(stage);
-		*/
-	    font = new BitmapFont();
+	    stage.addActor(button);		  
+*/
+		/* GRAPHICS & INPUTS*/
+		shapeRenderer = new ShapeRenderer();
+		batch = new SpriteBatch();
+		
+		InputProcessor inputProcessor = new Inputs();
+		
+		// Allows chaining of multiple inputProcessors
+		multiplexer = new InputMultiplexer();
+		multiplexer.addProcessor(inputProcessor);
+		multiplexer.addProcessor(stage);
+		Gdx.input.setInputProcessor(multiplexer);
+
+					
+		/* CAMERA */
+		float w = Gdx.graphics.getWidth();
+		float h = Gdx.graphics.getHeight();
+		
+		cam = new OrthographicCamera(30, 30 * (h / w));
+		cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
+		
+		printPos = "Pos: (0.0, 0.0, 0.0)";
+		printVel = "Vel: (0.0, 0.0, 0.0)";
+		printAcc = "Acc: (0.0, 0.0, 0.0)";
+		
+		/* FONTS */ 		 
+		font = new BitmapFont();
 		font.setUseIntegerPositions(false);
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Roboto-Bold.ttf"));
 		FreeTypeFontParameter fTitle = new FreeTypeFontParameter();
 		FreeTypeFontParameter fHeader = new FreeTypeFontParameter();
 		FreeTypeFontParameter fSubtitle = new FreeTypeFontParameter();
 		FreeTypeFontParameter fText = new FreeTypeFontParameter();
+		FreeTypeFontParameter fFocus = new FreeTypeFontParameter();
 		
 		fTitle.size = 20;
 		fTitle.shadowColor = Color.BLACK;
@@ -180,7 +213,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		fTitle.shadowOffsetY = 2;
 		
 		fHeader.size = 18;
-		fHeader.color = Color.WHITE;
+		fHeader.color = Color.GOLDENROD;
 		
 		//fHeader.color = new Color(28, 25, 54, 1f);
 		
@@ -190,6 +223,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		fText.size = 14;
 		fText.color = Color.LIGHT_GRAY;
 		
+		fFocus.size = 16;
+		fText.color = Color.WHITE;
+		
 		fontTitle = generator.generateFont(fTitle); 
 		
 		generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Roboto-Regular.ttf"));
@@ -197,16 +233,16 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		fontHeader = generator.generateFont(fHeader);
 		fontSubtitle = generator.generateFont(fSubtitle);
 		fontText = generator.generateFont(fText);
+		fontFocus = generator.generateFont(fFocus);
 		
 		fontTitle.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		fontHeader.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		fontSubtitle.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		fontText.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
-		
-		
-		
+		fontFocus.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		
 		generator.dispose();
+		/* TEXTURES */
         starColors[0] = "blue";
         starColors[1] = "orange";
         starColors[2] = "red";
@@ -232,94 +268,148 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
                 availableStarTextures.add(textures);
             }
         }
-		// INITIALIZE IN ORDER OF MASS SMALLEST TO LARGEST
-		// Name, Mass, radius, posx, posy, velx, vely, spritewidth
         
-        LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 10000, 0, 0, 0, 0, true);
-        LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 1, 250 , 250, 35, -35, true);
-
-        if (listOfBodies.size() == 0) {
-            String filePath = this.getClass().getClassLoader().getResource("").getPath();	// The path of the running file
-            filePath = filePath.substring(0, filePath.indexOf("/desktop")) + "/core/assets/systems/system1.txt";	//Navigate to system file
-            filePath = filePath.replaceAll("%20", " ");
-
-            File systemFile;
-            FileReader in;
-            BufferedReader readFile;
-            String textLine;
-            boolean fileLoaded = false;
-            int i = 0;
-
-            String nameStr;
-            float massFlt, posXFlt, posYFlt, velXFlt, velYFlt;
-
-            while (!fileLoaded && i < 2) {
-                try {
-                    systemFile = new File(filePath);
-                    in = new FileReader(systemFile);
-                    readFile = new BufferedReader(in);
-
-                    while ((textLine = readFile.readLine()) != null) {
-                        nameStr = textLine.substring(0, textLine.indexOf(","));
-                        textLine = textLine.substring(textLine.indexOf(",") + 1);
-                        massFlt = Integer.parseInt(textLine.substring(0, textLine.indexOf(",")));
-                        textLine = textLine.substring(textLine.indexOf(",") + 1);
-                        posXFlt = Integer.parseInt(textLine.substring(0, textLine.indexOf(",")));
-                        textLine = textLine.substring(textLine.indexOf(",") + 1);
-                        posYFlt = Integer.parseInt(textLine.substring(0, textLine.indexOf(",")));
-                        textLine = textLine.substring(textLine.indexOf(",") + 1);
-                        velXFlt = Integer.parseInt(textLine.substring(0, textLine.indexOf(",")));
-                        textLine = textLine.substring(textLine.indexOf(",") + 1);
-                        velYFlt = Integer.parseInt(textLine.substring(0, textLine.length()));
-                        
-                        // Gravity here needs to be read from the file
-                        LibGDXTools.bodyCreate(nameStr, massFlt, posXFlt, posYFlt, velXFlt, velYFlt, true);
-                    }
-                    readFile.close();
-                    in.close();
-
-                    fileLoaded = true;
-                } catch (FileNotFoundException e) {
-                    System.out.println("File Not Found: " + e.getMessage());
-                    System.out.println("Loading Default File...");
-
-                    filePath = filePath.substring(0, filePath.lastIndexOf("/"));
-                    filePath = filePath + "/default.txt";
-                    i++;
-                } catch (IOException e) {
-                    System.out.println("Problem Reading File: " + e.getMessage());
-                }
-            }
-        }
-
-		shapeRenderer = new ShapeRenderer();
-		batch = new SpriteBatch();
-
-		int i = 1 + (int)(Math.random() * 8);
-        String backgroundFileName = "backgrounds/" + i + ".jpg";
-        backgroundTexture = new Texture(backgroundFileName);
-		//backgroundTexture = new Texture("background/3.jpg");
-		
+		int j = 1 + (int)(Math.random() * 8); 
+        String backgroundFileName = "backgrounds/" + j + ".jpg";
+        backgroundTexture = new Texture(backgroundFileName);		
         backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
-		//backgroundTexture.setTextureWrap(TextureWrap.GL_REPEAT);
-		
-		float w = Gdx.graphics.getWidth();
-		float h = Gdx.graphics.getHeight();
-
-		// Constructs a new OrthographicCamera, using the given viewport width and height
-		// Height is multiplied by aspect ratio.
-
-		cam = new OrthographicCamera(30, 30 * (h / w));
-		cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
-		
-		printPos = "Pos: (0.0, 0.0, 0.0)";
-		printVel = "Vel: (0.0, 0.0, 0.0)";
-		printAcc = "Acc: (0.0, 0.0, 0.0)";
-		
-		InputProcessor inputProcessor = new Inputs();
-		Gdx.input.setInputProcessor(inputProcessor);
+        
+        /* INITIAL BODIES */
+		// Name, Mass, radius, posx, posy, velx, vely, spritewidth
+        LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 1, 250 , 250, 35, -35);
+        LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 10000, 0, 0, 0, 0);
+        
+        
+        /* FILES */
+        
+        if (listOfBodies.size() == 0) {
+            loadFile();
+        }
 	}
 
+    public void loadFile() {
+        String filePath = this.getClass().getClassLoader().getResource("").getPath();   // The path of the running file
+        filePath = filePath.substring(0, filePath.indexOf("/desktop")) + "/core/assets/systems/count.txt";    //Navigate to system file
+        filePath = filePath.replaceAll("%20", " ");
+
+        File systemFile;
+        FileReader in;
+        BufferedReader readFile;
+        String textLine;
+
+        boolean fileLoaded = false;
+        int i = 0;
+        int fileCount = 0;
+
+        try {
+            systemFile = new File(filePath);
+            in = new FileReader(systemFile);
+            readFile = new BufferedReader(in);
+
+            fileCount = Integer.parseInt(readFile.readLine().trim());
+        } catch (FileNotFoundException e) {
+            System.out.println("File Not Found: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("Problem Reading File: " + e.getMessage());
+        }
+        String nameStr;
+        float massFlt, posXFlt, posYFlt, velXFlt, velYFlt;
+
+        filePath = filePath.substring(0, filePath.lastIndexOf("/"));
+        filePath = filePath + "/system" + fileCount + ".txt";
+
+        while (fileLoaded == false && i < 2) {
+            try {
+                systemFile = new File(filePath);
+                in = new FileReader(systemFile);
+                readFile = new BufferedReader(in);
+
+                while ((textLine = readFile.readLine()) != null) {
+                    nameStr = textLine.substring(0, textLine.indexOf(","));
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);
+                    massFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);
+                    posXFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);
+                    posYFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);
+                    velXFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);
+                    velYFlt = (float) Double.parseDouble(textLine.substring(0, textLine.length()));
+
+                    LibGDXTools.bodyCreate(nameStr, massFlt, posXFlt, posYFlt, velXFlt, velYFlt);
+                }
+                readFile.close();
+                in.close();
+
+                fileLoaded = true;
+            } catch (FileNotFoundException e) {
+                System.out.println("File Not Found: " + e.getMessage());
+                System.out.println("Loading Default File...");
+
+                filePath = filePath.substring(0, filePath.lastIndexOf("/"));
+                filePath = filePath + "/default.txt";
+                i++;
+            } catch (IOException e) {
+                System.out.println("Problem Reading File: " + e.getMessage());
+            }
+        }
+    }
+
+    public void loadFile(String fileName) {
+        String filePath = this.getClass().getClassLoader().getResource("").getPath();   // The path of the running file
+        filePath = filePath.substring(0, filePath.indexOf("/desktop")) + "/core/assets/systems/" + fileName;    //Navigate to system file
+        filePath = filePath.replaceAll("%20", " ");
+
+        File systemFile;
+        FileReader in;
+        BufferedReader readFile;
+        String textLine;
+
+        boolean fileLoaded = false;
+        int i = 0;
+
+        String nameStr;
+        float massFlt, posXFlt, posYFlt, velXFlt, velYFlt;
+
+        while (fileLoaded == false && i < 2) {
+            try {
+                systemFile = new File(filePath);
+                in = new FileReader(systemFile);
+                readFile = new BufferedReader(in);
+
+                while ((textLine = readFile.readLine()) != null) {
+                    nameStr = textLine.substring(0, textLine.indexOf(","));
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);
+                    massFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);
+                    posXFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);
+                    posYFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);
+                    velXFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);
+                    velYFlt = (float) Double.parseDouble(textLine.substring(0, textLine.length()));
+
+                    LibGDXTools.bodyCreate(nameStr, massFlt, posXFlt, posYFlt, velXFlt, velYFlt);
+                }
+                readFile.close();
+                in.close();
+
+                fileLoaded = true;
+            } catch (FileNotFoundException e) {
+                System.out.println("File Not Found: " + e.getMessage());
+                System.out.println("Loading Default File...");
+
+                filePath = filePath.substring(0, filePath.lastIndexOf("/"));
+                filePath = filePath + "/default.txt";
+                i++;
+            } catch (IOException e) {
+                System.out.println("Problem Reading File: " + e.getMessage());
+            }
+        }
+    }
+    
 	public void place() {		
 		if (Gdx.input.isButtonPressed(0) && !newPlanet) {
 			//System.out.println("planetPlace");
@@ -386,78 +476,34 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	public void render () {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		
-		if(Gdx.input.isKeyPressed(Input.Keys.N) && !focusShift){
-			n++;
-			if (n >= listOfBodies.size()) {
-				n -= n;
-			}
-			focusShift = true;
-			zF = LibGDXTools.calculateDefaultZoom(listOfBodies.get(n).spriteWidth);
-	    } else if(!Gdx.input.isKeyPressed(Input.Keys.N) && focusShift){
-			focusShift = false;
-	    }
-		
-		if(Gdx.input.isKeyPressed(Input.Keys.B)){
-			listOfBodies.get(n).posVect.set(100, 100, 100);
-			listOfBodies.get(n).velVect.set(0, 0, 0);
-	    }
 
-		if(Gdx.input.isKeyPressed(Input.Keys.BACKSPACE) && !deleteBody){
-			listOfBodies.remove(n);
-			if (n >= listOfBodies.size()) {
-            	n -= n;
-            }
-			deleteBody = true;
-	    } else if(!Gdx.input.isKeyPressed(Input.Keys.BACKSPACE) && deleteBody){
-			deleteBody = false;
-	    }
-		
-		if(Gdx.input.isKeyPressed(Input.Keys.P) && !pauseIteration){
-			if (pauseState == false){
-				pauseState = true;
-			} else {
-				pauseState = false;
-			}
-			pauseIteration = true;
-	    }
-		
-		if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE) && !panelShift){
-        	if (sidePanelState == true){
-        		sidePanelState = false;
-        	} else {
-        		sidePanelState = true;
-        	}
-        	panelShift = true;
- 
-	    } else if(!Gdx.input.isKeyPressed(Input.Keys.ESCAPE) && panelShift){
-			panelShift = false;
-		} else if(!Gdx.input.isKeyPressed(Input.Keys.P) && pauseIteration){
-			pauseIteration = false;
-	    }
-		
-        if(Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)){
-        	listOfBodies.get(n).velVect.y += 3;
+        if (listOfBodies.size() == 0){
+        	loadFile();
         }
 		
-        if(Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)){
-        	listOfBodies.get(n).velVect.y -= 3;
-        }
-        
-        if(Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)){
-        	listOfBodies.get(n).velVect.x -= 3;
-        }
-        
-        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)){
-        	listOfBodies.get(n).velVect.x += 3;
-        }
-       
 
-        if(Gdx.input.isKeyPressed(Input.Keys.M)){
-        	listOfBodies.get(n).velVect.set(0,0,0);
-        }
+		
+		if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)){
+			 RunSimulation.listOfBodies.get(RunSimulation.n).velVect.y += 3;
+	     }
+			
+	    if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)){
+	        RunSimulation.listOfBodies.get(RunSimulation.n).velVect.y -= 3;
+	    }
+	        
+	   if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)){
+	        RunSimulation.listOfBodies.get(RunSimulation.n).velVect.x -= 3;
+	   }
+	        
+	   if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)){
+	        RunSimulation.listOfBodies.get(RunSimulation.n).velVect.x += 3;
+	   }
+		
+	   if (Gdx.input.isKeyPressed(Input.Keys.M)){
+       		RunSimulation.listOfBodies.get(RunSimulation.n).velVect.set(0,0,0);
+	   }
 
-        if (Gdx.input.isButtonPressed(Buttons.MIDDLE)){
+	   if (Gdx.input.isButtonPressed(Buttons.MIDDLE)){
             zF = 1;
         }
         
@@ -465,7 +511,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		shapeRenderer.setProjectionMatrix(cam.combined);
 		
 		batch.begin();
-		// stage.draw();
+		
 		batch.draw(backgroundTexture, -cam.viewportWidth/2 + camX, -cam.viewportHeight/2 + camY, (int) camX, (int) -camY, (int) cam.viewportWidth, (int) cam.viewportHeight);
 		batch.end();
 
@@ -481,7 +527,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				shapeRenderer.begin(ShapeType.Line);
 				if (POTOldX.size() < drawLimit) {
 					for (int x = 0; x < POTOldX.size(); x++) {
-						if (POTBody.get(x) >= listOfBodies.size()) {
+						while (POTBody.get(x) >= listOfBodies.size()) {
 							POTOldX.remove(x);
 							POTOldY.remove(x);
 							POTNewX.remove(x);
@@ -490,7 +536,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 						}
 						//System.out.println(listOfBodies.get(POTBody.get(x)).name);
 						shapeRenderer.setColor(1, 1, 1, x / drawLimit);
-						shapeRenderer.line(POTOldX.get(x) - 0.15f*listOfBodies.get(POTBody.get(x)).velVect.x*zF, POTOldY.get(x) - 0.15f*listOfBodies.get(POTBody.get(x)).velVect.y*zF, POTNewX.get(x) - 0.15f*listOfBodies.get(POTBody.get(x)).velVect.x*zF, POTNewY.get(x) - 0.15f*listOfBodies.get(POTBody.get(x)).velVect.y*zF);
+						shapeRenderer.line(POTOldX.get(x)*zF - 0.15f*listOfBodies.get(POTBody.get(x)).velVect.x*zF, POTOldY.get(x)*zF - 0.15f*listOfBodies.get(POTBody.get(x)).velVect.y*zF, POTNewX.get(x)*zF - 0.15f*listOfBodies.get(POTBody.get(x)).velVect.x*zF, POTNewY.get(x)*zF - 0.15f*listOfBodies.get(POTBody.get(x)).velVect.y*zF);
 					}	
 				} else {
 					POTOldX.remove(0);
@@ -501,7 +547,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 					
 					if (POTOldX.size() < drawLimit) {
 						for (int x = 0; x < POTOldX.size(); x++) {
-							if (POTBody.get(x) >= listOfBodies.size()) {
+							while (POTBody.get(x) >= listOfBodies.size()) {
 								POTOldX.remove(x);
 								POTOldY.remove(x);
 								POTNewX.remove(x);
@@ -509,7 +555,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 								POTBody.remove(x);
 							}
 							shapeRenderer.setColor(1, 1, 1, x / drawLimit);
-							shapeRenderer.line(POTOldX.get(x) - 0.15f*listOfBodies.get(POTBody.get(x)).velVect.x*zF, POTOldY.get(x) - 0.15f*listOfBodies.get(POTBody.get(x)).velVect.y*zF, POTNewX.get(x) - 0.15f*listOfBodies.get(POTBody.get(x)).velVect.x*zF, POTNewY.get(x) - 0.15f*listOfBodies.get(POTBody.get(x)).velVect.y*zF);
+							shapeRenderer.line(POTOldX.get(x)*zF - 0.15f*listOfBodies.get(POTBody.get(x)).velVect.x*zF, POTOldY.get(x)*zF - 0.15f*listOfBodies.get(POTBody.get(x)).velVect.y*zF, POTNewX.get(x)*zF - 0.15f*listOfBodies.get(POTBody.get(x)).velVect.x*zF, POTNewY.get(x)*zF - 0.15f*listOfBodies.get(POTBody.get(x)).velVect.y*zF);
 						}
 					}
 				}
@@ -524,13 +570,16 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
             float spriteWidth = renderBody.spriteWidth;
 
-			float spriteX = (float) renderBody.posVect.x * zF - (spriteWidth / 2);
-			float spriteY = (float) renderBody.posVect.y * zF - (spriteWidth / 2);
-			
+			float spriteX = (float) renderBody.posVect.x * zF - zF*(spriteWidth / 2);
+			float spriteY = (float) renderBody.posVect.y * zF - zF*(spriteWidth / 2);
+						
 			float frameX = 0;
 			float frameY = 0;
 			
 			if (!pauseState){
+				if (n >= listOfBodies.size()) {
+					n -= n;
+				}
 				frameX = spriteX - 0.15f*listOfBodies.get(n).velVect.x*zF;
 				frameY = spriteY - 0.15f*listOfBodies.get(n).velVect.y*zF;
 			} else {
@@ -538,13 +587,16 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				frameY = spriteY;
 			}
 			
-			fontSubtitle.draw(batch, renderBody.name, frameX + 0.7f*spriteWidth*zF/2, frameY + 1.5f*spriteWidth*zF/10);
+			if (i == n) {
+				fontFocus.draw(batch, renderBody.name, frameX + 0.7f*spriteWidth*zF/2, frameY + 1.5f*spriteWidth*zF/10);
 
+			} else {
+				fontSubtitle.draw(batch, renderBody.name, frameX + 0.7f*spriteWidth*zF/2, frameY + 1.5f*spriteWidth*zF/10);
+			}
+			
 			Texture spriteTexture = renderBody.texture;
-			batch.draw(spriteTexture, frameX, frameY, (float) (spriteWidth * zF), (float) (spriteWidth * zF));
+			batch.draw(spriteTexture, frameX, frameY, (float) (spriteWidth * zF), (float) (spriteWidth * zF));		
 		}
-
-		
         float focusX = 0;
 		float focusY = 0;
 
@@ -552,6 +604,10 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
         focusX = (float) listOfBodies.get(n).posVect.x * zF - zF*(listOfBodies.get(n).spriteWidth / 2);
         focusY = (float) listOfBodies.get(n).posVect.y * zF - zF*(listOfBodies.get(n).spriteWidth / 2);
 		*/
+		
+		if (n >= listOfBodies.size()) {
+			n -=n;
+		}
 		focusX = (float) listOfBodies.get(n).posVect.x * zF - (listOfBodies.get(n).spriteWidth / 8);
         focusY = (float) listOfBodies.get(n).posVect.y * zF - (listOfBodies.get(n).spriteWidth / 8);
 		
@@ -566,26 +622,25 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		camY -= moveY;
 	
 		camX += 1.1f*cam.viewportHeight/40;
+
 		float frameX = 0;
 		float frameY = 0;
 
 		if (pauseState == false){
 			frameX = camX - 0.1f*listOfBodies.get(n).velVect.x*zF;
-			frameY = camY - 0.1f*listOfBodies.get(n).velVect.y*zF;
-		}
-		else {
+			frameY = camY - 0.1f*listOfBodies.get(n).velVect.y*zF;	
+		} else {
 			frameX = camX;
 			frameY = camY;
 		}
-
 		cam.position.set(camX, camY, 0);
 		cam.update();	
 
 		if (sidePanelState == true && pauseState == true){
-			fontHeader.draw(batch, "PAUSED", frameX - 0.97f*cam.viewportWidth/2, frameY + 8.5f*cam.viewportHeight/20);
+			fontHeader.draw(batch, "PAUSED & SAVED", frameX - 0.97f*cam.viewportWidth/2, frameY + 8.3f*cam.viewportHeight/20);
 		} 
 		else if (sidePanelState == false && pauseState == true){
-			fontHeader.draw(batch, "PAUSED", frameX - 0.6f*cam.viewportWidth/20, frameY + 8.5f*cam.viewportHeight/20);
+			fontHeader.draw(batch, "PAUSED & SAVED", frameX - 1.4f*cam.viewportWidth/20, frameY + 8.3f*cam.viewportHeight/20);
 		}
 				
 		batch.end();		
@@ -615,15 +670,17 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			fontText.draw(batch, "(LEFT CLICK) Create new planet", frameX + 2.5f*cam.viewportWidth/12, frameY + 7*cam.viewportHeight/20);
 			fontText.draw(batch, "(RIGHT CLICK) Create new star", frameX + 2.5f*cam.viewportWidth/12, frameY + 6*cam.viewportHeight/20);			
 			fontText.draw(batch, "(ARROW KEYS) Move Focused Body", frameX + 2.5f*cam.viewportWidth/12, frameY + 5*cam.viewportHeight/20);
-			fontText.draw(batch, "(P) Pause   (N) Change Focus", frameX + 2.5f*cam.viewportWidth/12, frameY + 4*cam.viewportHeight/20);
+			fontText.draw(batch, "(SPACEBAR) Pause & Save (N) Change Focus", frameX + 2.5f*cam.viewportWidth/12, frameY + 4*cam.viewportHeight/20);
 			fontText.draw(batch, "(M) Reset Current Body's Velocity", frameX + 2.5f*cam.viewportWidth/12, frameY + 3*cam.viewportHeight/20);
-		
+			fontText.draw(batch, "(N) Change Focus to the Next Body", frameX + 2.5f*cam.viewportWidth/12, frameY + 2*cam.viewportHeight/20);
+			
 	
 			fontHeader.draw(batch, "SIMULATION SETTINGS", frameX + 2.5f*cam.viewportWidth/12, frameY + cam.viewportHeight/20);
 			fontSubtitle.draw(batch, "______________________", frameX + 2.5f*cam.viewportWidth/12, frameY + 0.9f*cam.viewportHeight/20);
 			fontText.draw(batch, printNumOfBodies, frameX + 2.5f*cam.viewportWidth/12, frameY);
 			fontText.draw(batch, printIterationStep, frameX + 2.5f*cam.viewportWidth/12, frameY - cam.viewportHeight/20);
 			fontText.draw(batch, printDeltaTime, frameX + 2.5f*cam.viewportWidth/12, frameY - 2*cam.viewportHeight/20);
+			fontText.draw(batch, "cam: follow", frameX + 2.5f*cam.viewportWidth/12, frameY - 3*cam.viewportHeight/20);
 			
 			fontHeader.draw(batch, printFocusPlanet, frameX + 2.5f*cam.viewportWidth/12, frameY - 4*cam.viewportHeight/20);
 			fontSubtitle.draw(batch, LibGDXTools.underlineCalculation(printFocusPlanet), frameX + 2.5f*cam.viewportWidth/12, frameY - 4.1f*cam.viewportHeight/20);
@@ -660,7 +717,19 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			fontTitle.draw(batch, "ORBITAL SIMULATION", frameX  - 1.3f*cam.viewportWidth/12, frameY + 0.93f*cam.viewportHeight/2);	
 			fontText.draw(batch, "(press ESC for more INFO)", frameX  - 1.1f*cam.viewportWidth/12, frameY - 0.93f*cam.viewportHeight/2);	
 		}
+		
 		batch.end();
+		
+		// Set the viewport to the whole screen.
+		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+		// Draw anywhere on the screen.
+		stage.act(0.01f);
+		stage.draw();
+		
+		// Restore the stage's viewport.
+		stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+		
 		OrbitalPhysics.passList(listOfBodies);
 		if(pauseState == false) {
 			if(iterationCounter <= numOfIterations){
@@ -676,8 +745,138 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		}
 
 	}
+
+
+	public static void saveFile() {
+        String filePath = RunSimulation.class.getProtectionDomain().getCodeSource().getLocation().getPath();    //The path of the RunSimulation
+        
+        filePath = filePath.substring(0, filePath.indexOf("/bin")) + "/assets/systems/count.txt";    //Navigate to system file
+        filePath = filePath.replaceAll("%20", " ");
+
+        File systemFile;
+        FileWriter out;
+        FileReader in;
+        BufferedWriter writeFile;
+        BufferedReader readFile;
+
+        Boolean fileWritten = false;
+        int i = 0;
+        String textLine = "";
+        int fileCount = 0;
+
+        try {
+            //Read count.txt to get file count, increment it, and write it to the file
+            systemFile = new File(filePath);
+            in = new FileReader(systemFile);
+            readFile = new BufferedReader(in);
+
+            fileCount = Integer.parseInt(readFile.readLine().trim()) + 1;
+
+            out = new FileWriter(systemFile);
+            writeFile = new BufferedWriter(out);
+
+            writeFile.write(String.valueOf(fileCount));
+
+            writeFile.close();
+            out.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("File Not Found: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("Problem Reading File: " + e.getMessage());
+        }
+
+        //Switch to system.txt
+        filePath = filePath.substring(0, filePath.lastIndexOf("/"));
+        filePath = filePath + "/system" + fileCount + ".txt";
+
+        while (fileWritten == false && i < 2) {
+            try {
+                //Write data to system file
+                systemFile = new File(filePath);
+                out = new FileWriter(systemFile);
+                writeFile = new BufferedWriter(out);
+
+                for (int j = 0; j < listOfBodies.size(); j++) {
+                    textLine = listOfBodies.get(j).name + "," + listOfBodies.get(j).mass + "," + listOfBodies.get(j).posVect.x + "," + listOfBodies.get(j).posVect.y;
+                    textLine = textLine + "," + listOfBodies.get(j).velVect.x + "," + listOfBodies.get(j).velVect.y;
+
+                    writeFile.write(textLine);
+                    writeFile.newLine();
+                }
+                writeFile.close();
+                out.close();
+
+                fileWritten = true;
+            } catch (FileNotFoundException e) {
+                System.out.println("File Not Found: " + e.getMessage());
+                System.out.println("Creating New File...");
+
+                try {
+                    systemFile = new File(filePath);
+                    systemFile.createNewFile();
+                } catch (IOException err) {
+                    System.out.println("Problem Creating File: " + e.getMessage());
+                }
+
+                i++;
+            } catch (IOException e) {
+                System.out.println("Problem Writing to File: " + e.getMessage());
+            }
+        }
+    }
+
+    public static void saveFile(String fileName) {
+        String filePath = RunSimulation.class.getProtectionDomain().getCodeSource().getLocation().getPath();   //The path of the RunSimulation
+        filePath = filePath.substring(0, filePath.indexOf("/build")) + "/assets/systems/" + fileName;    //Navigate to system file
+        filePath = filePath.replaceAll("%20", " ");
+
+        File systemFile;
+        FileWriter out;
+        BufferedWriter writeFile;
+
+        Boolean fileWritten = false;
+        int i = 0;
+        String textLine = "";
+
+        while (fileWritten == false && i < 2) {
+            try {
+                //Write data to system file
+                systemFile = new File(filePath);
+                out = new FileWriter(systemFile);
+                writeFile = new BufferedWriter(out);
+
+                for (int j = 0; j < listOfBodies.size(); j++) {
+                    textLine = listOfBodies.get(j).name + "," + listOfBodies.get(j).mass + "," + listOfBodies.get(j).posVect.x + "," + listOfBodies.get(j).posVect.y;
+                    textLine = textLine + "," + listOfBodies.get(j).velVect.x + "," + listOfBodies.get(j).velVect.y;
+
+                    writeFile.write(textLine);
+                    writeFile.newLine();
+                }
+                writeFile.close();
+                out.close();
+
+                fileWritten = true;
+            } catch (FileNotFoundException e) {
+                System.out.println("File Not Found: " + e.getMessage());
+                System.out.println("Creating New File...");
+
+                try {
+                    systemFile = new File(filePath);
+                    systemFile.createNewFile();
+                } catch (IOException err) {
+                    System.out.println("Problem Creating File: " + e.getMessage());
+                }
+
+                i++;
+            } catch (IOException e) {
+                System.out.println("Problem Writing to File: " + e.getMessage());
+            }
+        }
+    }
+
 	
 	public void resize(int width, int height) {
+		//stage.getViewport().update(width, height, true);
 		cam.viewportWidth = 1000f;
 		cam.viewportHeight = cam.viewportWidth * height/width;
 		cam.update();

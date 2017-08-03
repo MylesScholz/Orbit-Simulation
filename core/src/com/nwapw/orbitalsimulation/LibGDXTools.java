@@ -76,7 +76,7 @@ public class LibGDXTools {
 		return body;
 	}	
 	
-	static void bodyCreate(String name, float mass, float posX, float posY, float velX, float velY, boolean gravity) {
+	static void bodyCreate(String name, float mass, float posX, float posY, float velX, float velY) {
 		OrbitalBody body = new OrbitalBody();
 		body.setMass(mass);
 		body.setName(name);
@@ -90,7 +90,7 @@ public class LibGDXTools {
 		body.velVect.x = velX;
 		body.velVect.y = velY;
 
-		body.setGravity(gravity);
+		body.setGravity(true);
 		
 		RunSimulation.listOfBodies.add(body);
 		body.setTexture(bodyTextureChooser(mass));
@@ -263,16 +263,8 @@ public class LibGDXTools {
 
         if (Math.random() < 0.02){
         	int randInt =  random.nextInt(19) + 0;
-        	name = suffix[randInt] + name;
-        	
-        	
-        	
+        	name = suffix[randInt] + name;   	
         }
-        
-        
-        
-        
-        
         return name;
     }
 		
@@ -338,7 +330,7 @@ public class LibGDXTools {
 		return border;
 	}
 	static float calculateDefaultZoom(float spriteWidth){
-		//float zF = spriteWidth/500;
+		//float zF = 2 - spriteWidth/100f;
 		float zF = 1;
 		
 		//System.out.println(zF);
