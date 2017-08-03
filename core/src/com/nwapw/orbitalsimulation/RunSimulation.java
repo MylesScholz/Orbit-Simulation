@@ -57,7 +57,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	// The max number of iterations that the simulation runs
 	final static int numOfIterations = 100000000;
 	
-	final static float drawLimit = 25;
+	final static float drawLimit = 100;
 	
 	// 0 = Focus on a particular body, 1 = free movement
 	static int cameraMode = 0;
@@ -80,6 +80,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	public static ArrayList<Float> potNewX = new ArrayList<Float>();
 	public static ArrayList<Float> potNewY = new ArrayList<Float>();
 
+	//List of vectors for comet tails
+    ArrayList<Vector3> cometTail = new ArrayList<Vector3>();
 	
 	// Booleans for mouse input edge detection
 	boolean newPlanet = false;
@@ -468,7 +470,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
 		
         if (listOfBodies.size() == 0){
-        	LibGDXTools.bodyInitialize("Star", 10000, 25, 0, 0, 0, 0, 40);
+        	loadFile();
 		}
 		
 
@@ -632,6 +634,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			 shapeRenderer.end();	
 			 Gdx.gl.glDisable(GL30.GL_BLEND);
 		}
+
+		//Draw trail
+
 		for (int i = 0; i < listOfBodies.size(); i++) {
 			if (listOfBodies.get(i).oldPosVect.isZero()) {
 			} else {
@@ -645,7 +650,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				if (potOldX.size() < drawLimit) {
 					//System.out.println("1");
 					for (int x = 0; x < potOldX.size(); x++) {
-						shapeRenderer.setColor(1, 0, 0, x / drawLimit);
+						shapeRenderer.setColor(1, 1, 1, x / drawLimit);
 						//System.outystem.out.println(shapeRenderer.getColor().a);
 						shapeRenderer.line(potOldX.get(x)*zF, potOldY.get(x)*zF, potNewX.get(x)*zF, potNewY.get(x)*zF);
 						
@@ -658,7 +663,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 					if (potOldX.size() < drawLimit) {
 						//System.out.println("2");
 						for (int x = 0; x < potOldX.size(); x++) {
-							shapeRenderer.setColor(1, 0, 0, x / drawLimit);
+							shapeRenderer.setColor(1, 1, 1, x / drawLimit);
 							shapeRenderer.line(potOldX.get(x)*zF, potOldY.get(x)*zF, potNewX.get(x)*zF, potNewY.get(x)*zF);
 						}
 					} else {
@@ -669,7 +674,42 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				Gdx.gl.glDisable(GL30.GL_BLEND);
 			}
 		}
-		// Workaround to make side panel items appear above shapeRenderer transparent rectangle
+
+		//Draw comet tails
+
+        /*
+        for (int i = 0; i < listOfBodies.size(); i++) {
+            if (listOfBodies.get(i).mass == 1) {
+                Vector3 distToStar = new Vector3();
+                for (int j = 0; j < listOfBodies.size(); j++) {
+                    if (listOfBodies.get(j).mass >= 10000) {
+                        distToStar = listOfBodies.get(i).posVect.add(listOfBodies.get(j).posVect).scl(-1);
+                    }
+                }
+                cometTail.add(distToStar);
+
+                Gdx.gl.glEnable(GL30.GL_BLEND);
+                Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
+                shapeRenderer.begin(ShapeType.Line);
+                if (cometTail.size() < drawLimit / 2) {
+                    for (int j = 1; j < cometTail.size(); j++) {
+                        shapeRenderer.setColor(0, 0, 1, j / drawLimit);
+                        shapeRenderer.line(cometTail.get(j - 1).x * zF, cometTail.get(j - 1).y * zF, cometTail.get(j).x * zF, cometTail.get(j).y * zF);
+                    }
+                } else {
+                    cometTail.remove(0);
+                    for (int j = 1; j < cometTail.size(); j++) {
+                        shapeRenderer.setColor(0, 0, 1, j / drawLimit);
+                        shapeRenderer.line(cometTail.get(j - 1).x * zF, cometTail.get(j - 1).y * zF, cometTail.get(j).x * zF, cometTail.get(j).y * zF);
+                    }
+                }
+                shapeRenderer.end();
+                Gdx.gl.glDisable(GL30.GL_BLEND);
+            }
+        }
+        */
+
+        // Workaround to make side panel items appear above shapeRenderer transparent rectangle
 		batch.begin();
 		if (sidePanelState == true) {
 			String printNumOfBodies = "# of bodies: " + String.valueOf(listOfBodies.size());
