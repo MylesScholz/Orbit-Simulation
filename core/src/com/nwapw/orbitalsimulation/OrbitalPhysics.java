@@ -35,7 +35,7 @@ public class OrbitalPhysics {
 	final static float deltaTime = (float) 0.01;
 	final static int numOfIterations = 1000000;
 	
-	
+	static boolean indexOutOfBounds;
 	
 	static void iterateSimulation(float deltaTime) {
 
@@ -44,49 +44,41 @@ public class OrbitalPhysics {
 		// 1. Calculate net force and acceleration from acting on each body.
 		
 
-		for (int i=0; i < listOfBodies.size(); i++){
-			
-			OrbitalBody currentBody = listOfBodies.get(i);
-			sumOfAcc.set(0,0,0);
-			
-			listOfBodies.get(i).mostPullingBodyAcc = 0;
-			
-			for (int j = 0; j < listOfBodies.size() ; j++){
-				
-				if (j != i){
-					
-					OrbitalBody pullingBody = listOfBodies.get(j);
-					calculatedAcc.set(0,0,0);
-					
-					if (perturbationCalculationMethod == 0){ // Cowell's Formulation
+		for (int i=0; i < listOfBodies.size(); i++) {			
+			if (listOfBodies.get(i).gravity) {
+				OrbitalBody currentBody = listOfBodies.get(i);
+				sumOfAcc.set(0,0,0);
+				listOfBodies.get(i).mostPullingBodyAcc = 0;
+				for (int j = 0; j < listOfBodies.size() ; j++){
+					if (listOfBodies.get(j).gravity) {
+						if (j != i){
+							OrbitalBody pullingBody = listOfBodies.get(j);
+							calculatedAcc.set(0,0,0);
 						
-						calculatedAcc = cowellsFormulation(currentBody, pullingBody);
-						
-						if (calculatedAcc.len() >= listOfBodies.get(i).mostPullingBodyAcc){
-							
-							listOfBodies.get(i).mostPullingBodyAcc = calculatedAcc.len();
-							listOfBodies.get(i).mostPullingBodyName = listOfBodies.get(j).name;
+							if (perturbationCalculationMethod == 0){ // Cowell's Formulation
+								calculatedAcc = cowellsFormulation(currentBody, pullingBody);
+								
+								if (calculatedAcc.len() >= listOfBodies.get(i).mostPullingBodyAcc){
+									listOfBodies.get(i).mostPullingBodyAcc = calculatedAcc.len();
+									listOfBodies.get(i).mostPullingBodyName = listOfBodies.get(j).name;
+								}
+								sumOfAcc.add(calculatedAcc);
+							}
+							/*
+							else if {
+								// TODO: Encke's Method, Variation of Parameters, etc.
+							}
+							*/
 						}
-												
-						sumOfAcc.add(calculatedAcc);
-
 					}
-					/*
-					else if {
-						// TODO: Encke's Method, Variation of Parameters, etc.
-					}
-					*/
 				}
-			}
-			
-			// 2. Iterate and integrate for velocity and then position.
+				// 2. Iterate and integrate for velocity and then position.
 
-			currentBody.setAcceleration(sumOfAcc.x, sumOfAcc.y, sumOfAcc.z);			
-			currentBody.iterateVelThenPos(deltaTime);
-			
+				currentBody.setAcceleration(sumOfAcc.x, sumOfAcc.y, sumOfAcc.z);			
+				currentBody.iterateVelThenPos(deltaTime);			
+			}
 		}	
-		
-		 checkAllCollisions();
+		checkAllCollisions();
 	}	
 	
 	static Vector3 cowellsFormulation(OrbitalBody currentBody, OrbitalBody pullingBody) {
@@ -133,6 +125,10 @@ public class OrbitalPhysics {
 		listOfBodies = list;
 	}
 	
+	static boolean passIndexError() {
+		return indexOutOfBounds;
+	}
+	
     public static boolean checkCollision(OrbitalBody body1, OrbitalBody body2) {
 		//float distance = Math.sqrt((Math.pow(body1.posVect.x - body2.posVect.x, 2))+(Math.pow(body1.posVect.y - body2.posVect.y, 2)));
         float distance = body1.posVect.dst(body2.posVect);
@@ -145,30 +141,36 @@ public class OrbitalPhysics {
     }
 
     public static void checkAllCollisions() {
-        
     	for (int i = 0; i < listOfBodies.size(); i++) {
-            for (int j = 0; j < listOfBodies.size(); j++) {
-            	
-                if (i != j && checkCollision(listOfBodies.get(i), listOfBodies.get(j))) {
-                    if (listOfBodies.get(i).mass < listOfBodies.get(j).mass) {
-                        listOfBodies.remove(i);
-                    } else if (listOfBodies.get(i).mass > listOfBodies.get(j).mass) {
-                        listOfBodies.remove(j);
-                    } else {
-                        listOfBodies.get(i).mass += listOfBodies.get(j).mass;
-                        listOfBodies.get(i).velVect.add(listOfBodies.get(j).velVect);
-                        listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
-                        listOfBodies.get(i).spriteWidth = listOfBodies.get(i).radius * 2;
-                    }
-                    
-                    checkAllCollisions();
-                    break;
-                    
-                }
-            }
-
+    		if (listOfBodies.get(i).gravity) {
+    			for (int j = 0; j < listOfBodies.size(); j++) {
+    				if (listOfBodies.get(j).gravity) {
+    					System.out.println(listOfBodies.get(i).gravity);
+    					System.out.println(listOfBodies.get(j).gravity);
+    					if (i != j && checkCollision(listOfBodies.get(i), listOfBodies.get(j))) {
+    						if (listOfBodies.get(i).mass < listOfBodies.get(j).mass) {
+    							listOfBodies.remove(i);
+    							if (RunSimulation.passIndex() >= listOfBodies.size()) {
+    								indexOutOfBounds = true;
+    							}
+    						} else if (listOfBodies.get(i).mass > listOfBodies.get(j).mass) {
+    							listOfBodies.remove(j);
+    							if (RunSimulation.passIndex() >= listOfBodies.size()) {
+    								indexOutOfBounds = true;
+    							}
+    						} else {
+    							listOfBodies.get(i).mass += listOfBodies.get(j).mass;
+    							listOfBodies.get(i).velVect.add(listOfBodies.get(j).velVect);
+    							listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
+    							listOfBodies.get(i).spriteWidth = listOfBodies.get(i).radius * 2;
+    						}
+    						
+    						checkAllCollisions();
+    						break;
+    					}
+    				}
+    			}
+    		}
         }
-        
-        
     }
 }

@@ -33,6 +33,8 @@ public class OrbitalBody {
 	
 	float spriteWidth = 10;
 	
+	boolean gravity = true;
+	
 	Texture texture;
 
 	void setName(String newName){
@@ -77,6 +79,9 @@ public class OrbitalBody {
 		this.spriteWidth = newSpriteWidth;
 	}
 	
+	void setGravity(boolean setGravity) {
+		this.gravity = setGravity;
+	}
 	
 	// TODO create integrator choice picker
 	float integratorChoice(float value, float deltaTime) {
