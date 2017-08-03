@@ -767,7 +767,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	public static void saveFile() {
         String filePath = RunSimulation.class.getProtectionDomain().getCodeSource().getLocation().getPath();    //The path of the RunSimulation
         
-        filePath = filePath.substring(0, filePath.indexOf("/build")) + "/assets/systems/count.txt";    //Navigate to system file
+        filePath = filePath.substring(0, filePath.indexOf("/bin")) + "assets/systems/count.txt";    //Navigate to system file
         filePath = filePath.replaceAll("%20", " ");
 
         File systemFile;
