@@ -22,6 +22,7 @@ import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -31,8 +32,11 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -57,7 +61,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	// The max number of iterations that the simulation runs
 	final static int numOfIterations = 100000000;
 	
-	final static float drawLimit = 100;
+	final static float drawLimit = 25;
 	
 	// 0 = Focus on a particular body, 1 = free movement
 	static int cameraMode = 0;
@@ -80,8 +84,6 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	public static ArrayList<Float> potNewX = new ArrayList<Float>();
 	public static ArrayList<Float> potNewY = new ArrayList<Float>();
 
-	//List of vectors for comet tails
-    ArrayList<Vector3> cometTail = new ArrayList<Vector3>();
 	
 	// Booleans for mouse input edge detection
 	boolean newPlanet = false;
@@ -142,9 +144,13 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	static boolean sidePanelState = false;
 	int sidePanelWidth = 200;
 
-	Skin skin;
+	static Skin skin;
 	Stage stage;
+	Table table;
+	
 	static boolean pauseState = false;
+	static int savedIndicator = 0;
+	
 	InputMultiplexer multiplexer;
 	
 	@Override
@@ -153,24 +159,60 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		
 		
         /* SCENE2D*/
-		stage = new Stage(new ExtendViewport(640, 840)); 
+		stage = new Stage(new ExtendViewport(1000, 500)); 
+		table = new Table();
+		table.setFillParent(true);
+		stage.addActor(table);
 
-		/*
-		skin = new Skin(Gdx.files.internal("data/uiskin.json"));
-		 final TextButton button = new TextButton("Click me", skin, "default");
-		 button.setWidth(200f);
-	     button.setHeight(20f);
-	     button.setPosition(Gdx.graphics.getWidth() /2 - 100f, Gdx.graphics.getHeight()/2 - 10f);   
+		table.setDebug(true);
 		
-	        button.addListener(new ClickListener(){
-	            @Override 
-	            public void clicked(InputEvent event, float x, float y){
-	                button.setText("You clicked the button");
+
+		
+		
+		
+		 skin = new Skin(Gdx.files.internal("uiskin.json"));
+		 
+		 final TextButton pauseButton = new TextButton("Pause", skin, "default");
+		 pauseButton.setWidth(100f);
+	     pauseButton.setHeight(20f);
+	     pauseButton.setPosition(Gdx.graphics.getWidth() / 2 - 60f, 20f);   
+	     
+	     pauseButton.addListener(new ClickListener(){
+	    	 @Override 
+	    	 public void clicked(InputEvent event, float x, float y){
+	            
+	              if (pauseState == true){
+	            	  pauseState = false;
+	            	  pauseButton.setText("Pause");
+	              }
+	              else {
+	            	  pauseState = true;
+	            	  pauseButton.setText("Run");
+	              }
+	            System.out.println(pauseState); 
+	
+	            }
+	        });	    
+	     
+		 final TextButton saveButton = new TextButton("Save", skin, "default");
+		 saveButton.setWidth(100f);
+	     saveButton.setHeight(20f);
+	     saveButton.setPosition(Gdx.graphics.getWidth() / 2 + 60f, 20f);   
+	     
+	     saveButton.addListener(new ClickListener(){
+	    	 @Override 
+	    	 public void clicked(InputEvent event, float x, float y){
+	            
+	    		savedIndicator = 50;
+
+	
 	            }
 	        });
+ 
 	     
-	    stage.addActor(button);		  
-*/
+	    table.addActor(saveButton);		  
+	    table.addActor(pauseButton);
+
 		/* GRAPHICS & INPUTS*/
 		shapeRenderer = new ShapeRenderer();
 		batch = new SpriteBatch();
@@ -291,7 +333,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
     public void loadFile() {
         String filePath = this.getClass().getClassLoader().getResource("").getPath();   // The path of the running file
-        filePath = filePath.substring(0, filePath.indexOf("/bin")) + "/core/assets/systems/count.txt";    //Navigate to system file
+        filePath = filePath.substring(0, filePath.indexOf("/desktop")) + "/core/assets/systems/count.txt";    //Navigate to system file
         filePath = filePath.replaceAll("%20", " ");
 
         File systemFile;
@@ -470,7 +512,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
 		
         if (listOfBodies.size() == 0){
-        	loadFile();
+        	LibGDXTools.bodyInitialize("Star", 10000, 25, 0, 0, 0, 0, 40);
 		}
 		
 
@@ -593,37 +635,51 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
 		float frameX = 0;
 		float frameY = 0;
-		
-		
-		
+				
 		if (pauseState == false){
 			frameX = camX - 0.1f*listOfBodies.get(n).velVect.x*zF;
-			frameY = camY - 0.1f*listOfBodies.get(n).velVect.y*zF;
-			
-			
-
-
-			
-			
+			frameY = camY - 0.1f*listOfBodies.get(n).velVect.y*zF;	
 		}
 		else {
 			frameX = camX;
 			frameY = camY;
 		}
-		
-		
-
-		
+				
 		cam.position.set(camX, camY, 0);
 		cam.update();	
 
+
+		
 		if (sidePanelState == true && pauseState == true){
-			fontHeader.draw(batch, "PAUSED & SAVED", frameX - 0.97f*cam.viewportWidth/2, frameY + 8.3f*cam.viewportHeight/20);
+			fontHeader.draw(batch, "PAUSED", frameX - 0.97f*cam.viewportWidth/2, frameY + 8.3f*cam.viewportHeight/20);
 		} 
 		else if (sidePanelState == false && pauseState == true){
-			fontHeader.draw(batch, "PAUSED & SAVED", frameX - 1.4f*cam.viewportWidth/20, frameY + 8.3f*cam.viewportHeight/20);
+			fontHeader.draw(batch, "PAUSED", frameX - 0.9f*cam.viewportWidth/20, frameY + 8.3f*cam.viewportHeight/20);
 		}
-				
+		
+		
+		if (savedIndicator > 0){
+			savedIndicator--;
+			
+			if (sidePanelState == true){
+				if (pauseState == true){
+					fontHeader.draw(batch, "SAVED", frameX - 0.97f*cam.viewportWidth/2, frameY + 7.6f*cam.viewportHeight/20);
+				}
+				else {
+					fontHeader.draw(batch, "SAVED", frameX - 0.97f*cam.viewportWidth/2, frameY + 8.3f*cam.viewportHeight/20);	
+				}
+			}
+			else {			
+				if (pauseState == true){
+					fontHeader.draw(batch, "SAVED", frameX - 0.9f*cam.viewportWidth/20, frameY + 7.5f*cam.viewportHeight/20);
+				}
+				else {
+					fontHeader.draw(batch, "SAVED", frameX - 1.4f*cam.viewportWidth/20, frameY + 8.3f*cam.viewportHeight/20);
+				}
+			}
+			
+		}
+		
 		batch.end();
 		if (sidePanelState == true){
 			Gdx.gl.glEnable(GL30.GL_BLEND);
@@ -634,9 +690,6 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			 shapeRenderer.end();	
 			 Gdx.gl.glDisable(GL30.GL_BLEND);
 		}
-
-		//Draw trail
-
 		for (int i = 0; i < listOfBodies.size(); i++) {
 			if (listOfBodies.get(i).oldPosVect.isZero()) {
 			} else {
@@ -650,7 +703,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				if (potOldX.size() < drawLimit) {
 					//System.out.println("1");
 					for (int x = 0; x < potOldX.size(); x++) {
-						shapeRenderer.setColor(1, 1, 1, x / drawLimit);
+						shapeRenderer.setColor(1, 0, 0, x / drawLimit);
 						//System.outystem.out.println(shapeRenderer.getColor().a);
 						shapeRenderer.line(potOldX.get(x)*zF, potOldY.get(x)*zF, potNewX.get(x)*zF, potNewY.get(x)*zF);
 						
@@ -663,7 +716,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 					if (potOldX.size() < drawLimit) {
 						//System.out.println("2");
 						for (int x = 0; x < potOldX.size(); x++) {
-							shapeRenderer.setColor(1, 1, 1, x / drawLimit);
+							shapeRenderer.setColor(1, 0, 0, x / drawLimit);
 							shapeRenderer.line(potOldX.get(x)*zF, potOldY.get(x)*zF, potNewX.get(x)*zF, potNewY.get(x)*zF);
 						}
 					} else {
@@ -674,42 +727,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				Gdx.gl.glDisable(GL30.GL_BLEND);
 			}
 		}
-
-		//Draw comet tails
-
-        /*
-        for (int i = 0; i < listOfBodies.size(); i++) {
-            if (listOfBodies.get(i).mass == 1) {
-                Vector3 distToStar = new Vector3();
-                for (int j = 0; j < listOfBodies.size(); j++) {
-                    if (listOfBodies.get(j).mass >= 10000) {
-                        distToStar = listOfBodies.get(i).posVect.add(listOfBodies.get(j).posVect).scl(-1);
-                    }
-                }
-                cometTail.add(distToStar);
-
-                Gdx.gl.glEnable(GL30.GL_BLEND);
-                Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
-                shapeRenderer.begin(ShapeType.Line);
-                if (cometTail.size() < drawLimit / 2) {
-                    for (int j = 1; j < cometTail.size(); j++) {
-                        shapeRenderer.setColor(0, 0, 1, j / drawLimit);
-                        shapeRenderer.line(cometTail.get(j - 1).x * zF, cometTail.get(j - 1).y * zF, cometTail.get(j).x * zF, cometTail.get(j).y * zF);
-                    }
-                } else {
-                    cometTail.remove(0);
-                    for (int j = 1; j < cometTail.size(); j++) {
-                        shapeRenderer.setColor(0, 0, 1, j / drawLimit);
-                        shapeRenderer.line(cometTail.get(j - 1).x * zF, cometTail.get(j - 1).y * zF, cometTail.get(j).x * zF, cometTail.get(j).y * zF);
-                    }
-                }
-                shapeRenderer.end();
-                Gdx.gl.glDisable(GL30.GL_BLEND);
-            }
-        }
-        */
-
-        // Workaround to make side panel items appear above shapeRenderer transparent rectangle
+		// Workaround to make side panel items appear above shapeRenderer transparent rectangle
 		batch.begin();
 		if (sidePanelState == true) {
 			String printNumOfBodies = "# of bodies: " + String.valueOf(listOfBodies.size());
@@ -807,7 +825,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	public static void saveFile() {
         String filePath = RunSimulation.class.getProtectionDomain().getCodeSource().getLocation().getPath();    //The path of the RunSimulation
         
-        filePath = filePath.substring(0, filePath.indexOf("/bin")) + "assets/systems/count.txt";    //Navigate to system file
+        filePath = filePath.substring(0, filePath.indexOf("/bin")) + "/assets/systems/count.txt";    //Navigate to system file
         filePath = filePath.replaceAll("%20", " ");
 
         File systemFile;
