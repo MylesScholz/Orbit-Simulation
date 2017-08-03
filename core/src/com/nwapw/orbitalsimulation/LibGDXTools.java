@@ -74,7 +74,7 @@ public class LibGDXTools {
 		body.spriteWidth = spriteWidth;
 		
 		return body;
-	}	
+	}
 	
 	static void bodyCreate(String name, float mass, float posX, float posY, float velX, float velY) {
 		OrbitalBody body = new OrbitalBody();
