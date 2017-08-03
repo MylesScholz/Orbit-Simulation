@@ -58,7 +58,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	// The max number of iterations that the simulation runs
 	final static int numOfIterations = 100000000;
 	
-	final static float drawLimit = 1000;
+	final static float drawLimit = 10000;
 	
 	// 0 = Focus on a particular body, 1 = free movement
 	static int cameraMode = 0;
@@ -84,11 +84,14 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	public static ArrayList<Float> POTNewY = new ArrayList<Float>();
 	public static ArrayList<Integer> POTBody = new ArrayList<Integer>();
 	public static ArrayList<Integer> createdBody = new ArrayList<Integer>();
-	
-	boolean focusShift;
-	boolean pauseIteration;
-	boolean panelShift;
-	boolean deleteBody;
+
+	public static ArrayList<Float> potOldX = new ArrayList<Float>();
+	public static ArrayList<Float> potOldY = new ArrayList<Float>();
+	public static ArrayList<Float> potNewX = new ArrayList<Float>();
+	public static ArrayList<Float> potNewY = new ArrayList<Float>();
+
+	//List of vectors for comet tails
+    ArrayList<Vector3> cometTail = new ArrayList<Vector3>();
 	
 	// Booleans for mouse input edge detection
 	boolean newPlanet = false;
@@ -291,7 +294,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
     public void loadFile() {
         String filePath = this.getClass().getClassLoader().getResource("").getPath();   // The path of the running file
-        filePath = filePath.substring(0, filePath.indexOf("/desktop")) + "/core/assets/systems/count.txt";    //Navigate to system file
+        filePath = filePath.substring(0, filePath.indexOf("/bin")) + "/core/assets/systems/count.txt";    //Navigate to system file
         filePath = filePath.replaceAll("%20", " ");
 
         File systemFile;
@@ -482,10 +485,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
         if (listOfBodies.size() == 0){
         	loadFile();
         }
-		
 
-		
-		if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)){
+        if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)){
 			 RunSimulation.listOfBodies.get(RunSimulation.n).velVect.y += 3;
 	     }
 			
@@ -653,7 +654,80 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			 shapeRenderer.end();	
 			 Gdx.gl.glDisable(GL30.GL_BLEND);
 		}
-		// Workaround to make side panel items appear above shapeRenderer transparent rectangle
+		//Draw trail
+		for (int i = 0; i < listOfBodies.size(); i++) {
+			if (listOfBodies.get(i).oldPosVect.isZero()) {
+			} else {
+				potOldX.add(listOfBodies.get(i).oldPosVect.x);
+				potOldY.add(listOfBodies.get(i).oldPosVect.y);
+				potNewX.add(listOfBodies.get(i).posVect.x);
+				potNewY.add(listOfBodies.get(i).posVect.y);
+				Gdx.gl.glEnable(GL30.GL_BLEND);
+				Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
+				shapeRenderer.begin(ShapeType.Line);
+				if (potOldX.size() < drawLimit) {
+					//System.out.println("1");
+					for (int x = 0; x < potOldX.size(); x++) {
+						shapeRenderer.setColor(1, 1, 1, x / drawLimit);
+						//System.outystem.out.println(shapeRenderer.getColor().a);
+						shapeRenderer.line(potOldX.get(x)*zF, potOldY.get(x)*zF, potNewX.get(x)*zF, potNewY.get(x)*zF);
+						
+					}	
+				} else {
+					potOldX.remove(0);
+					potOldY.remove(0);
+					potNewX.remove(0);
+					potNewY.remove(0);
+					if (potOldX.size() < drawLimit) {
+						//System.out.println("2");
+						for (int x = 0; x < potOldX.size(); x++) {
+							shapeRenderer.setColor(1, 1, 1, x / drawLimit);
+							shapeRenderer.line(potOldX.get(x)*zF, potOldY.get(x)*zF, potNewX.get(x)*zF, potNewY.get(x)*zF);
+						}
+					} else {
+						//System.out.println("4");
+					}
+				}
+				shapeRenderer.end();	
+				Gdx.gl.glDisable(GL30.GL_BLEND);
+			}
+		}
+
+		//Draw comet tails
+
+        /*
+        for (int i = 0; i < listOfBodies.size(); i++) {
+            if (listOfBodies.get(i).mass == 1) {
+                Vector3 distToStar = new Vector3();
+                for (int j = 0; j < listOfBodies.size(); j++) {
+                    if (listOfBodies.get(j).mass >= 10000) {
+                        distToStar = listOfBodies.get(i).posVect.add(listOfBodies.get(j).posVect).scl(-1);
+                    }
+                }
+                cometTail.add(distToStar);
+
+                Gdx.gl.glEnable(GL30.GL_BLEND);
+                Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
+                shapeRenderer.begin(ShapeType.Line);
+                if (cometTail.size() < drawLimit / 2) {
+                    for (int j = 1; j < cometTail.size(); j++) {
+                        shapeRenderer.setColor(0, 0, 1, j / drawLimit);
+                        shapeRenderer.line(cometTail.get(j - 1).x * zF, cometTail.get(j - 1).y * zF, cometTail.get(j).x * zF, cometTail.get(j).y * zF);
+                    }
+                } else {
+                    cometTail.remove(0);
+                    for (int j = 1; j < cometTail.size(); j++) {
+                        shapeRenderer.setColor(0, 0, 1, j / drawLimit);
+                        shapeRenderer.line(cometTail.get(j - 1).x * zF, cometTail.get(j - 1).y * zF, cometTail.get(j).x * zF, cometTail.get(j).y * zF);
+                    }
+                }
+                shapeRenderer.end();
+                Gdx.gl.glDisable(GL30.GL_BLEND);
+            }
+        }
+        */
+
+        // Workaround to make side panel items appear above shapeRenderer transparent rectangle
 		batch.begin();
 		if(sidePanelState == true) {
 
@@ -686,7 +760,6 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			fontSubtitle.draw(batch, LibGDXTools.underlineCalculation(printFocusPlanet), frameX + 2.5f*cam.viewportWidth/12, frameY - 4.1f*cam.viewportHeight/20);
 			fontText.draw(batch, printMostAttraction, frameX + 2.5f*cam.viewportWidth/12, frameY - 5*cam.viewportHeight/20);
 			fontText.draw(batch, "Mass: " + listOfBodies.get(n).mass, frameX + 2.5f*cam.viewportWidth/12, frameY - 6*cam.viewportHeight/20);
-
 			if (iterationCounter % 6 == 0 || pauseState == true ) {
 				printPos = "Pos: ";
 				printVel = "Vel: ";

@@ -149,10 +149,9 @@ public class OrbitalPhysics {
     							listOfBodies.get(j).mass += listOfBodies.get(i).mass;                      
     							listOfBodies.get(j).radius = (int) Math.sqrt((listOfBodies.get(j).mass * 10) / Math.PI);
     							listOfBodies.get(j).spriteWidth = listOfBodies.get(j).radius * 2;
-                    	
+    							
     							// listOfBodies.get(j).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
     							// listOfBodies.get(j).spriteWidth = listOfBodies.get(i).radius * 2;
-                    	
     							listOfBodies.remove(i);
     							
     							if (RunSimulation.passIndex() >= listOfBodies.size()) {
