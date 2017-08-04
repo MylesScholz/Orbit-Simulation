@@ -168,7 +168,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	public void create () {				
         
 		/* SCENE2D*/
-		
+		/*
 		stage = new Stage(new ExtendViewport(1366, 768)); 
 		
 		rootTable = new Table();
@@ -256,7 +256,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	   // table.addActor(saveButton);	
 	   // table.row();
 	    //table.addActor(pauseButton);
-
+		*/
 	    
 	    
 		/* GRAPHICS & INPUTS*/
@@ -268,7 +268,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		// Allows chaining of multiple inputProcessors
 		multiplexer = new InputMultiplexer();
 		multiplexer.addProcessor(inputProcessor);
-		multiplexer.addProcessor(stage);
+		//multiplexer.addProcessor(stage);
 		Gdx.input.setInputProcessor(multiplexer);
 
 					
@@ -294,23 +294,23 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		FreeTypeFontParameter fText = new FreeTypeFontParameter();
 		FreeTypeFontParameter fFocus = new FreeTypeFontParameter();
 		
-		fTitle.size = 20;
+		fTitle.size = 35;
 		fTitle.shadowColor = Color.BLACK;
 		fTitle.shadowOffsetX = 2;
 		fTitle.shadowOffsetY = 2;
 		
-		fHeader.size = 18;
+		fHeader.size = 25;
 		fHeader.color = Color.GOLDENROD;
 		
 		//fHeader.color = new Color(28, 25, 54, 1f);
 		
-		fSubtitle.size = 16;
+		fSubtitle.size = 18;
 		fSubtitle.color = Color.CORAL;
 		
-		fText.size = 14;
+		fText.size = 18;
 		fText.color = Color.LIGHT_GRAY;
 		
-		fFocus.size = 16;
+		fFocus.size = 26;
 		fText.color = Color.WHITE;
 		
 		fontTitle = generator.generateFont(fTitle); 
@@ -604,15 +604,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
             zF = 1;
         }
         
-        
-        if (sidePanelState == true && popupTable.getWidth() != 500f) {
-        	sidePanel.setWidth(500f);
-        	//System.out.println("fjwlefj");
-        }
-        else if (sidePanelState == false && popupTable.getWidth() != 0f){
-        	sidePanel.setWidth(0f);
-        	//System.out.println("oeiwje");
-        }
+
         
        // System.out.println(sidePanel.getWidth());
         
@@ -640,8 +632,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
             float spriteWidth = renderBody.spriteWidth;
 
-			float spriteX = (float) renderBody.posVect.x * zF - zF*(spriteWidth / 2);
-			float spriteY = (float) renderBody.posVect.y * zF - zF*(spriteWidth / 2);
+			float spriteX = (float) zF * (renderBody.posVect.x - (spriteWidth / 2));
+			float spriteY = (float) zF * (renderBody.posVect.y - (spriteWidth / 2));
 						
 			float frameX = 0;
 			float frameY = 0;
@@ -660,11 +652,11 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			}
 			
 			if (i == n){
-				fontFocus.draw(batch, renderBody.name, frameX + 0.7f*spriteWidth*zF/2, frameY + 1.5f*spriteWidth*zF/10);
+				fontFocus.draw(batch, renderBody.name, frameX + 0.7f*spriteWidth*zF/2, frameY + 1.25f*spriteWidth*zF/10);
 
 			}
 			else {
-				fontSubtitle.draw(batch, renderBody.name, frameX + 0.7f*spriteWidth*zF/2, frameY + 1.5f*spriteWidth*zF/10);
+				fontSubtitle.draw(batch, renderBody.name, frameX + 0.7f*spriteWidth*zF/2, frameY + 1.25f*spriteWidth*zF/10);
 
 			}
 			
@@ -683,8 +675,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
         focusX = (float) listOfBodies.get(n).posVect.x * zF - zF*(listOfBodies.get(n).spriteWidth / 2);
         focusY = (float) listOfBodies.get(n).posVect.y * zF - zF*(listOfBodies.get(n).spriteWidth / 2);
 		*/
-		focusX = (float) listOfBodies.get(n).posVect.x * zF - (listOfBodies.get(n).spriteWidth / 8);
-        focusY = (float) listOfBodies.get(n).posVect.y * zF - (listOfBodies.get(n).spriteWidth / 8);
+		focusX = (float) listOfBodies.get(n).posVect.x * zF - zF*(listOfBodies.get(n).spriteWidth / 8);
+        focusY = (float) listOfBodies.get(n).posVect.y * zF - zF*(listOfBodies.get(n).spriteWidth / 8);
 		
 		if (sidePanelState == true){
 			focusX += sidePanelWidth;
@@ -716,10 +708,10 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
 		
 		if (sidePanelState == true && pauseState == true){
-			fontHeader.draw(batch, "PAUSED", frameX - 0.97f*cam.viewportWidth/2, frameY + 8.3f*cam.viewportHeight/20);
+			fontHeader.draw(batch, "PAUSED & SAVED", frameX - 0.97f*cam.viewportWidth/2, frameY + 8.3f*cam.viewportHeight/20);
 		} 
 		else if (sidePanelState == false && pauseState == true){
-			fontHeader.draw(batch, "PAUSED", frameX - 0.9f*cam.viewportWidth/20, frameY + 8.3f*cam.viewportHeight/20);
+			fontHeader.draw(batch, "PAUSED & SAVED", frameX - 1.2f*cam.viewportWidth/20, frameY + 8.3f*cam.viewportHeight/20);
 		}
 		
 		
@@ -751,7 +743,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
 			 shapeRenderer.begin(ShapeType.Filled);
 			 shapeRenderer.setColor(0.05f, 0.05f, 0.1f, 0.8f);
-			 shapeRenderer.rect(frameX + cam.viewportWidth/6, frameY - cam.viewportHeight/2, cam.viewportWidth/2, cam.viewportHeight);
+			 shapeRenderer.rect(frameX + cam.viewportWidth/6, frameY - cam.viewportHeight, cam.viewportWidth/2, 2*cam.viewportHeight);
 			 shapeRenderer.end();	
 			 Gdx.gl.glDisable(GL30.GL_BLEND);
 		}
@@ -802,28 +794,30 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			String printFocusNumber = "focused body: " + n;
 			String printMostAttraction = "Most Grav. Attraction: " + listOfBodies.get(n).mostPullingBodyName;
 
-			fontHeader.draw(batch, "CONTROLS", frameX + 2.5f*cam.viewportWidth/12, frameY + 9*cam.viewportHeight/20);			
-			fontSubtitle.draw(batch, LibGDXTools.underlineCalculation("CONTROLS") + "__", frameX + 2.5f*cam.viewportWidth/12,  frameY + 8.9f*cam.viewportHeight/20);
-			fontText.draw(batch, "(SCROLL) Zoom", frameX + 2.5f*cam.viewportWidth/12, frameY + 8*cam.viewportHeight/20);
-			fontText.draw(batch, "(LEFT CLICK) Create new planet", frameX + 2.5f*cam.viewportWidth/12, frameY + 7*cam.viewportHeight/20);
-			fontText.draw(batch, "(RIGHT CLICK) Create new star", frameX + 2.5f*cam.viewportWidth/12, frameY + 6*cam.viewportHeight/20);			
-			fontText.draw(batch, "(ARROW KEYS) Move Focused Body", frameX + 2.5f*cam.viewportWidth/12, frameY + 5*cam.viewportHeight/20);
-			fontText.draw(batch, "(SPACEBAR) Pause & Save (N) Change Focus", frameX + 2.5f*cam.viewportWidth/12, frameY + 4*cam.viewportHeight/20);
-			fontText.draw(batch, "(M) Reset Current Body's Velocity", frameX + 2.5f*cam.viewportWidth/12, frameY + 3*cam.viewportHeight/20);
-			fontText.draw(batch, "(N) Change Focus to the Next Body", frameX + 2.5f*cam.viewportWidth/12, frameY + 2*cam.viewportHeight/20);
+			fontHeader.draw(batch, "CONTROLS", frameX + 2.5f*cam.viewportWidth/12, frameY + 10.1f*cam.viewportHeight/24);			
+			fontSubtitle.draw(batch, LibGDXTools.underlineCalculation("CONTROLS") + "____", frameX + 2.5f*cam.viewportWidth/12,  frameY + 9.85f*cam.viewportHeight/24);
+			fontText.draw(batch, "(SCROLL) Zoom", frameX + 2.5f*cam.viewportWidth/12, frameY + 9*cam.viewportHeight/24);
+			fontText.draw(batch, "(LEFT CLICK) Create new planet", frameX + 2.5f*cam.viewportWidth/12, frameY + 8*cam.viewportHeight/24);
+			fontText.draw(batch, "(RIGHT CLICK) Create new star", frameX + 2.5f*cam.viewportWidth/12, frameY + 7*cam.viewportHeight/24);			
+			fontText.draw(batch, "(ARROW KEYS) Move Focused Body", frameX + 2.5f*cam.viewportWidth/12, frameY + 6*cam.viewportHeight/24);
+			fontText.draw(batch, "(SPACEBAR) Pause & Save", frameX + 2.5f*cam.viewportWidth/12, frameY + 5*cam.viewportHeight/24);
+			fontText.draw(batch, "(M) Reset Current Body's Velocity", frameX + 2.5f*cam.viewportWidth/12, frameY + 4*cam.viewportHeight/24);
+			fontText.draw(batch, "(N) Change Focus to the Next Body", frameX + 2.5f*cam.viewportWidth/12, frameY + 3*cam.viewportHeight/24);
 			
 	
-			fontHeader.draw(batch, "SIMULATION SETTINGS", frameX + 2.5f*cam.viewportWidth/12, frameY + cam.viewportHeight/20);
-			fontSubtitle.draw(batch, "______________________", frameX + 2.5f*cam.viewportWidth/12, frameY + 0.9f*cam.viewportHeight/20);
-			fontText.draw(batch, printNumOfBodies, frameX + 2.5f*cam.viewportWidth/12, frameY);
-			fontText.draw(batch, printIterationStep, frameX + 2.5f*cam.viewportWidth/12, frameY - cam.viewportHeight/20);
-			fontText.draw(batch, printDeltaTime, frameX + 2.5f*cam.viewportWidth/12, frameY - 2*cam.viewportHeight/20);
-			fontText.draw(batch, "cam: follow", frameX + 2.5f*cam.viewportWidth/12, frameY - 3*cam.viewportHeight/20);
 			
-			fontHeader.draw(batch, printFocusPlanet, frameX + 2.5f*cam.viewportWidth/12, frameY - 4*cam.viewportHeight/20);
-			fontSubtitle.draw(batch, LibGDXTools.underlineCalculation(printFocusPlanet), frameX + 2.5f*cam.viewportWidth/12, frameY - 4.1f*cam.viewportHeight/20);
-			fontText.draw(batch, printMostAttraction, frameX + 2.5f*cam.viewportWidth/12, frameY - 5*cam.viewportHeight/20);
-			fontText.draw(batch, "Mass: " + listOfBodies.get(n).mass, frameX + 2.5f*cam.viewportWidth/12, frameY - 6*cam.viewportHeight/20);
+			
+			fontHeader.draw(batch, "SIMULATION SETTINGS", frameX + 2.5f*cam.viewportWidth/12, frameY + 1.1f*cam.viewportHeight/24);
+			fontSubtitle.draw(batch, "___________________________", frameX + 2.5f*cam.viewportWidth/12, frameY + 0.85f*cam.viewportHeight/24);
+			fontText.draw(batch, printNumOfBodies, frameX + 2.5f*cam.viewportWidth/12, frameY);
+			fontText.draw(batch, printIterationStep, frameX + 2.5f*cam.viewportWidth/12, frameY - cam.viewportHeight/24);
+			fontText.draw(batch, printDeltaTime, frameX + 2.5f*cam.viewportWidth/12, frameY - 2*cam.viewportHeight/24);
+			fontText.draw(batch, "cam: follow", frameX + 2.5f*cam.viewportWidth/12, frameY - 3*cam.viewportHeight/24);
+			
+			fontHeader.draw(batch, printFocusPlanet.toUpperCase(), frameX + 2.5f*cam.viewportWidth/12, frameY - 5*cam.viewportHeight/24);
+			fontSubtitle.draw(batch, LibGDXTools.underlineCalculation(printFocusPlanet) + "____", frameX + 2.5f*cam.viewportWidth/12, frameY - 5.25f*cam.viewportHeight/24);
+			fontText.draw(batch, printMostAttraction, frameX + 2.5f*cam.viewportWidth/12, frameY - 6*cam.viewportHeight/24);
+			fontText.draw(batch, "Mass: " + listOfBodies.get(n).mass, frameX + 2.5f*cam.viewportWidth/12, frameY - 7*cam.viewportHeight/24);
 
 			if (iterationCounter % 6 == 0 || pauseState == true ) {
 				printPos = "Pos: ";
@@ -845,17 +839,17 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
 						
 			} 
-			fontText.draw(batch, printPos, frameX + 2.5f*cam.viewportWidth/12, frameY - 7*cam.viewportHeight/20);
-			fontText.draw(batch, printVel, frameX + 2.5f*cam.viewportWidth/12, frameY - 8*cam.viewportHeight/20);
-			fontText.draw(batch, printAcc, frameX + 2.5f*cam.viewportWidth/12, frameY - 9*cam.viewportHeight/20);
+			fontText.draw(batch, printPos, frameX + 2.5f*cam.viewportWidth/12, frameY - 8*cam.viewportHeight/24);
+			fontText.draw(batch, printVel, frameX + 2.5f*cam.viewportWidth/12, frameY - 9*cam.viewportHeight/24);
+			fontText.draw(batch, printAcc, frameX + 2.5f*cam.viewportWidth/12, frameY - 10*cam.viewportHeight/24);
 			
 			fontTitle.draw(batch, "ORBITAL SIMULATION", frameX - 0.97f*cam.viewportWidth/2, frameY + 0.93f*cam.viewportHeight/2);	
 			fontText.draw(batch, "(press ESC for FULLSCREEN)", frameX - 0.97f*cam.viewportWidth/2, frameY - 0.93f*cam.viewportHeight/2);	
 			
 		}
 		else {
-			fontTitle.draw(batch, "ORBITAL SIMULATION", frameX  - 1.3f*cam.viewportWidth/12, frameY + 0.93f*cam.viewportHeight/2);	
-			fontText.draw(batch, "(press ESC for more INFO)", frameX  - 1.1f*cam.viewportWidth/12, frameY - 0.93f*cam.viewportHeight/2);	
+			fontTitle.draw(batch, "ORBITAL SIMULATION", frameX  - 1.5f*cam.viewportWidth/12, frameY + 0.93f*cam.viewportHeight/2);	
+			fontHeader.draw(batch, "(press ESC for more INFO)", frameX  - 1.1f*cam.viewportWidth/12, frameY - 0.93f*cam.viewportHeight/2);	
 		
 		}
 		batch.end();
@@ -1017,7 +1011,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	
 	public void resize(int width, int height) {
 		//stage.getViewport().update(width, height, true);
-		cam.viewportWidth = 1000f;
+		cam.viewportWidth = 1500f;
 		cam.viewportHeight = cam.viewportWidth * height/width;
 		cam.update();
 	}
