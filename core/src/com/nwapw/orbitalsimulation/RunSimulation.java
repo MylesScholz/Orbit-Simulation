@@ -61,12 +61,12 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	
 	// Specifies time used to calculate numerical integration
 	// TODO Adaptive step-size control
-	final static float deltaTime = (float) 0.1;
+	final static float deltaTime = (float) 0.05;
 	
 	// The max number of iterations that the simulation runs
 	final static int numOfIterations = 100000000;
 	
-	final static float drawLimit = 25;
+	final static float drawLimit = 5000;
 	
 	// 0 = Focus on a particular body, 1 = free movement
 	static int cameraMode = 0;
@@ -168,6 +168,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	public void create () {				
         
 		/* SCENE2D*/
+		
 		stage = new Stage(new ExtendViewport(1366, 768)); 
 		
 		rootTable = new Table();
@@ -504,7 +505,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		if (Gdx.input.isButtonPressed(0) && !newPlanet) {
 			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
 		    cam.unproject(mousePos); 
-	    
+		    
 		    clickLeftPositionX = (int) (mousePos.x / zF);
 			clickLeftPositionY = (int) (mousePos.y / zF);		
 			
@@ -606,14 +607,14 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
         
         if (sidePanelState == true && popupTable.getWidth() != 500f) {
         	sidePanel.setWidth(500f);
-        	System.out.println("fjwlefj");
+        	//System.out.println("fjwlefj");
         }
         else if (sidePanelState == false && popupTable.getWidth() != 0f){
         	sidePanel.setWidth(0f);
-        	System.out.println("oeiwje");
+        	//System.out.println("oeiwje");
         }
         
-        System.out.println(sidePanel.getWidth());
+       // System.out.println(sidePanel.getWidth());
         
         
         
@@ -650,8 +651,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		        if (n >= listOfBodies.size()) {
 		            n -= n;
 		        }
-			frameX = spriteX - 0.15f*listOfBodies.get(n).velVect.x*zF;
-			frameY = spriteY - 0.15f*listOfBodies.get(n).velVect.y*zF;
+			frameX = spriteX - 0.08f*listOfBodies.get(n).velVect.x*zF;
+			frameY = spriteY - 0.08f*listOfBodies.get(n).velVect.y*zF;
 			}
 			else {
 				frameX = spriteX;
@@ -701,8 +702,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		float frameY = 0;
 				
 		if (pauseState == false){
-			frameX = camX - 0.1f*listOfBodies.get(n).velVect.x*zF;
-			frameY = camY - 0.1f*listOfBodies.get(n).velVect.y*zF;	
+			frameX = camX - 0.06f*listOfBodies.get(n).velVect.x*zF;
+			frameY = camY - 0.04f*listOfBodies.get(n).velVect.y*zF;	
 		}
 		else {
 			frameX = camX;
@@ -767,7 +768,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				if (potOldX.size() < drawLimit) {
 					//System.out.println("1");
 					for (int x = 0; x < potOldX.size(); x++) {
-						shapeRenderer.setColor(1, 0, 0, x / drawLimit);
+						shapeRenderer.setColor(1, 1, 1, x / drawLimit);
 						//System.outystem.out.println(shapeRenderer.getColor().a);
 						shapeRenderer.line(potOldX.get(x)*zF, potOldY.get(x)*zF, potNewX.get(x)*zF, potNewY.get(x)*zF);
 						
@@ -780,7 +781,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 					if (potOldX.size() < drawLimit) {
 						//System.out.println("2");
 						for (int x = 0; x < potOldX.size(); x++) {
-							shapeRenderer.setColor(1, 0, 0, x / drawLimit);
+							shapeRenderer.setColor(1, 1, 1, x / drawLimit);
 							shapeRenderer.line(potOldX.get(x)*zF, potOldY.get(x)*zF, potNewX.get(x)*zF, potNewY.get(x)*zF);
 						}
 					} else {
@@ -863,11 +864,11 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
 		// Draw anywhere on the screen.
-		stage.act(0.01f);
-		stage.draw();
+		//stage.act(0.01f);
+		//stage.draw();
 		
 		// Restore the stage's viewport.
-		stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+		//stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 		
 		OrbitalPhysics.passList(listOfBodies);
 		if (pauseState == false){

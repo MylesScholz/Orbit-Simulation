@@ -163,15 +163,26 @@ public class OrbitalPhysics {
                     	
                     	// listOfBodies.get(j).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
                         // listOfBodies.get(j).spriteWidth = listOfBodies.get(i).radius * 2;
-                        if (n >= listOfBodies.size()) {
-                            n -= n;
-                        }
-                    	if (listOfBodies.get(n) == listOfBodies.get(i)){
-                    		n = j;
+
+                    	
+                    	String focusName = listOfBodies.get(j).name;
+                    	boolean focusDestroyed = false;
+                    	if (i == n){
+                    		focusDestroyed = true;
                     	}
+                    	
                     	
                     	listOfBodies.remove(i);
                     	
+                    	
+                    	if (focusDestroyed == true){
+	                    	for (int k = 0; k < listOfBodies.size(); k++) {
+	                    		if (focusName == listOfBodies.get(k).name){
+	                    			RunSimulation.n = k;
+	                    		}
+	                    		
+	                    	}
+                    	}
                     
                     	
                     } else if (listOfBodies.get(i).mass > listOfBodies.get(j).mass) {
@@ -187,13 +198,25 @@ public class OrbitalPhysics {
                     	
                     	//listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(j).radius, 2) * 2));
                        // listOfBodies.get(i).spriteWidth = listOfBodies.get(j).radius * 2;
-                        if (n >= listOfBodies.size()) {
-                            n -= n;
-                        }
-                    	if (listOfBodies.get(n) == listOfBodies.get(j)){
-                    		n = i;
+
+                    	
+                    	String focusName = listOfBodies.get(i).name;
+                       	boolean focusDestroyed = false;
+                    	if (j == n){
+                    		focusDestroyed = true;
                     	}
+                    	
                     	listOfBodies.remove(j);
+                    	
+                    	if (focusDestroyed == true){
+	                    	for (int k = 0; k < listOfBodies.size(); k++) {
+	                    		if (focusName == listOfBodies.get(k).name){
+	                    			RunSimulation.n = k;
+	                    			
+	                    		}
+	                    		
+	                    	}
+                    	}
                     	
                     } else {
                     	
@@ -213,8 +236,22 @@ public class OrbitalPhysics {
                         if (listOfBodies.get(n) == listOfBodies.get(j)){
                     		n = i;
                     	}
+                    	String focusName = listOfBodies.get(i).name;
+                       	boolean focusDestroyed = false;
+                    	if (j == n){
+                    		focusDestroyed = true;
+                    	}
+                    	
                     	listOfBodies.remove(j);
-  
+                    	
+                    	if (focusDestroyed == true){
+	                    	for (int k = 0; k < listOfBodies.size(); k++) {
+	                    		if (focusName == listOfBodies.get(k).name){
+	                    			RunSimulation.n = k;
+	                    		}
+	                    		
+	                    	}
+                    	}
                     }
                     
                     checkAllCollisions();
