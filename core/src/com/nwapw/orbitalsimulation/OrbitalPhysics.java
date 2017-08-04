@@ -145,7 +145,7 @@ public class OrbitalPhysics {
     }
 
     public static void checkAllCollisions() {
-        
+        int n = RunSimulation.n;
     	for (int i = 0; i < listOfBodies.size(); i++) {
             for (int j = 0; j < listOfBodies.size(); j++) {
             	
@@ -163,8 +163,13 @@ public class OrbitalPhysics {
                     	
                     	// listOfBodies.get(j).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
                         // listOfBodies.get(j).spriteWidth = listOfBodies.get(i).radius * 2;
+                        if (n >= listOfBodies.size()) {
+                            n -= n;
+                        }
+                    	if (listOfBodies.get(n) == listOfBodies.get(i)){
+                    		n = j;
+                    	}
                     	
-                    	RunSimulation.n = j;
                     	listOfBodies.remove(i);
                     	
                     
@@ -182,7 +187,12 @@ public class OrbitalPhysics {
                     	
                     	//listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(j).radius, 2) * 2));
                        // listOfBodies.get(i).spriteWidth = listOfBodies.get(j).radius * 2;
-                    	RunSimulation.n = i;
+                        if (n >= listOfBodies.size()) {
+                            n -= n;
+                        }
+                    	if (listOfBodies.get(n) == listOfBodies.get(j)){
+                    		n = i;
+                    	}
                     	listOfBodies.remove(j);
                     	
                     } else {
@@ -197,8 +207,14 @@ public class OrbitalPhysics {
 
                         //listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
                         //listOfBodies.get(i).spriteWidth = listOfBodies.get(i).radius * 2;
-                        RunSimulation.n = i;
-                        listOfBodies.remove(j);
+                        if (n >= listOfBodies.size()) {
+                            n -= n;
+                        }
+                        if (listOfBodies.get(n) == listOfBodies.get(j)){
+                    		n = i;
+                    	}
+                    	listOfBodies.remove(j);
+  
                     }
                     
                     checkAllCollisions();

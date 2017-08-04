@@ -31,11 +31,16 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -146,37 +151,83 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
 	static Skin skin;
 	Stage stage;
-	Table table;
+	Table rootTable;
+	Table upperTable;
+	Table popupTable;
+	Table sidePanel;
+
+	Table dockTable;
 	
+	Stack interfaceStack;
 	static boolean pauseState = false;
 	static int savedIndicator = 0;
 	
 	InputMultiplexer multiplexer;
 	
 	@Override
-	public void create () {
+	public void create () {				
+        
+		/* SCENE2D*/
+		stage = new Stage(new ExtendViewport(1366, 768)); 
 		
+		rootTable = new Table();
+		rootTable.setFillParent(true);
+		stage.addActor(rootTable);
 		
-		
-        /* SCENE2D*/
-		stage = new Stage(new ExtendViewport(1000, 500)); 
-		table = new Table();
-		table.setFillParent(true);
-		stage.addActor(table);
+		rootTable.setDebug(true);
 
-		table.setDebug(true);
-		
-
-		
-		
-		
 		 skin = new Skin(Gdx.files.internal("uiskin.json"));
 		 
 		 final TextButton pauseButton = new TextButton("Pause", skin, "default");
-		 pauseButton.setWidth(100f);
-	     pauseButton.setHeight(20f);
-	     pauseButton.setPosition(Gdx.graphics.getWidth() / 2 - 60f, 20f);   
+ 	     
+		 final TextButton saveButton = new TextButton("Save", skin, "default");
+  
 	     
+		 interfaceStack = new Stack();
+		 rootTable.add(interfaceStack).expand();
+		 
+		 //Label title = new Label("Orbital Simulation", skin ,"Roboto-Bold");
+		 //interfaceStack.add(title);
+		 
+		 
+	     
+	     upperTable = new Table();
+	     interfaceStack.add(upperTable);
+	     
+	     popupTable = new Table();
+	     upperTable.add(popupTable).width(600f).height(600f);
+	     
+	     Container imageContainer = new Container();
+	     Container textContainer = new Container();
+	     
+	     popupTable.add(imageContainer).height(400f).width(1000f);
+	     popupTable.row();
+	     
+	     //Label popupText = new Label();
+	     
+	     popupTable.add(textContainer).height(200f);
+	    
+	     
+	     sidePanel = new Table();
+	     rootTable.add(sidePanel).width(500f);
+	     
+	     rootTable.row();
+	     
+	     dockTable = new Table();
+	     rootTable.add(dockTable);
+	     
+	     dockTable.add(new TextButton("Zoom In", skin, "default")).width(75).height(Gdx.graphics.getHeight()/20);
+	     dockTable.add(new TextButton("Zoom Out", skin, "default")).width(75).pad(Gdx.graphics.getHeight()/40);
+	     dockTable.add(new TextButton("Cam Mode", skin, "default")).width(75).pad(Gdx.graphics.getHeight()/40);	     
+	     dockTable.add(new TextButton("Focus", skin, "default")).width(75).pad(Gdx.graphics.getHeight()/40);	  
+
+	     
+	     dockTable.add(pauseButton).pad(Gdx.graphics.getHeight()/40).width(75);
+	     dockTable.add(saveButton).pad(Gdx.graphics.getHeight()/40).width(75);
+	     dockTable.add(new TextButton("Load", skin, "default")).width(75).pad(Gdx.graphics.getHeight()/40);	
+	     dockTable.add(new TextButton("Debug", skin, "default")).width(75).pad(Gdx.graphics.getHeight()/40);	     
+	     dockTable.add(new TextButton("Objectives", skin, "default")).width(75).pad(Gdx.graphics.getHeight()/40);	  
+	    
 	     pauseButton.addListener(new ClickListener(){
 	    	 @Override 
 	    	 public void clicked(InputEvent event, float x, float y){
@@ -188,17 +239,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	              else {
 	            	  pauseState = true;
 	            	  pauseButton.setText("Run");
-	              }
-	            System.out.println(pauseState); 
-	
+	              }	
 	            }
-	        });	    
-	     
-		 final TextButton saveButton = new TextButton("Save", skin, "default");
-		 saveButton.setWidth(100f);
-	     saveButton.setHeight(20f);
-	     saveButton.setPosition(Gdx.graphics.getWidth() / 2 + 60f, 20f);   
-	     
+	        });	  
 	     saveButton.addListener(new ClickListener(){
 	    	 @Override 
 	    	 public void clicked(InputEvent event, float x, float y){
@@ -208,11 +251,13 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	
 	            }
 	        });
- 
 	     
-	    table.addActor(saveButton);		  
-	    table.addActor(pauseButton);
+	   // table.addActor(saveButton);	
+	   // table.row();
+	    //table.addActor(pauseButton);
 
+	    
+	    
 		/* GRAPHICS & INPUTS*/
 		shapeRenderer = new ShapeRenderer();
 		batch = new SpriteBatch();
@@ -558,6 +603,29 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
             zF = 1;
         }
         
+        
+        if (sidePanelState == true && popupTable.getWidth() != 500f) {
+        	sidePanel.setWidth(500f);
+        	System.out.println("fjwlefj");
+        }
+        else if (sidePanelState == false && popupTable.getWidth() != 0f){
+        	sidePanel.setWidth(0f);
+        	System.out.println("oeiwje");
+        }
+        
+        System.out.println(sidePanel.getWidth());
+        
+        
+        
+    
+       // else if (sidePanelState == false && popupTable.getWidth() != 0f){
+       // 	System.out.println("not 0f");
+       // }
+        
+
+        
+        
+        
 		batch.setProjectionMatrix(cam.combined);
 		shapeRenderer.setProjectionMatrix(cam.combined);
 		
@@ -601,10 +669,6 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			
 			Texture spriteTexture = renderBody.texture;
 			batch.draw(spriteTexture, frameX, frameY, (float) (spriteWidth * zF), (float) (spriteWidth * zF));
-
-
-		
-		
 		}
 
 		
