@@ -71,20 +71,19 @@ public class OrbitalPhysics {
 						sumOfAcc.add(calculatedAcc);
 
 					}
-					/*
-					else if {
-						// TODO: Encke's Method, Variation of Parameters, etc.
-					}
-					*/
 				}
 			}
 			
 			// 2. Iterate and integrate for velocity and then position.
 
 			currentBody.setAcceleration(sumOfAcc.x, sumOfAcc.y, sumOfAcc.z);			
-			currentBody.iterateVelThenPos(deltaTime);
+			
 			
 		}	
+		for (int i = 0; i < listOfBodies.size(); i++){
+			listOfBodies.get(i).iterateVelThenPos(deltaTime);
+		}
+		
 		
 		 checkAllCollisions();
 	}	
@@ -150,6 +149,8 @@ public class OrbitalPhysics {
             for (int j = 0; j < listOfBodies.size(); j++) {
             	
                 if (i != j && checkCollision(listOfBodies.get(i), listOfBodies.get(j))) {
+                //	System.out.println("Collision!");
+                	
                     if (listOfBodies.get(i).mass < listOfBodies.get(j).mass) {
                     	
                     	// Conservation of Momentum

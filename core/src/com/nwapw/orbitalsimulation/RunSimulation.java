@@ -48,7 +48,16 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 
 public class RunSimulation extends ApplicationAdapter implements ApplicationListener {
-		
+	
+	/* CONTROLS
+	 * 
+	 * P - Purge all planets not near stars
+	 * X - new galaxy
+	 * 
+	 * 
+	 */
+	
+	
 	// Constant for the force of gravity, affects how much bodies accelerate
 	final static int gravConst = 100; 
 
@@ -105,8 +114,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	int unclickRightPositionY;
 	
 	
-	OrbitalBody planet = new OrbitalBody();	
-	OrbitalBody sun = new OrbitalBody();
+	
 	
 	SpriteBatch batch;
 	Texture backgroundTexture;
@@ -123,6 +131,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	
 	// zoom factor
 	static float zF = 1;
+	static float zFTransition = 0;
 	
 	static float placedBodySpeed = 0.5f;
 	
@@ -148,7 +157,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	
 	static boolean sidePanelState = false;
 	int sidePanelWidth = 200;
-
+	static boolean zoomLines = false;
+	static boolean purgeState = false;
+	
 	static Skin skin;
 	Stage stage;
 	Table rootTable;
@@ -375,9 +386,12 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
         if (listOfBodies.size() == 0) {
             loadFile();
         }
+        
+        zF = LibGDXTools.calculateDefaultZoom(listOfBodies.get(n).spriteWidth);
 	}
 
     public void loadFile() {
+    	
         String filePath = this.getClass().getClassLoader().getResource("").getPath();   // The path of the running file
         filePath = filePath.substring(0, filePath.indexOf("/desktop")) + "/core/assets/systems/count.txt";    //Navigate to system file
         filePath = filePath.replaceAll("%20", " ");
@@ -555,6 +569,15 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		
+		if (purgeState == true) {
+			for (int i = 0; i < listOfBodies.size(); i++){
+				if (listOfBodies.get(i).accVect.len() < 0.1 && listOfBodies.get(i).mass < 10000){
+					listOfBodies.remove(i);
+				}
+			}			
+		}
+
 
 		
         if (listOfBodies.size() == 0){
@@ -643,8 +666,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		        if (n >= listOfBodies.size()) {
 		            n -= n;
 		        }
-			frameX = spriteX - 0.08f*listOfBodies.get(n).velVect.x*zF;
-			frameY = spriteY - 0.08f*listOfBodies.get(n).velVect.y*zF;
+			frameX = spriteX - 0.075f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
+			frameY = spriteY - 0.075f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);
 			}
 			else {
 				frameX = spriteX;
@@ -694,8 +717,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		float frameY = 0;
 				
 		if (pauseState == false){
-			frameX = camX - 0.06f*listOfBodies.get(n).velVect.x*zF;
-			frameY = camY - 0.04f*listOfBodies.get(n).velVect.y*zF;	
+			frameX = camX - 0.05005f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
+			frameY = camY - 0.0500f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);	
 		}
 		else {
 			frameX = camX;
@@ -796,7 +819,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
 			fontHeader.draw(batch, "CONTROLS", frameX + 2.5f*cam.viewportWidth/12, frameY + 10.1f*cam.viewportHeight/24);			
 			fontSubtitle.draw(batch, LibGDXTools.underlineCalculation("CONTROLS") + "____", frameX + 2.5f*cam.viewportWidth/12,  frameY + 9.85f*cam.viewportHeight/24);
-			fontText.draw(batch, "(SCROLL) Zoom", frameX + 2.5f*cam.viewportWidth/12, frameY + 9*cam.viewportHeight/24);
+			fontText.draw(batch, "(SCROLL OR +/-) Zoom", frameX + 2.5f*cam.viewportWidth/12, frameY + 9*cam.viewportHeight/24);
 			fontText.draw(batch, "(LEFT CLICK) Create new planet", frameX + 2.5f*cam.viewportWidth/12, frameY + 8*cam.viewportHeight/24);
 			fontText.draw(batch, "(RIGHT CLICK) Create new star", frameX + 2.5f*cam.viewportWidth/12, frameY + 7*cam.viewportHeight/24);			
 			fontText.draw(batch, "(ARROW KEYS) Move Focused Body", frameX + 2.5f*cam.viewportWidth/12, frameY + 6*cam.viewportHeight/24);
@@ -844,12 +867,12 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			fontText.draw(batch, printAcc, frameX + 2.5f*cam.viewportWidth/12, frameY - 10*cam.viewportHeight/24);
 			
 			fontTitle.draw(batch, "ORBITAL SIMULATION", frameX - 0.97f*cam.viewportWidth/2, frameY + 0.93f*cam.viewportHeight/2);	
-			fontText.draw(batch, "(press ESC for FULLSCREEN)", frameX - 0.97f*cam.viewportWidth/2, frameY - 0.93f*cam.viewportHeight/2);	
+			fontText.draw(batch, "(press ESC for FULLSCREEN)", frameX - 0.97f*cam.viewportWidth/2, frameY - 0.92f*cam.viewportHeight/2);	
 			
 		}
 		else {
 			fontTitle.draw(batch, "ORBITAL SIMULATION", frameX  - 1.5f*cam.viewportWidth/12, frameY + 0.93f*cam.viewportHeight/2);	
-			fontHeader.draw(batch, "(press ESC for more INFO)", frameX  - 1.1f*cam.viewportWidth/12, frameY - 0.93f*cam.viewportHeight/2);	
+			fontHeader.draw(batch, "(press ESC for more INFO)", frameX  - 1.1f*cam.viewportWidth/12, frameY - 0.92f*cam.viewportHeight/2);	
 		
 		}
 		batch.end();
@@ -877,6 +900,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			iterationCounter += 1;
 		}
 
+
+		
+		
 		
 	}
 

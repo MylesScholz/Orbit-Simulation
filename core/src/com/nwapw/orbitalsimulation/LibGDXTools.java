@@ -288,8 +288,19 @@ public class LibGDXTools {
 		return border;
 	}
 	static float calculateDefaultZoom(float spriteWidth){
-		//float zF = 2 - spriteWidth/100f;
-		float zF = 1;
+		
+		float zF = 0;
+		
+		if (spriteWidth > 200){
+			zF = spriteWidth/1000;
+		}
+		else {
+			zF = 10 - 1f*spriteWidth;
+		}
+		
+		//zF = 1000 - 2.8f*spriteWidth;
+
+		//float zF = 1;
 		
 		//System.out.println(zF);
 		return zF;

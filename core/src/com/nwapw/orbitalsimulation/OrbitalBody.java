@@ -97,11 +97,6 @@ public class OrbitalBody {
 		//TODO change to integrator choice
 		
 		// Integrates Acceleration to Velocity
-		/*
-		if (this.name == "Planet #1") {
-			System.out.println("BEFORE " + currentPos[0]);
-		}
-		*/
 		currentVel[0] = NumericalIntegration.integrateRect(currentVel[0], currentAcc[0], deltaTime);
 		currentVel[1] = NumericalIntegration.integrateRect(currentVel[1], currentAcc[1], deltaTime);
 		currentVel[2] = NumericalIntegration.integrateRect(currentVel[2], currentAcc[2], deltaTime);
@@ -113,6 +108,32 @@ public class OrbitalBody {
 		currentPos[0] = NumericalIntegration.integrateRect(currentPos[0], currentVel[0], deltaTime);
 		currentPos[1] = NumericalIntegration.integrateRect(currentPos[1], currentVel[1], deltaTime);
 		currentPos[2] = NumericalIntegration.integrateRect(currentPos[2], currentVel[2], deltaTime);		
+		
+		
+		
+		/*
+		// Integrates Acceleration to Velocity
+		currentVel[0] = NumericalIntegration.integrateRK4(currentVel[0], currentAcc[0], deltaTime);
+		currentVel[1] = NumericalIntegration.integrateRK4(currentVel[1], currentAcc[1], deltaTime);
+		currentVel[2] = NumericalIntegration.integrateRK4(currentVel[2], currentAcc[2], deltaTime);
+	
+		velVect.set(currentVel);
+
+		// Integrates Velocity to Position
+		
+		currentPos[0] = NumericalIntegration.integrateRK4(currentPos[0], currentVel[0], deltaTime);
+		currentPos[1] = NumericalIntegration.integrateRK4(currentPos[1], currentVel[1], deltaTime);
+		currentPos[2] = NumericalIntegration.integrateRK4(currentPos[2], currentVel[2], deltaTime);		
+		*/
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		// TODO quickfix bug, find reason why
 		//evenBodyBug();
