@@ -70,7 +70,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	
 	// Specifies time used to calculate numerical integration
 	// TODO Adaptive step-size control
-	final static float deltaTime = (float) 0.05;
+	final static float deltaTime = 1f;
 	
 	// The max number of iterations that the simulation runs
 	final static int numOfIterations = 100000000;
@@ -159,6 +159,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	int sidePanelWidth = 200;
 	static boolean zoomLines = false;
 	static boolean purgeState = false;
+	static boolean collisionsOn = true;
 	
 	static Skin skin;
 	Stage stage;
@@ -674,14 +675,16 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				frameY = spriteY;
 			}
 			
-			if (i == n){
-				fontFocus.draw(batch, renderBody.name, frameX + 0.7f*spriteWidth*zF/2, frameY + 1.25f*spriteWidth*zF/10);
-
-			}
-			else {
-				fontSubtitle.draw(batch, renderBody.name, frameX + 0.7f*spriteWidth*zF/2, frameY + 1.25f*spriteWidth*zF/10);
-
-			}
+			//if (1/(Math.pow(zF, 3)) < spriteWidth) {
+				if (i == n){
+					fontFocus.draw(batch, renderBody.name, frameX + 0.7f*spriteWidth*zF/2, frameY + 1.25f*spriteWidth*zF/10);
+	
+				}
+				else {
+					fontSubtitle.draw(batch, renderBody.name, frameX + 0.7f*spriteWidth*zF/2, frameY + 1.25f*spriteWidth*zF/10);
+	
+				}
+			//}
 			
 			Texture spriteTexture = renderBody.texture;
 			batch.draw(spriteTexture, frameX, frameY, (float) (spriteWidth * zF), (float) (spriteWidth * zF));
@@ -734,7 +737,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			fontHeader.draw(batch, "PAUSED & SAVED", frameX - 0.97f*cam.viewportWidth/2, frameY + 8.3f*cam.viewportHeight/20);
 		} 
 		else if (sidePanelState == false && pauseState == true){
-			fontHeader.draw(batch, "PAUSED & SAVED", frameX - 1.2f*cam.viewportWidth/20, frameY + 8.3f*cam.viewportHeight/20);
+			fontHeader.draw(batch, "PAUSED & SAVED", frameX - 1.4f*cam.viewportWidth/20, frameY + 8.3f*cam.viewportHeight/20);
 		}
 		
 		
@@ -817,16 +820,16 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			String printFocusNumber = "focused body: " + n;
 			String printMostAttraction = "Most Grav. Attraction: " + listOfBodies.get(n).mostPullingBodyName;
 
-			fontHeader.draw(batch, "CONTROLS", frameX + 2.5f*cam.viewportWidth/12, frameY + 10.1f*cam.viewportHeight/24);			
-			fontSubtitle.draw(batch, LibGDXTools.underlineCalculation("CONTROLS") + "____", frameX + 2.5f*cam.viewportWidth/12,  frameY + 9.85f*cam.viewportHeight/24);
-			fontText.draw(batch, "(SCROLL OR +/-) Zoom", frameX + 2.5f*cam.viewportWidth/12, frameY + 9*cam.viewportHeight/24);
-			fontText.draw(batch, "(LEFT CLICK) Create new planet", frameX + 2.5f*cam.viewportWidth/12, frameY + 8*cam.viewportHeight/24);
-			fontText.draw(batch, "(RIGHT CLICK) Create new star", frameX + 2.5f*cam.viewportWidth/12, frameY + 7*cam.viewportHeight/24);			
-			fontText.draw(batch, "(ARROW KEYS) Move Focused Body", frameX + 2.5f*cam.viewportWidth/12, frameY + 6*cam.viewportHeight/24);
-			fontText.draw(batch, "(SPACEBAR) Pause & Save", frameX + 2.5f*cam.viewportWidth/12, frameY + 5*cam.viewportHeight/24);
-			fontText.draw(batch, "(M) Reset Current Body's Velocity", frameX + 2.5f*cam.viewportWidth/12, frameY + 4*cam.viewportHeight/24);
-			fontText.draw(batch, "(N) Change Focus to the Next Body", frameX + 2.5f*cam.viewportWidth/12, frameY + 3*cam.viewportHeight/24);
-			
+			fontHeader.draw(batch, "CONTROLS", frameX + 2.5f*cam.viewportWidth/12, frameY + 11.1f*cam.viewportHeight/24);			
+			fontSubtitle.draw(batch, LibGDXTools.underlineCalculation("CONTROLS") + "____", frameX + 2.5f*cam.viewportWidth/12,  frameY + 10.85f*cam.viewportHeight/24);
+			fontText.draw(batch, "(SCROLL OR +/-) Zoom", frameX + 2.5f*cam.viewportWidth/12, frameY + 10*cam.viewportHeight/24);
+			fontText.draw(batch, "(LEFT CLICK) Create new planet", frameX + 2.5f*cam.viewportWidth/12, frameY + 9*cam.viewportHeight/24);
+			fontText.draw(batch, "(RIGHT CLICK) Create new star", frameX + 2.5f*cam.viewportWidth/12, frameY + 8*cam.viewportHeight/24);			
+			fontText.draw(batch, "(ARROW KEYS) Move Focused Body", frameX + 2.5f*cam.viewportWidth/12, frameY + 7*cam.viewportHeight/24);
+			fontText.draw(batch, "(SPACEBAR) Pause & Save", frameX + 2.5f*cam.viewportWidth/12, frameY + 6*cam.viewportHeight/24);
+			fontText.draw(batch, "(M) Reset Current Body's Velocity", frameX + 2.5f*cam.viewportWidth/12, frameY + 5*cam.viewportHeight/24);
+			fontText.draw(batch, "(N) Change Focus (B) Change Focus to Next Star", frameX + 2.5f*cam.viewportWidth/12, frameY + 4*cam.viewportHeight/24);
+			fontText.draw(batch, "( , ) Decrease dt  ( . ) Increase dt", frameX + 2.5f*cam.viewportWidth/12, frameY + 3*cam.viewportHeight/24);
 	
 			
 			

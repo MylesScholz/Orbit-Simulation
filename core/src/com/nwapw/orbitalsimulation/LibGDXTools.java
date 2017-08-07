@@ -192,7 +192,7 @@ public class LibGDXTools {
         }
        
        
-        int randomSyllableLength = (int) Math.floor(Math.abs(Math.random() - Math.random()) * (1 + 6 - 1) + 1);
+        int randomSyllableLength = (int) Math.floor(Math.abs(Math.random() - Math.random()) * (1 + 5 - 1) + 1);
         
         String hyphenSpaceInput[] = new String[randomSyllableLength];
         
@@ -292,7 +292,7 @@ public class LibGDXTools {
 		float zF = 0;
 		
 		if (spriteWidth > 200){
-			zF = spriteWidth/1000;
+			zF = (float) (300000f/Math.pow(spriteWidth, 2));
 		}
 		else {
 			zF = 10 - 1f*spriteWidth;
@@ -303,6 +303,7 @@ public class LibGDXTools {
 		//float zF = 1;
 		
 		//System.out.println(zF);
+		
 		return zF;
 	}
 

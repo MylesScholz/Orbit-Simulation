@@ -32,7 +32,6 @@ public class OrbitalPhysics {
 	final static int gravConst = 100;
 	final static int perturbationCalculationMethod = 0; // 0 = Cowell's Method
 	
-	final static float deltaTime = (float) 0.01;
 	final static int numOfIterations = 1000000;
 	
 	
@@ -40,10 +39,10 @@ public class OrbitalPhysics {
 	static void iterateSimulation(float deltaTime) {
 
        
-
-		// 1. Calculate net force and acceleration from acting on each body.
+		for (int i = 0; i < listOfBodies.size(); i++){
+			listOfBodies.get(i).integrateLeapfrogPos(deltaTime);
+		}
 		
-
 		for (int i=0; i < listOfBodies.size(); i++){
 			
 			OrbitalBody currentBody = listOfBodies.get(i);
@@ -52,40 +51,35 @@ public class OrbitalPhysics {
 			listOfBodies.get(i).mostPullingBodyAcc = 0;
 			
 			for (int j = 0; j < listOfBodies.size() ; j++){
-				
 				if (j != i){
-					
 					OrbitalBody pullingBody = listOfBodies.get(j);
 					calculatedAcc.set(0,0,0);
-					
 					if (perturbationCalculationMethod == 0){ // Cowell's Formulation
-						
 						calculatedAcc = cowellsFormulation(currentBody, pullingBody);
-						
-						if (calculatedAcc.len() >= listOfBodies.get(i).mostPullingBodyAcc){
-							
+						if (calculatedAcc.len() >= listOfBodies.get(i).mostPullingBodyAcc){	
 							listOfBodies.get(i).mostPullingBodyAcc = calculatedAcc.len();
 							listOfBodies.get(i).mostPullingBodyName = listOfBodies.get(j).name;
-						}
-												
+						}												
 						sumOfAcc.add(calculatedAcc);
-
 					}
 				}
 			}
-			
-			// 2. Iterate and integrate for velocity and then position.
-
-			currentBody.setAcceleration(sumOfAcc.x, sumOfAcc.y, sumOfAcc.z);			
-			
-			
-		}	
+			currentBody.setAcceleration(sumOfAcc.x, sumOfAcc.y, sumOfAcc.z);					
+		}
+		
 		for (int i = 0; i < listOfBodies.size(); i++){
-			listOfBodies.get(i).iterateVelThenPos(deltaTime);
+			listOfBodies.get(i).integrateLeapfrogVel(deltaTime);			
 		}
 		
 		
+	/*
+		for (int i = 0; i < listOfBodies.size(); i++){
+			listOfBodies.get(i).integrateEuler(deltaTime);
+		}
+	*/	
+		if (RunSimulation.collisionsOn) {
 		 checkAllCollisions();
+		}
 	}	
 	
 	static Vector3 cowellsFormulation(OrbitalBody currentBody, OrbitalBody pullingBody) {
@@ -105,26 +99,7 @@ public class OrbitalPhysics {
 		//calculatedAcc.scl(1/currentBody.mass);
 		
 		//System.out.println(calculatedAcc);
-		/*
-		float px1 = currentPos.x;
-		float py1 = currentPos.y;
-		float px2 = pullingPos.x;
-		float py2 = pullingPos.y;
-		
-		float dx = pullingPos.x - currentPos.x;
-		float dy = pullingPos.y - currentPos.y;
-		
-		float d = (float) Math.sqrt(dx*dx + dy*dy);
-		
-		float f = gravConst * currentBody.mass * pullingBody.mass / (d*d);
-		
-		float theta = (float) Math.atan2(dy, dx);
-		float fx = (float) Math.cos(theta) * f;
-		float fy = (float) Math.sin(theta) * f;
-		
-		calculatedAcc.x = fx;
-		calculatedAcc.y = fy;
-		*/
+
 		return calculatedAcc;
 	
 	}

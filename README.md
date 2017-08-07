@@ -1,21 +1,20 @@
-# Orbit-Simulation
-
-Desktop app built in Java on LibGDX graphics library with the ability of becoming cross platform with a little more work
-
-- N-body simulation
-- perturbations
-
-
+# Orbital Simulator
+A Java-based Orbital Simulator built with LibGDX graphics libraries.
 
 ## Physics
-- iteration
-- cowell's method
+This program attempts to simulate N-body simulations through continuous iterations by using Cowell's method, where acceleration is calculated for each body based on its attraction to other bodies, and this is used as a basis to calculate the velocity and position vectors.
+
+### Numerical Integration
+The orbital simulator can change between three types of numerical integration algorithms in order to iterate position and velocity values from acceleration and previous values.
+
+#### Euler's Method
+The basic, first-order method used to integrate. Trajectories are less accurate, but are faster to compute.
+
+#### Range-Kutta 4 (RK4)
 
 
-### Numerical Integrator
-- Euler / RK4/ Leapfrog
-- Symplectic
-
+#### Leapfrog (Velocity Verlet)
+Second-order and symplectic. Being second-order, it is more accurate than Euler's method, but less accurate than RK4. However, it is symplectic, which means that it conserves the Hamiltonian (or total energy). 
 
 ## Interface
 ### Controls

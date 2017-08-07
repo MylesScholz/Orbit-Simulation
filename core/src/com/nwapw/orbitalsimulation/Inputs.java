@@ -1,5 +1,6 @@
 package com.nwapw.orbitalsimulation;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
@@ -23,7 +24,16 @@ public class Inputs implements InputProcessor {
         	}
         	
 	    }   
-	
+		if(keycode == Input.Keys.Q){
+			
+        	if (RunSimulation.collisionsOn == true){
+        		RunSimulation.collisionsOn = false;
+        	}
+        	else {
+        		RunSimulation.collisionsOn = true;
+        	}
+        	
+	    }   
 		if (keycode == Input.Keys.N){
 			RunSimulation.n++;
 			if (RunSimulation.n >= RunSimulation.listOfBodies.size()) {
@@ -32,11 +42,31 @@ public class Inputs implements InputProcessor {
 			RunSimulation.zF = LibGDXTools.calculateDefaultZoom(RunSimulation.listOfBodies.get(RunSimulation.n).spriteWidth);
 		}
 		if (keycode == Input.Keys.B){
-			if (RunSimulation.n >= RunSimulation.listOfBodies.size()) {
-				RunSimulation.n -= RunSimulation.n;
+			
+			// focus on next star
+			boolean next = true;
+			int cycleCounter = 0;
+			ArrayList<OrbitalBody> listOfBodies = RunSimulation.listOfBodies;
+			
+			while (next) {
+				RunSimulation.n++;
+				cycleCounter++;
+				if (RunSimulation.n >= RunSimulation.listOfBodies.size()) {
+					RunSimulation.n -= RunSimulation.n;
+				}
+				if (listOfBodies.get(RunSimulation.n).mass > 10000) {
+					next = false;
+				}
+
+				if (cycleCounter > listOfBodies.size()){
+					break;
+				}
 			}
-			RunSimulation.listOfBodies.get(RunSimulation.n).posVect.set(100, 100, 100);
-			RunSimulation.listOfBodies.get(RunSimulation.n).velVect.set(0, 0, 0);
+			
+			
+			
+			
+
 	    }
 		
 		if(keycode == Input.Keys.BACKSPACE){
@@ -96,28 +126,32 @@ public class Inputs implements InputProcessor {
 				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 4, spawnPosX + 842*randScalar, spawnPosY - 172*randScalar, 36f*randScalar, 60f*randScalar);	
 							}				
 			if (random.nextFloat() < 0.5){
-				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 4, spawnPosX - 1127*randScalar, spawnPosY - 101*randScalar, 6.7067494f, 55.26426f*randScalar);
+				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 4, spawnPosX - 1127*randScalar, spawnPosY - 101*randScalar, 6.7067494f*randScalar, 55.26426f*randScalar);
 			}			
 			if (random.nextFloat() < 0.5){
-				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 1, spawnPosX +480*randScalar, spawnPosY - 51*randScalar, 18.085638f, -92.809425f*randScalar);
+				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 1, spawnPosX +480*randScalar, spawnPosY - 51*randScalar, 18.085638f*randScalar, -92.809425f*randScalar);
 			}			
 			if (random.nextFloat() < 0.5){
-				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 3, spawnPosX +589*randScalar, spawnPosY - 71*randScalar, -10.085638f, 83.809425f*randScalar);
+				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 3, spawnPosX +589*randScalar, spawnPosY - 71*randScalar, -10.085638f*randScalar, 83.809425f*randScalar);
 			}
 			if (random.nextFloat() < 0.5){
-				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 4, spawnPosX + 4*randScalar, spawnPosY -127*randScalar, 98.83999f, 25.148289f*randScalar);
+				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 4, spawnPosX + 4*randScalar, spawnPosY -127*randScalar, 98.83999f*randScalar, 25.148289f*randScalar);
 			}
 			if (random.nextFloat() < 0.5){
-				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 2, spawnPosX - 1298*randScalar, spawnPosY -417*randScalar, -25f, 42.148289f*randScalar);
+				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 2, spawnPosX - 1298*randScalar, spawnPosY -417*randScalar, -25f*randScalar, 42.148289f*randScalar);
 			}			
-			
 
+			
+			
+			
+			
+			
+			
 			/*
 			Quakeefue,4.0,842.6411,-172.17839,36.11201,49.586468
 			Vyn,3.0,589.42206,-71.173965,-10.210268,83.9666
 			Quy,2.0,-1298.182,-417.44095,-25.18356,42.1492
 */
-			
 
 						
 			
@@ -195,7 +229,6 @@ public class Inputs implements InputProcessor {
 		else if (RunSimulation.zF >= 15){
 			RunSimulation.zF = 15f;
 		}
-		
 		
 		
 		//System.out.println(RunSimulation.zF);

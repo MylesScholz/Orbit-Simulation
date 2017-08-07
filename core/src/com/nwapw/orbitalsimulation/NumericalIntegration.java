@@ -19,6 +19,7 @@ public class NumericalIntegration {
 	/*
 	 * RK4 (Range-Kutta)
 	 * 4th Order - reduces error
+	 * more accurate but creates systematc errors
 	 */
 	static float integrateRK4(float initial, float slope, float delta) {
 		float nextStep;
@@ -33,6 +34,7 @@ public class NumericalIntegration {
 		return nextStep;		
 	}
 	
+
 	/*
 	 * Leapfrog
 	 * 2nd Order
