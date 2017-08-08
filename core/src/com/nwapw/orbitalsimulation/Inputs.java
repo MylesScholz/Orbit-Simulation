@@ -13,6 +13,28 @@ public class Inputs implements InputProcessor {
 
 	@Override
 	public boolean keyDown(int keycode) {
+		if (keycode == Input.Keys.CONTROL_LEFT) {
+			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
+			RunSimulation.cam.unproject(mousePos); 
+		    mousePos.scl(1/RunSimulation.zF);
+		    
+		    float closestDist = RunSimulation.listOfBodies.get(0).posVect.dst(mousePos);
+		    int closestN = 0;
+		   
+		    for (int i = 1; i < RunSimulation.listOfBodies.size()-1; i++){
+		    	if (RunSimulation.listOfBodies.get(i).posVect.dst(mousePos) < closestDist ) {
+		    		//System.out.println(RunSimulation.listOfBodies.get(i).name);
+		    		//System.out.println((RunSimulation.listOfBodies.get(i).posVect.dst(mousePos)));
+		    		closestN = i;
+		    		
+		    	}		    	
+	
+		    }
+		    RunSimulation.n = closestN;
+		    
+		    
+		}
+		
 		
 		if(keycode == Input.Keys.ESCAPE){
 			

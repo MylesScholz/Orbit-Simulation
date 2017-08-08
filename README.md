@@ -5,7 +5,7 @@ A Java-based Orbital Simulator built with LibGDX graphics libraries.
 
 ## Physics
 This program attempts to simulate N-body simulations through continuous iterations by using Cowell's method, where acceleration is calculated for each body based on its attraction to other bodies, and this is used as a basis to calculate the velocity and position vectors.
-### Particle-Particle && Particle-Mesh
+### Particle-Particle & Particle-Mesh
 #### Particle-Particle
 The basic method of calculating net accelerations for each body involves adding the gravitational attraction from all other bodies.
 #### Particle-Mesh *

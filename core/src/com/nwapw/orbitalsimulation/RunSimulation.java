@@ -53,7 +53,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	 * 
 	 * P - Purge all planets not near stars
 	 * X - new galaxy
-	 * 
+	 * CTRL - Focus on closest body to mouse
 	 * 
 	 */
 	
@@ -70,7 +70,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	
 	// Specifies time used to calculate numerical integration
 	// TODO Adaptive step-size control
-	final static float deltaTime = 1f;
+	final static float deltaTime = 0.2f;
 	
 	// The max number of iterations that the simulation runs
 	final static int numOfIterations = 100000000;
