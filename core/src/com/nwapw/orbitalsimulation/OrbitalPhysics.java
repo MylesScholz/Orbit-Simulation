@@ -73,27 +73,30 @@ public class OrbitalPhysics {
 
 	static void cowellsFormulation() {
 		for (int i=0; i < listOfBodies.size(); i++){
-			
-			OrbitalBody currentBody = listOfBodies.get(i);
-			sumOfAcc.set(0,0,0);
-			
-			listOfBodies.get(i).mostPullingBodyAcc = 0;
-			
-			for (int j = 0; j < listOfBodies.size() ; j++){
-				if (j != i){
-					OrbitalBody pullingBody = listOfBodies.get(j);
-					calculatedAcc.set(0,0,0);
-					if (perturbationCalculationMethod == 0){ // Cowell's Formulation
-						calculatedAcc = calculateGravAttraction(currentBody, pullingBody);
-						if (calculatedAcc.len() >= listOfBodies.get(i).mostPullingBodyAcc){	
-							listOfBodies.get(i).mostPullingBodyAcc = calculatedAcc.len();
-							listOfBodies.get(i).mostPullingBodyName = listOfBodies.get(j).name;
-						}												
-						sumOfAcc.add(calculatedAcc);
+			if (listOfBodies.get(i).gravity) {
+				OrbitalBody currentBody = listOfBodies.get(i);
+				sumOfAcc.set(0, 0, 0);
+
+				listOfBodies.get(i).mostPullingBodyAcc = 0;
+
+				for (int j = 0; j < listOfBodies.size(); j++) {
+					if (listOfBodies.get(j).gravity) {
+						if (j != i) {
+							OrbitalBody pullingBody = listOfBodies.get(j);
+							calculatedAcc.set(0, 0, 0);
+							if (perturbationCalculationMethod == 0) { // Cowell's Formulation
+								calculatedAcc = calculateGravAttraction(currentBody, pullingBody);
+								if (calculatedAcc.len() >= listOfBodies.get(i).mostPullingBodyAcc) {
+									listOfBodies.get(i).mostPullingBodyAcc = calculatedAcc.len();
+									listOfBodies.get(i).mostPullingBodyName = listOfBodies.get(j).name;
+								}
+								sumOfAcc.add(calculatedAcc);
+							}
+						}
 					}
 				}
+				currentBody.setAcceleration(sumOfAcc.x, sumOfAcc.y, sumOfAcc.z);
 			}
-			currentBody.setAcceleration(sumOfAcc.x, sumOfAcc.y, sumOfAcc.z);					
 		}
 	}
 	static void predictedCowellsFormulation() {

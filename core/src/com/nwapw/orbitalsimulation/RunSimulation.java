@@ -677,13 +677,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			}			
 		}
 
-
-		
         if (listOfBodies.size() == 0){
-        	LibGDXTools.bodyInitialize("Star", 10000, 25, 0, 0, 0, 0, 40);
+        	loadFile();
 		}
-		
-
 
         if (Gdx.input.isKeyPressed(Input.Keys.UP)){
         RunSimulation.listOfBodies.get(RunSimulation.n).velVect.y += 3;
@@ -990,7 +986,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
                 Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
                 shapeRenderer.begin(ShapeType.Line);
 
-                while (listOfBodies.get(i).cometTailX.size() >= drawLimit) {
+                while (listOfBodies.get(i).cometTailX.size() >= drawLimit / 4) {
 					listOfBodies.get(i).cometTailX.remove(listOfBodies.get(i).cometTailX.size() - 1);
 					listOfBodies.get(i).cometTailY.remove(listOfBodies.get(i).cometTailY.size() - 1);
                 }
