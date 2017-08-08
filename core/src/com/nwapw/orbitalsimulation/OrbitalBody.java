@@ -14,27 +14,47 @@ public class OrbitalBody {
 	String name;
 	
 	String mostPullingBodyName;
+	String predictedMostPullingBodyName;
 	float mostPullingBodyAcc;
+	float predictedMostPullingBodyAcc;
 	
 	float mass;
 	float radius;
+	// x = 0, y = 1, z = 2, stored as float	
+	Vector3 currentPos = new Vector3();
+	Vector3 currentVel = new Vector3();
+	Vector3 currentAcc = new Vector3();
 	
-	static float[] currentPos = new float[3];
-	float[] currentVel = new float[3];
-	float[] currentAcc = new float[3];
+	
+	//Leap Frog
+	Vector3 backhalfstepVel = new Vector3();
+	Vector3 forwardhalfstepVel = new Vector3();
+	
+	Vector3 prevstepPos = new Vector3();
+	
+	
 
 	// x = 0, y = 1, z = 2, stored as float
-	Vector3 oldPosVect = new Vector3();
 	Vector3 posVect = new Vector3();
+	Vector3 oldPosVect = new Vector3();
+	Vector3 predictedOldPosVect = new Vector3();
+	Vector3 predictedPosVect = new Vector3();
 	Vector3 velVect = new Vector3();
+	Vector3 predictedVelVect = new Vector3();
 	Vector3 accVect = new Vector3();
 
 	ArrayList<Float> cometTailX = new ArrayList<Float>();
 	ArrayList<Float> cometTailY = new ArrayList<Float>();
+
+	Vector3 predictedAccVect = new Vector3();
 	
 	Sprite sprite;
 	
 	float spriteWidth = 10;
+	
+	boolean gravity = true;
+	boolean predictedGravity = true;
+	boolean removed = false;
 	
 	Texture texture;
 
@@ -54,22 +74,38 @@ public class OrbitalBody {
 		this.texture = newTexture;
 	}	
 	
+	void setPosition(float x, float y, float z){
+		posVect.set(x,y,z);	
+	}	
+	
 	void setOldPosition(float x, float y, float z) {
 		oldPosVect.set(x,y,z);
 	}
 	
-	void setPosition(float x, float y, float z){
-		posVect.set(x,y,z);	
-	}	
+	void setPredictedOldPosition(float x, float y, float z) {
+		predictedOldPosVect.set(x,y,z);
+	}
+	
+	void setPredictedPosition(float x, float y, float z) {
+		predictedPosVect.set(x,y,z);
+	}
 	
 	void setVelocity(float x, float y, float z){
 		velVect.set(x,y,z);
 	}
 	
+	void setPredictedVelocity(float x, float y, float z) {
+		predictedVelVect.set(x,y,z);
+	}
+	
 	void setAcceleration(float x, float y, float z){
 		accVect.set(x,y,z);
 	}
-
+	
+	void setPredictedAcceleration(float x, float y, float z) {
+		predictedAccVect.set(x,y,z);
+	}
+	
 	void setBody(String newName, float newMass, float[] position, float[] velocity) {
 		name = newName;
 		mass = newMass;
@@ -80,6 +116,17 @@ public class OrbitalBody {
 		this.spriteWidth = newSpriteWidth;
 	}
 	
+	void setGravity(boolean setGravity) {
+		this.gravity = setGravity;
+	}
+	
+	void setPredictedGravity(boolean setPredictedGravity) {
+		this.predictedGravity = setPredictedGravity;
+	}
+	
+	void setRemoved(boolean setRemoved) {
+		this.removed = setRemoved;
+	}
 	
 	// TODO create integrator choice picker
 	float integratorChoice(float value, float deltaTime) {
@@ -89,51 +136,51 @@ public class OrbitalBody {
 		return value;
 	}
 	
-	void iterateVelThenPos(float deltaTime) {
+	void integrateEuler(float deltaTime) {
 		
-		float[] currentPos = {posVect.x, posVect.y, posVect.z};
-		float[] currentVel = {velVect.x, velVect.y, velVect.z};
-		float[] currentAcc = {accVect.x, accVect.y, accVect.z};
+		currentPos.set(posVect.x, posVect.y, posVect.z);
+		currentVel.set(velVect.x, velVect.y, velVect.z);
+		currentAcc.set(accVect.x, accVect.y, accVect.z);
 		
 		oldPosVect.set(currentPos);
-		
-		//TODO change to integrator choice
+		predictedOldPosVect.set(currentPos);
 		
 		// Integrates Acceleration to Velocity
-		/*
-		if (this.name == "Planet #1") {
-			System.out.println("BEFORE " + currentPos[0]);
-		}
-		*/
-		currentVel[0] = NumericalIntegration.integrateRect(currentVel[0], currentAcc[0], deltaTime);
-		currentVel[1] = NumericalIntegration.integrateRect(currentVel[1], currentAcc[1], deltaTime);
-		currentVel[2] = NumericalIntegration.integrateRect(currentVel[2], currentAcc[2], deltaTime);
-	
+
+		currentVel = currentVel.add(currentAcc.scl(deltaTime));
 		velVect.set(currentVel);
+		predictedVelVect.set(currentVel);
 
 		// Integrates Velocity to Position
-		
-		currentPos[0] = NumericalIntegration.integrateRect(currentPos[0], currentVel[0], deltaTime);
-		currentPos[1] = NumericalIntegration.integrateRect(currentPos[1], currentVel[1], deltaTime);
-		currentPos[2] = NumericalIntegration.integrateRect(currentPos[2], currentVel[2], deltaTime);		
-		
-		// TODO quickfix bug, find reason why
-		//evenBodyBug();
+		currentPos = currentPos.add(currentVel.scl(deltaTime));
 		posVect.set(currentPos);
-		/*
-		if (this.name == "Planet #1") {
-			System.out.println("AFTER  " + currentPos[0]);
-			System.out.println("AFTER1 " + posVect.getX());
-		}		 
-		*/
+
 	}
+	void integrateLeapfrogPos(float deltaTime){
+		oldPosVect.set(posVect); // for drawing orbit lines
+		prevstepPos.set(posVect);
+		posVect.set(prevstepPos.add(backhalfstepVel.scl(deltaTime)));
+		
+	}	
+	void integrateLeapfrogVel(float deltaTime){		
+		backhalfstepVel.set(velVect);
+		velVect.set(backhalfstepVel.add(accVect.scl(deltaTime)));		
+		
+	}	
+	void integratePredictedLeapfrogPos(float deltaTime){
+		predictedOldPosVect.set(predictedPosVect); // for drawing orbit lines
+		prevstepPos.set(predictedPosVect);
+		predictedPosVect.set(prevstepPos.add(backhalfstepVel.scl(deltaTime)));
+		
+	}	
+	void integratePredictedLeapfrogVel(float deltaTime){		
+		backhalfstepVel.set(predictedVelVect);
+		predictedVelVect.set(backhalfstepVel.add(predictedAccVect.scl(deltaTime)));		
+		
+	}		
 	
-	//public static void evenBodyBug () {
-	//	if (RunSimulation.listOfBodies.size() % 2 == 0){		
-	//		System.out.println("Even Body Bug");
-	//		currentPos[0] *= -1;
-	//		currentPos[1] *= -1;
-	//		currentPos[2] *= -1;
-	//	}
-	//}
+	
+	
+	
+	
 }

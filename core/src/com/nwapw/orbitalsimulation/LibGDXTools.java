@@ -78,12 +78,11 @@ public class LibGDXTools {
 	
 	static void bodyCreate(String name, float mass, float posX, float posY, float velX, float velY) {
 		OrbitalBody body = new OrbitalBody();
-
-		body.setName(name);
 		body.setMass(mass);
-
-		body.setRadius((int) Math.sqrt((mass * 10) / Math.PI));
-		body.spriteWidth = (int) Math.sqrt((mass * 10) / Math.PI) * 2;
+		body.setName(name);
+		
+		body.setRadius((int) Math.sqrt(mass * 10/ Math.PI));
+		body.spriteWidth = (int) Math.sqrt(mass * 10/ Math.PI) * 2;
 
 		body.posVect.x = posX;
 		body.posVect.y = posY;
@@ -91,6 +90,55 @@ public class LibGDXTools {
 		body.velVect.x = velX;
 		body.velVect.y = velY;
 
+		body.setGravity(true);
+		body.setPredictedGravity(true);
+		body.setRemoved(false);
+		
+		RunSimulation.listOfBodies.add(body);
+		body.setTexture(bodyTextureChooser(mass));
+	}
+	
+	static void bodyCreatePlanet(float posX, float posY, float velX, float velY) {
+		OrbitalBody body = new OrbitalBody();
+		body.setMass(1 + (int)(Math.random() * 4));
+		body.setName(LibGDXTools.nameGen());
+		
+		body.setRadius((int) Math.sqrt(((1 + (int)(Math.random() * 4)) * 10) / Math.PI));
+		body.spriteWidth = (int) Math.sqrt(((1 + (int)(Math.random() * 4)) * 10) / Math.PI) * 2;
+
+		body.posVect.x = posX;
+		body.posVect.y = posY;
+
+		body.velVect.x = velX;
+		body.velVect.y = velY;
+
+		body.setGravity(false);
+		body.setPredictedGravity(false);
+		body.setRemoved(false);
+		
+		RunSimulation.listOfBodies.add(body);
+		body.setTexture(bodyTextureChooser(1 + (int)(Math.random() * 4)));
+	}
+	
+	static void bodyCreateSun(float posX, float posY, float velX, float velY) {
+		OrbitalBody body = new OrbitalBody();
+		float mass = 1000 + (int)(Math.random() * 4000);
+		body.setMass(mass);
+		body.setName(LibGDXTools.nameGen());
+		
+		body.setRadius((int) Math.sqrt(mass / Math.PI));
+		body.spriteWidth = (int) Math.sqrt(mass / Math.PI) * 2;
+
+		body.posVect.x = posX;
+		body.posVect.y = posY;
+
+		body.velVect.x = velX;
+		body.velVect.y = velY;
+
+		body.setGravity(false);
+		body.setPredictedGravity(false);
+		body.setRemoved(false);
+		
 		RunSimulation.listOfBodies.add(body);
 		body.setTexture(bodyTextureChooser(mass));
 	}
@@ -192,7 +240,7 @@ public class LibGDXTools {
         }
        
        
-        int randomSyllableLength = (int) Math.floor(Math.abs(Math.random() - Math.random()) * (1 + 6 - 1) + 1);
+        int randomSyllableLength = (int) Math.floor(Math.abs(Math.random() - Math.random()) * (1 + 5 - 1) + 1);
         
         String hyphenSpaceInput[] = new String[randomSyllableLength];
         
@@ -257,17 +305,8 @@ public class LibGDXTools {
 	
 	static float spriteRadiusCalculator(float mass){
 		
-
 		float length = 1;
-		/*
-		//length = (float) Math.pow(3*mass/(4*Math.PI), 1/3);
-		length = (float) (3*mass/(4*Math.PI));
-		
-		
-		System.out.println("mass: " + mass);
-		System.out.println("length: " + length);
-		*/
-		
+
 		if (mass < 100){ // body is a "planet"
 			length = 20;
 		}
@@ -287,11 +326,16 @@ public class LibGDXTools {
 		}
 		return border;
 	}
-	static float calculateDefaultZoom(float spriteWidth){
-		//float zF = 2 - spriteWidth/100f;
-		float zF = 1;
+	static float calculateDefaultZoom(float spriteWidth){		
+		float zF = 0;
 		
-		//System.out.println(zF);
+		if (spriteWidth > 200){
+			zF = (float) (300000f/Math.pow(spriteWidth, 2));
+		}
+		else {
+			zF = 10 - 1f*spriteWidth;
+		}
+		
 		return zF;
 	}
 
