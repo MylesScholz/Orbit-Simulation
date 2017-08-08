@@ -1,0 +1,7 @@
+Star,10000.0,NaN,NaN,NaN,NaN
+Powoixu,6.0,NaN,NaN,NaN,NaN
+Tyn,3.0,NaN,NaN,NaN,NaN
+Zayantir,1.0,NaN,NaN,NaN,NaN
+Rynphu,3.0,NaN,NaN,NaN,NaN
+Que,2.0,NaN,NaN,NaN,NaN
+Reefyn,4889.0,NaN,NaN,NaN,NaN
