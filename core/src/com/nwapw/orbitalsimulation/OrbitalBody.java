@@ -28,6 +28,9 @@ public class OrbitalBody {
 	Vector3 posVect = new Vector3();
 	Vector3 velVect = new Vector3();
 	Vector3 accVect = new Vector3();
+
+	ArrayList<Float> cometTailX = new ArrayList<Float>();
+	ArrayList<Float> cometTailY = new ArrayList<Float>();
 	
 	Sprite sprite;
 	
