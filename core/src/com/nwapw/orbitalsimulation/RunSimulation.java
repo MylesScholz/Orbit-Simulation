@@ -52,11 +52,11 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	// Specifies time used to calculate numerical integration
 	// TODO Adaptive step-size control
 	static float deltaTime = (float) 0.01;
-	static float deltaPredictionTime = (float) 1;
+	static float deltaPredictionTime = (float) 0.1;
 	
 	// The max number of iterations that the simulation runs
 	final static int numOfIterations = 100000000;
-	final static int numOfPredictions = 500;
+	final static int numOfPredictions = 1000;
 	
 	final static float drawLimit = 1000;
 	final static float predictedDrawLimit = 1000;
@@ -630,6 +630,12 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				if (n >= listOfBodies.size()) {
 					n -= n;
 				}
+				if (!listOfBodies.get(n).gravity) {
+					n += 1;
+				}
+				if (n >= listOfBodies.size()) {
+					n -= n;
+				}
 				if (listOfBodies.size() == 0) {
 					loadFile();
 				}
@@ -660,6 +666,14 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		
 		if (n >= listOfBodies.size()) {
 			n -=n;
+		}
+		
+		if (!listOfBodies.get(n).gravity) {
+			n += 1;
+		}
+		
+		if (n >= listOfBodies.size()) {
+			n -= n;
 		}
 		
 		if (listOfBodies.size() == 0) {
