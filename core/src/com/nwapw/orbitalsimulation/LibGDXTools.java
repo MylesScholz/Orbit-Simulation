@@ -240,7 +240,7 @@ public class LibGDXTools {
         }
        
        
-        int randomSyllableLength = (int) Math.floor(Math.abs(Math.random() - Math.random()) * (1 + 6 - 1) + 1);
+        int randomSyllableLength = (int) Math.floor(Math.abs(Math.random() - Math.random()) * (1 + 5 - 1) + 1);
         
         String hyphenSpaceInput[] = new String[randomSyllableLength];
         
@@ -305,17 +305,8 @@ public class LibGDXTools {
 	
 	static float spriteRadiusCalculator(float mass){
 		
-
 		float length = 1;
-		/*
-		//length = (float) Math.pow(3*mass/(4*Math.PI), 1/3);
-		length = (float) (3*mass/(4*Math.PI));
-		
-		
-		System.out.println("mass: " + mass);
-		System.out.println("length: " + length);
-		*/
-		
+
 		if (mass < 100){ // body is a "planet"
 			length = 20;
 		}
@@ -335,11 +326,16 @@ public class LibGDXTools {
 		}
 		return border;
 	}
-	static float calculateDefaultZoom(float spriteWidth){
-		float zF = 2 - spriteWidth/100f;
-		//float zF = 1;
+	static float calculateDefaultZoom(float spriteWidth){		
+		float zF = 0;
 		
-		//System.out.println(zF);
+		if (spriteWidth > 200){
+			zF = (float) (300000f/Math.pow(spriteWidth, 2));
+		}
+		else {
+			zF = 10 - 1f*spriteWidth;
+		}
+		
 		return zF;
 	}
 
