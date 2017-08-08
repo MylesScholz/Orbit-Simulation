@@ -276,7 +276,8 @@ public class Inputs implements InputProcessor {
 		else if (RunSimulation.zF >= 15){
 			RunSimulation.zF = 15f;
 		}
-
+		
+		
 		//System.out.println(RunSimulation.zF);
 		return false;
 	}

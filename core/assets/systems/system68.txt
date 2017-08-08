@@ -1,2 +1,0 @@
-Chee,10000.0,NaN,NaN,NaN,NaN
-Soi doi,3.0,NaN,NaN,NaN,NaN
