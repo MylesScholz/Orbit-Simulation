@@ -565,7 +565,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedPosition(clickLeftPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickLeftPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity((clickLeftPositionX - focusedBodyOldX) - (currentMousePositionX - listOfBodies.get(n).posVect.x), (clickLeftPositionY - focusedBodyOldY) - (currentMousePositionY - listOfBodies.get(n).posVect.y), 0);			
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedGravity(true);
-			//predict(listOfBodies.get(listOfBodies.size() - 1), listOfBodies.get(n));
+			predict(listOfBodies.get(listOfBodies.size() - 1), listOfBodies.get(n));
 		} else if (!Gdx.input.isButtonPressed(0) && newPlanet && !newSun) {
 			//System.out.println("planetMove");
 			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
@@ -603,7 +603,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedPosition(clickRightPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickRightPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity((clickRightPositionX - focusedBodyOldX) - (currentMousePositionX - listOfBodies.get(n).posVect.x), (clickRightPositionY - focusedBodyOldY) - (currentMousePositionY - listOfBodies.get(n).posVect.y), 0);			
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedGravity(true);
-			//predict(listOfBodies.get(listOfBodies.size() - 1), listOfBodies.get(n));
+			predict(listOfBodies.get(listOfBodies.size() - 1), listOfBodies.get(n));
 		} else if (!Gdx.input.isButtonPressed(1) && newSun && !newPlanet) {
 			//System.out.println("sunMove");
 			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
@@ -631,6 +631,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 					FTOldY.add(newBody.predictedOldPosVect.y);
 					FTNewX.add(newBody.predictedPosVect.x);
 					FTNewY.add(newBody.predictedPosVect.y);
+				} else {
+					System.out.println("Removed");
 				}
 				OrbitalPhysics.predictedIterateSimulation(deltaPredictionTime);
 				Gdx.gl.glEnable(GL30.GL_BLEND);
@@ -1092,7 +1094,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			if(iterationCounter <= numOfIterations){
 				timeCounter += deltaTime;
 				OrbitalPhysics.iterateSimulation(deltaTime);
-				removedBody();
+				passError();
 				place();
 				if((iterationCounter % dataDivision) == 0) {
 					//fpsLogger.log();
@@ -1246,7 +1248,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		}
 	}
 	
-	public void removedBody() {
+	public void passError() {
 		if (OrbitalPhysics.passIndexError()) {
 			n -= n;
 		}

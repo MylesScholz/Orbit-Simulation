@@ -113,7 +113,7 @@ public class LibGDXTools {
 		body.velVect.y = velY;
 
 		body.setGravity(false);
-		body.setPredictedGravity(false);
+		body.setPredictedGravity(true);
 		body.setRemoved(false);
 		
 		RunSimulation.listOfBodies.add(body);
@@ -136,7 +136,7 @@ public class LibGDXTools {
 		body.velVect.y = velY;
 
 		body.setGravity(false);
-		body.setPredictedGravity(false);
+		body.setPredictedGravity(true);
 		body.setRemoved(false);
 		
 		RunSimulation.listOfBodies.add(body);

@@ -97,7 +97,6 @@ public class OrbitalPhysics {
 		}
 	}
 	static void predictedCowellsFormulation() {
-		
 		for (int i=0; i < listOfBodies.size(); i++) {	
 			if (listOfBodies.get(i).predictedGravity) {
 				OrbitalBody currentBody = listOfBodies.get(i);
@@ -184,131 +183,129 @@ public class OrbitalPhysics {
     public static void checkAllCollisions() {
         int n = RunSimulation.n;
     	for (int i = 0; i < listOfBodies.size(); i++) {
-            for (int j = 0; j < listOfBodies.size(); j++) {
-            	
-                if (i != j && checkCollision(listOfBodies.get(i), listOfBodies.get(j))) {
-                //	System.out.println("Collision!");
-                	
-                    if (listOfBodies.get(i).mass < listOfBodies.get(j).mass) {
-                    	
-                    	// Conservation of Momentum
-                    	Vector3 sumVel = listOfBodies.get(i).velVect.scl(listOfBodies.get(i).mass).add(listOfBodies.get(j).velVect.scl(listOfBodies.get(j).mass));
-                    	sumVel.scl(1/(listOfBodies.get(i).mass + listOfBodies.get(j).mass));
-                    	listOfBodies.get(j).velVect.set(sumVel);
-                    	
-                    	listOfBodies.get(j).mass += listOfBodies.get(i).mass;                      
-                    	listOfBodies.get(j).radius = (int) Math.sqrt((listOfBodies.get(j).mass * 10) / Math.PI);
-                    	listOfBodies.get(j).spriteWidth = (int) Math.sqrt((listOfBodies.get(j).mass * 10) / Math.PI) * 2;
-                    	
-                    	// listOfBodies.get(j).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
-                        // listOfBodies.get(j).spriteWidth = listOfBodies.get(i).radius * 2;
-
-                    	
-                    	String focusName = listOfBodies.get(j).name;
-                    	boolean focusDestroyed = false;
-                    	if (i == n){
-                    		focusDestroyed = true;
-                    	}
-                    	
-                    	
-                    	listOfBodies.remove(i);
-                    	
-                    	
-                    	if (focusDestroyed == true){
-	                    	for (int k = 0; k < listOfBodies.size(); k++) {
-	                    		if (focusName == listOfBodies.get(k).name){
-	                    			RunSimulation.n = k;
-	                    		}
-	                    		
-	                    	}
-                    	}
-                    
-                    	
-                    } else if (listOfBodies.get(i).mass > listOfBodies.get(j).mass) {
-                    	
-                    	// Conservation of Momentum
-                    	Vector3 sumVel = listOfBodies.get(i).velVect.scl(listOfBodies.get(i).mass).add(listOfBodies.get(j).velVect.scl(listOfBodies.get(j).mass));
-                    	sumVel.scl(1/(listOfBodies.get(i).mass + listOfBodies.get(j).mass));
-                    	listOfBodies.get(i).velVect.set(sumVel);
-                        
-                    	listOfBodies.get(i).mass += listOfBodies.get(j).mass;                   
-                    	listOfBodies.get(i).radius = (int) Math.sqrt((listOfBodies.get(i).mass * 10) / Math.PI);
-                    	listOfBodies.get(i).spriteWidth = (int) Math.sqrt((listOfBodies.get(i).mass * 10) / Math.PI) * 2;
-                    	
-                    	//listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(j).radius, 2) * 2));
-                       // listOfBodies.get(i).spriteWidth = listOfBodies.get(j).radius * 2;
-
-                    	
-                    	String focusName = listOfBodies.get(i).name;
-                       	boolean focusDestroyed = false;
-                    	if (j == n){
-                    		focusDestroyed = true;
-                    	}
-                    	
-                    	listOfBodies.remove(j);
-                    	
-                    	if (focusDestroyed == true){
-	                    	for (int k = 0; k < listOfBodies.size(); k++) {
-	                    		if (focusName == listOfBodies.get(k).name){
-	                    			RunSimulation.n = k;
-	                    			
-	                    		}
-	                    		
-	                    	}
-                    	}
-                    	
-                    } else {
-                    	
-                    	// Conservation of Momentum
-                    	Vector3 sumVel = listOfBodies.get(i).velVect.scl(listOfBodies.get(i).mass).add(listOfBodies.get(j).velVect.scl(listOfBodies.get(j).mass));
-                    	sumVel.scl(1/(listOfBodies.get(i).mass + listOfBodies.get(j).mass));
-                   
-                    	listOfBodies.get(i).velVect.set(sumVel);
-                    	
-                        listOfBodies.get(i).mass += listOfBodies.get(j).mass;
-
-                        //listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
-                        //listOfBodies.get(i).spriteWidth = listOfBodies.get(i).radius * 2;
-                        if (n >= listOfBodies.size()) {
-                            n -= n;
-                        }
-                        if (listOfBodies.get(n) == listOfBodies.get(j)){
-                    		n = i;
-                    	}
-                    	String focusName = listOfBodies.get(i).name;
-                       	boolean focusDestroyed = false;
-                    	if (j == n){
-                    		focusDestroyed = true;
-                    	}
-                    	
-                    	listOfBodies.remove(j);
-                    	
-                    	if (focusDestroyed == true){
-	                    	for (int k = 0; k < listOfBodies.size(); k++) {
-	                    		if (focusName == listOfBodies.get(k).name){
-	                    			RunSimulation.n = k;
-	                    		}
-	                    		
-	                    	}
-                    	}
-                    }
-                    
-                    checkAllCollisions();
-                    break;
-                    
-                	}
-            	}
-            }
-    }
-
-
+    		if (listOfBodies.get(i).gravity) {
+    			for (int j = 0; j < listOfBodies.size(); j++) {
+    				if (listOfBodies.get(j).gravity) {
+    					if (i != j && checkCollision(listOfBodies.get(i), listOfBodies.get(j))) {
+    						//	System.out.println("Collision!");
+    						
+    						if (listOfBodies.get(i).mass < listOfBodies.get(j).mass) {
+    							
+    							// Conservation of Momentum
+    							Vector3 sumVel = listOfBodies.get(i).velVect.scl(listOfBodies.get(i).mass).add(listOfBodies.get(j).velVect.scl(listOfBodies.get(j).mass));
+    							sumVel.scl(1/(listOfBodies.get(i).mass + listOfBodies.get(j).mass));
+    							listOfBodies.get(j).velVect.set(sumVel);
+    							
+    							listOfBodies.get(j).mass += listOfBodies.get(i).mass;                      
+    							listOfBodies.get(j).radius = (int) Math.sqrt((listOfBodies.get(j).mass * 10) / Math.PI);
+    							listOfBodies.get(j).spriteWidth = (int) Math.sqrt((listOfBodies.get(j).mass * 10) / Math.PI) * 2;
+    							
+    							// listOfBodies.get(j).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
+    							// listOfBodies.get(j).spriteWidth = listOfBodies.get(i).radius * 2;
+    							
+    							
+    							String focusName = listOfBodies.get(j).name;
+    							boolean focusDestroyed = false;
+    							if (i == n){
+    								focusDestroyed = true;
+    							}
+    							
+    							
+    							listOfBodies.remove(i);
+    							
+    							
+    							if (focusDestroyed == true){
+    								for (int k = 0; k < listOfBodies.size(); k++) {
+    									if (focusName == listOfBodies.get(k).name){
+    										RunSimulation.n = k;
+    									}
+    									
+    								}
+    							}
+    							
+    							
+    						} else if (listOfBodies.get(i).mass > listOfBodies.get(j).mass) {
+    							
+    							// Conservation of Momentum
+    							Vector3 sumVel = listOfBodies.get(i).velVect.scl(listOfBodies.get(i).mass).add(listOfBodies.get(j).velVect.scl(listOfBodies.get(j).mass));
+    							sumVel.scl(1/(listOfBodies.get(i).mass + listOfBodies.get(j).mass));
+    							listOfBodies.get(i).velVect.set(sumVel);
+    							
+    							listOfBodies.get(i).mass += listOfBodies.get(j).mass;                   
+    							listOfBodies.get(i).radius = (int) Math.sqrt((listOfBodies.get(i).mass * 10) / Math.PI);
+    							listOfBodies.get(i).spriteWidth = (int) Math.sqrt((listOfBodies.get(i).mass * 10) / Math.PI) * 2;
+    							
+    							//listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(j).radius, 2) * 2));
+    							// listOfBodies.get(i).spriteWidth = listOfBodies.get(j).radius * 2;
+    							
+    							
+    							String focusName = listOfBodies.get(i).name;
+    							boolean focusDestroyed = false;
+    							if (j == n){
+    								focusDestroyed = true;
+    							}
+    							
+    							listOfBodies.remove(j);
+    							
+    							if (focusDestroyed == true){
+    								for (int k = 0; k < listOfBodies.size(); k++) {
+    									if (focusName == listOfBodies.get(k).name){
+    										RunSimulation.n = k;
+    										
+    									}
+    									
+    								}
+    							}
+    							
+    						} else {
+    							
+    							// Conservation of Momentum
+    							Vector3 sumVel = listOfBodies.get(i).velVect.scl(listOfBodies.get(i).mass).add(listOfBodies.get(j).velVect.scl(listOfBodies.get(j).mass));
+    							sumVel.scl(1/(listOfBodies.get(i).mass + listOfBodies.get(j).mass));
+    							
+    							listOfBodies.get(i).velVect.set(sumVel);
+    							
+    							listOfBodies.get(i).mass += listOfBodies.get(j).mass;
+    							
+    							//listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
+    							//listOfBodies.get(i).spriteWidth = listOfBodies.get(i).radius * 2;
+    							if (n >= listOfBodies.size()) {
+    								n -= n;
+    							}
+    							if (listOfBodies.get(n) == listOfBodies.get(j)){
+    								n = i;
+    							}
+    							String focusName = listOfBodies.get(i).name;
+    							boolean focusDestroyed = false;
+    							if (j == n){
+    								focusDestroyed = true;
+    							}
+    							
+    							listOfBodies.remove(j);
+    							
+    							if (focusDestroyed == true){
+    								for (int k = 0; k < listOfBodies.size(); k++) {
+    									if (focusName == listOfBodies.get(k).name){
+    										RunSimulation.n = k;
+    									}							
+    								}
+    							}
+    						}
+    						checkAllCollisions();
+    						break;
+    					}	
+    				}
+    			}
+    		}
+    	}
+    }	
+    
     public static boolean predictCollision(OrbitalBody body1, OrbitalBody body2) {
-		float distance = body1.predictedPosVect.dst(body2.predictedPosVect);
-    	
+    	float distance = body1.predictedPosVect.dst(body2.predictedPosVect);
     	if (distance*RunSimulation.zF*1.2f <= body1.radius*RunSimulation.zF + body2.radius*RunSimulation.zF) {
             return true;
         } else {
-            return false;
+        return false;
         }
     }
     
