@@ -20,10 +20,19 @@ public class OrbitalBody {
 	
 	float mass;
 	float radius;
+	// x = 0, y = 1, z = 2, stored as float	
+	Vector3 currentPos = new Vector3();
+	Vector3 currentVel = new Vector3();
+	Vector3 currentAcc = new Vector3();
 	
-	static float[] currentPos = new float[3];
-	float[] currentVel = new float[3];
-	float[] currentAcc = new float[3];
+	
+	//Leap Frog
+	Vector3 backhalfstepVel = new Vector3();
+	Vector3 forwardhalfstepVel = new Vector3();
+	
+	Vector3 prevstepPos = new Vector3();
+	
+	
 
 	// x = 0, y = 1, z = 2, stored as float
 	Vector3 posVect = new Vector3();
@@ -123,60 +132,51 @@ public class OrbitalBody {
 		return value;
 	}
 	
-	void iterateVelThenPos(float deltaTime) {
+	void integrateEuler(float deltaTime) {
 		
-		float[] currentPos = {posVect.x, posVect.y, posVect.z};
-		float[] currentVel = {velVect.x, velVect.y, velVect.z};
-		float[] currentAcc = {accVect.x, accVect.y, accVect.z};
+		currentPos.set(posVect.x, posVect.y, posVect.z);
+		currentVel.set(velVect.x, velVect.y, velVect.z);
+		currentAcc.set(accVect.x, accVect.y, accVect.z);
 		
 		oldPosVect.set(currentPos);
 		predictedOldPosVect.set(currentPos);
 		
-		//TODO change to integrator choice
-		
 		// Integrates Acceleration to Velocity
-		
-		currentVel[0] = NumericalIntegration.integrateRect(currentVel[0], currentAcc[0], deltaTime);
-		currentVel[1] = NumericalIntegration.integrateRect(currentVel[1], currentAcc[1], deltaTime);
-		currentVel[2] = NumericalIntegration.integrateRect(currentVel[2], currentAcc[2], deltaTime);
-	
+
+		currentVel = currentVel.add(currentAcc.scl(deltaTime));
 		velVect.set(currentVel);
 		predictedVelVect.set(currentVel);
 
 		// Integrates Velocity to Position
-		
-		currentPos[0] = NumericalIntegration.integrateRect(currentPos[0], currentVel[0], deltaTime);
-		currentPos[1] = NumericalIntegration.integrateRect(currentPos[1], currentVel[1], deltaTime);
-		currentPos[2] = NumericalIntegration.integrateRect(currentPos[2], currentVel[2], deltaTime);		
-		
+		currentPos = currentPos.add(currentVel.scl(deltaTime));
 		posVect.set(currentPos);
-		predictedPosVect.set(currentPos);
-	}
-	
-	void predictedIterateVelThenPos(float deltaTime) {
-		
-		float[] currentPos = {predictedPosVect.x, predictedPosVect.y, predictedPosVect.z};
-		float[] currentVel = {predictedVelVect.x, predictedVelVect.y, predictedVelVect.z};
-		float[] currentAcc = {predictedAccVect.x, predictedAccVect.y, predictedAccVect.z};
-		
-		predictedOldPosVect.set(currentPos);
-		
-		//TODO change to integrator choice
-		
-		// Integrates Acceleration to Velocity
-		
-		currentVel[0] = NumericalIntegration.integrateRect(currentVel[0], currentAcc[0], deltaTime);
-		currentVel[1] = NumericalIntegration.integrateRect(currentVel[1], currentAcc[1], deltaTime);
-		currentVel[2] = NumericalIntegration.integrateRect(currentVel[2], currentAcc[2], deltaTime);
-	
-		predictedVelVect.set(currentVel);
 
-		// Integrates Velocity to Position
-		
-		currentPos[0] = NumericalIntegration.integrateRect(currentPos[0], currentVel[0], deltaTime);
-		currentPos[1] = NumericalIntegration.integrateRect(currentPos[1], currentVel[1], deltaTime);
-		currentPos[2] = NumericalIntegration.integrateRect(currentPos[2], currentVel[2], deltaTime);		
-		
-		predictedPosVect.set(currentPos);
 	}
+	void integrateLeapfrogPos(float deltaTime){
+		oldPosVect.set(posVect); // for drawing orbit lines
+		prevstepPos.set(posVect);
+		posVect.set(prevstepPos.add(backhalfstepVel.scl(deltaTime)));
+		
+	}	
+	void integrateLeapfrogVel(float deltaTime){		
+		backhalfstepVel.set(velVect);
+		velVect.set(backhalfstepVel.add(accVect.scl(deltaTime)));		
+		
+	}	
+	void integratePredictedLeapfrogPos(float deltaTime){
+		predictedOldPosVect.set(predictedPosVect); // for drawing orbit lines
+		prevstepPos.set(predictedPosVect);
+		predictedPosVect.set(prevstepPos.add(backhalfstepVel.scl(deltaTime)));
+		
+	}	
+	void integratePredictedLeapfrogVel(float deltaTime){		
+		backhalfstepVel.set(predictedVelVect);
+		predictedVelVect.set(backhalfstepVel.add(predictedAccVect.scl(deltaTime)));		
+		
+	}		
+	
+	
+	
+	
+	
 }

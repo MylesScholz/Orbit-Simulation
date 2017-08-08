@@ -33,51 +33,99 @@ public class OrbitalPhysics {
 	
 	final static int gravConst = 100;
 	final static int perturbationCalculationMethod = 0; // 0 = Cowell's Method
-	
+
 	static boolean indexOutOfBounds = false;
+	final static int numOfIterations = 1000000;
+
 	
 		
 	
 	static void iterateSimulation(float deltaTime) {
-		// 1. Calculate net force and acceleration from acting on each body.
-		for (int i=0; i < listOfBodies.size(); i++) {			
-			if (listOfBodies.get(i).gravity) {
+       
+		for (int i = 0; i < listOfBodies.size(); i++){
+			listOfBodies.get(i).integrateLeapfrogPos(deltaTime);
+		}	
+		cowellsFormulation();
+		
+		for (int i = 0; i < listOfBodies.size(); i++){
+			listOfBodies.get(i).integrateLeapfrogVel(deltaTime);			
+		}
+		if (RunSimulation.collisionsOn) {
+		 checkAllCollisions();
+		}
+	}
+	
+	static void predictedIterateSimulation(float deltaPredictionTime) {
+		
+		for (int i = 0; i < listOfBodies.size(); i++){
+			listOfBodies.get(i).integratePredictedLeapfrogPos(deltaPredictionTime);
+		}	
+		predictedCowellsFormulation();
+		
+		for (int i = 0; i < listOfBodies.size(); i++){
+			listOfBodies.get(i).integratePredictedLeapfrogVel(deltaPredictionTime);			
+		}	
+		predictAllCollisions();
+	}	
+	
+
+
+
+	static void cowellsFormulation() {
+		for (int i=0; i < listOfBodies.size(); i++){
+			
+			OrbitalBody currentBody = listOfBodies.get(i);
+			sumOfAcc.set(0,0,0);
+			
+			listOfBodies.get(i).mostPullingBodyAcc = 0;
+			
+			for (int j = 0; j < listOfBodies.size() ; j++){
+				if (j != i){
+					OrbitalBody pullingBody = listOfBodies.get(j);
+					calculatedAcc.set(0,0,0);
+					if (perturbationCalculationMethod == 0){ // Cowell's Formulation
+						calculatedAcc = calculateGravAttraction(currentBody, pullingBody);
+						if (calculatedAcc.len() >= listOfBodies.get(i).mostPullingBodyAcc){	
+							listOfBodies.get(i).mostPullingBodyAcc = calculatedAcc.len();
+							listOfBodies.get(i).mostPullingBodyName = listOfBodies.get(j).name;
+						}												
+						sumOfAcc.add(calculatedAcc);
+					}
+				}
+			}
+			currentBody.setAcceleration(sumOfAcc.x, sumOfAcc.y, sumOfAcc.z);					
+		}
+	}
+	static void predictedCowellsFormulation() {
+		
+		for (int i=0; i < listOfBodies.size(); i++) {	
+			if (listOfBodies.get(i).predictedGravity) {
 				OrbitalBody currentBody = listOfBodies.get(i);
-				sumOfAcc.set(0,0,0);
-				listOfBodies.get(i).mostPullingBodyAcc = 0;
+				predictedSumOfAcc.set(0,0,0);
+				listOfBodies.get(i).predictedMostPullingBodyAcc = 0;
 				for (int j = 0; j < listOfBodies.size() ; j++){
-					if (listOfBodies.get(j).gravity) {
+					if (listOfBodies.get(j).predictedGravity) {
 						if (j != i){
 							OrbitalBody pullingBody = listOfBodies.get(j);
-							calculatedAcc.set(0,0,0);
-						
-							if (perturbationCalculationMethod == 0){ // Cowell's Formulation
-								calculatedAcc = cowellsFormulation(currentBody, pullingBody);
-								
-								if (calculatedAcc.len() >= listOfBodies.get(i).mostPullingBodyAcc){
-									listOfBodies.get(i).mostPullingBodyAcc = calculatedAcc.len();
-									listOfBodies.get(i).mostPullingBodyName = listOfBodies.get(j).name;
+							predictedCalculatedAcc.set(0,0,0);
+								predictedCalculatedAcc = calculatePredictedGravAttraction(currentBody, pullingBody);				
+								if (predictedCalculatedAcc.len() >= listOfBodies.get(i).predictedMostPullingBodyAcc){
+									listOfBodies.get(i).predictedMostPullingBodyAcc = predictedCalculatedAcc.len();
+									listOfBodies.get(i).predictedMostPullingBodyName = listOfBodies.get(j).name;
 								}
-								sumOfAcc.add(calculatedAcc);
-							}
-							/*
-							else if {
-								// TODO: Encke's Method, Variation of Parameters, etc.
-							}
-							*/
+								predictedSumOfAcc.add(predictedCalculatedAcc);
 						}
 					}
 				}
-				// 2. Iterate and integrate for velocity and then position.
-
-				currentBody.setAcceleration(sumOfAcc.x, sumOfAcc.y, sumOfAcc.z);			
-				currentBody.iterateVelThenPos(deltaTime);			
+				currentBody.setPredictedAcceleration(predictedSumOfAcc.x, predictedSumOfAcc.y, predictedSumOfAcc.z);			
+			
 			}
-		}	
-		checkAllCollisions();
-	}	
+		}
+		
+	}
 	
-	static Vector3 cowellsFormulation(OrbitalBody currentBody, OrbitalBody pullingBody) {
+	static Vector3 calculateGravAttraction(OrbitalBody currentBody, OrbitalBody pullingBody) {
+				
 		Vector3 currentPos = currentBody.posVect;
 		Vector3 pullingPos = pullingBody.posVect;
 		
@@ -93,59 +141,10 @@ public class OrbitalPhysics {
 		//calculatedAcc.scl(1/currentBody.mass);
 		
 		//System.out.println(calculatedAcc);
-		/*
-		float px1 = currentPos.x;
-		float py1 = currentPos.y;
-		float px2 = pullingPos.x;
-		float py2 = pullingPos.y;
-		
-		float dx = pullingPos.x - currentPos.x;
-		float dy = pullingPos.y - currentPos.y;
-		
-		float d = (float) Math.sqrt(dx*dx + dy*dy);
-		
-		float f = gravConst * currentBody.mass * pullingBody.mass / (d*d);
-		
-		float theta = (float) Math.atan2(dy, dx);
-		float fx = (float) Math.cos(theta) * f;
-		float fy = (float) Math.sin(theta) * f;
-		
-		calculatedAcc.x = fx;
-		calculatedAcc.y = fy;
-		*/
+
 		return calculatedAcc;
 	}
-	
-	static void predictedIterateSimulation(float deltaPredictionTime) {
-		for (int i=0; i < listOfBodies.size(); i++) {			
-			if (listOfBodies.get(i).predictedGravity) {
-				OrbitalBody currentBody = listOfBodies.get(i);
-				predictedSumOfAcc.set(0,0,0);
-				listOfBodies.get(i).predictedMostPullingBodyAcc = 0;
-				for (int j = 0; j < listOfBodies.size() ; j++){
-					if (listOfBodies.get(j).predictedGravity) {
-						if (j != i){
-							OrbitalBody pullingBody = listOfBodies.get(j);
-							predictedCalculatedAcc.set(0,0,0);
-							if (perturbationCalculationMethod == 0){ // Cowell's Formulation
-								predictedCalculatedAcc = predictedCowellsFormulation(currentBody, pullingBody);				
-								if (predictedCalculatedAcc.len() >= listOfBodies.get(i).predictedMostPullingBodyAcc){
-									listOfBodies.get(i).predictedMostPullingBodyAcc = predictedCalculatedAcc.len();
-									listOfBodies.get(i).predictedMostPullingBodyName = listOfBodies.get(j).name;
-								}
-								predictedSumOfAcc.add(predictedCalculatedAcc);
-							}
-						}
-					}
-				}
-				currentBody.setPredictedAcceleration(predictedSumOfAcc.x, predictedSumOfAcc.y, predictedSumOfAcc.z);			
-				currentBody.predictedIterateVelThenPos(deltaPredictionTime);			
-			}
-		}	
-		predictAllCollisions();
-	}	
-	
-	static Vector3 predictedCowellsFormulation(OrbitalBody currentBody, OrbitalBody pullingBody) {
+	static Vector3 calculatePredictedGravAttraction(OrbitalBody currentBody, OrbitalBody pullingBody) {		
 		Vector3 currentPos = currentBody.predictedPosVect;
 		Vector3 pullingPos = pullingBody.predictedPosVect;
 		Vector3 diffOfPosVect = new Vector3();
@@ -158,8 +157,11 @@ public class OrbitalPhysics {
 		
 		calculatedAcc.scl((float) (-1*gravConst * pullingBody.mass / Math.pow(currentPos.dst(pullingPos), 3)));	
 		return calculatedAcc;
-	}
-	
+	}	
+
+
+
+
 	static void passList(ArrayList<OrbitalBody> list) {
 		listOfBodies = list;
 	}
@@ -180,79 +182,125 @@ public class OrbitalPhysics {
     }
     
     public static void checkAllCollisions() {
+        int n = RunSimulation.n;
     	for (int i = 0; i < listOfBodies.size(); i++) {
-    		if (listOfBodies.get(i).gravity) {
-    			for (int j = 0; j < listOfBodies.size(); j++) {
-    				if(listOfBodies.get(j).gravity) {
-    					if (i != j && checkCollision(listOfBodies.get(i), listOfBodies.get(j))) {
-    						if (listOfBodies.get(i).mass < listOfBodies.get(j).mass) {
-    							// Conservation of Momentum
-    							Vector3 sumVel = listOfBodies.get(i).velVect.scl(listOfBodies.get(i).mass).add(listOfBodies.get(j).velVect.scl(listOfBodies.get(j).mass));
-    							sumVel.scl(1/(listOfBodies.get(i).mass + listOfBodies.get(j).mass));
-    							listOfBodies.get(j).velVect.set(sumVel);
-    							
-    							listOfBodies.get(j).mass += listOfBodies.get(i).mass;                      
-    							listOfBodies.get(j).radius = (int) Math.sqrt((listOfBodies.get(j).mass * 10) / Math.PI);
-    							listOfBodies.get(j).spriteWidth = listOfBodies.get(j).radius * 2;
-    							
-    							// listOfBodies.get(j).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
-    							// listOfBodies.get(j).spriteWidth = listOfBodies.get(i).radius * 2;
-    							listOfBodies.remove(i);
-    							
-    							if (RunSimulation.passIndex() >= listOfBodies.size()) {
-    								System.out.println("Index Out Of Bounds");
-    								indexOutOfBounds = true;
-    							} else {
-    								indexOutOfBounds = false;
-    							}
-    						} else if (listOfBodies.get(i).mass > listOfBodies.get(j).mass) {
-    							// Conservation of Momentum
-    							Vector3 sumVel = listOfBodies.get(i).velVect.scl(listOfBodies.get(i).mass).add(listOfBodies.get(j).velVect.scl(listOfBodies.get(j).mass));
-    							sumVel.scl(1/(listOfBodies.get(i).mass + listOfBodies.get(j).mass));
-    							listOfBodies.get(i).velVect.set(sumVel);
-    							
-    							listOfBodies.get(i).mass += listOfBodies.get(j).mass;                   
-    							listOfBodies.get(i).radius = (int) Math.sqrt((listOfBodies.get(i).mass * 10) / Math.PI);
-    							listOfBodies.get(i).spriteWidth = listOfBodies.get(i).radius * 2;
-    							
-    							//listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(j).radius, 2) * 2));
-    							// listOfBodies.get(i).spriteWidth = listOfBodies.get(j).radius * 2;
-    							listOfBodies.remove(j);
-    							
-    							if (RunSimulation.passIndex() >= listOfBodies.size()) {
-    								System.out.println("Index Out Of Bounds");
-    								indexOutOfBounds = true;
-    							} else {
-    								indexOutOfBounds = false;
-    							}
-    						} else {
-    							// Conservation of Momentum
-    							Vector3 sumVel = listOfBodies.get(i).velVect.scl(listOfBodies.get(i).mass).add(listOfBodies.get(j).velVect.scl(listOfBodies.get(j).mass));
-    							sumVel.scl(1/(listOfBodies.get(i).mass + listOfBodies.get(j).mass));
-    							
-    							listOfBodies.get(i).velVect.set(sumVel);
-    							
-    							listOfBodies.get(i).mass += listOfBodies.get(j).mass;
-    							
-    							//listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
-    							//listOfBodies.get(i).spriteWidth = listOfBodies.get(i).radius * 2;
-    							listOfBodies.remove(j);
-    							
-    							if (RunSimulation.passIndex() >= listOfBodies.size()) {
-    								System.out.println("Index Out Of Bounds");
-    								indexOutOfBounds = true;
-    							} else {
-    								indexOutOfBounds = false;
-    							}
-    						}	
-    						checkAllCollisions();
-    						break;
-    					}
-    				}
-    			}
-    		}
-    	}
+            for (int j = 0; j < listOfBodies.size(); j++) {
+            	
+                if (i != j && checkCollision(listOfBodies.get(i), listOfBodies.get(j))) {
+                //	System.out.println("Collision!");
+                	
+                    if (listOfBodies.get(i).mass < listOfBodies.get(j).mass) {
+                    	
+                    	// Conservation of Momentum
+                    	Vector3 sumVel = listOfBodies.get(i).velVect.scl(listOfBodies.get(i).mass).add(listOfBodies.get(j).velVect.scl(listOfBodies.get(j).mass));
+                    	sumVel.scl(1/(listOfBodies.get(i).mass + listOfBodies.get(j).mass));
+                    	listOfBodies.get(j).velVect.set(sumVel);
+                    	
+                    	listOfBodies.get(j).mass += listOfBodies.get(i).mass;                      
+                    	listOfBodies.get(j).radius = (int) Math.sqrt((listOfBodies.get(j).mass * 10) / Math.PI);
+                    	listOfBodies.get(j).spriteWidth = (int) Math.sqrt((listOfBodies.get(j).mass * 10) / Math.PI) * 2;
+                    	
+                    	// listOfBodies.get(j).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
+                        // listOfBodies.get(j).spriteWidth = listOfBodies.get(i).radius * 2;
+
+                    	
+                    	String focusName = listOfBodies.get(j).name;
+                    	boolean focusDestroyed = false;
+                    	if (i == n){
+                    		focusDestroyed = true;
+                    	}
+                    	
+                    	
+                    	listOfBodies.remove(i);
+                    	
+                    	
+                    	if (focusDestroyed == true){
+	                    	for (int k = 0; k < listOfBodies.size(); k++) {
+	                    		if (focusName == listOfBodies.get(k).name){
+	                    			RunSimulation.n = k;
+	                    		}
+	                    		
+	                    	}
+                    	}
+                    
+                    	
+                    } else if (listOfBodies.get(i).mass > listOfBodies.get(j).mass) {
+                    	
+                    	// Conservation of Momentum
+                    	Vector3 sumVel = listOfBodies.get(i).velVect.scl(listOfBodies.get(i).mass).add(listOfBodies.get(j).velVect.scl(listOfBodies.get(j).mass));
+                    	sumVel.scl(1/(listOfBodies.get(i).mass + listOfBodies.get(j).mass));
+                    	listOfBodies.get(i).velVect.set(sumVel);
+                        
+                    	listOfBodies.get(i).mass += listOfBodies.get(j).mass;                   
+                    	listOfBodies.get(i).radius = (int) Math.sqrt((listOfBodies.get(i).mass * 10) / Math.PI);
+                    	listOfBodies.get(i).spriteWidth = (int) Math.sqrt((listOfBodies.get(i).mass * 10) / Math.PI) * 2;
+                    	
+                    	//listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(j).radius, 2) * 2));
+                       // listOfBodies.get(i).spriteWidth = listOfBodies.get(j).radius * 2;
+
+                    	
+                    	String focusName = listOfBodies.get(i).name;
+                       	boolean focusDestroyed = false;
+                    	if (j == n){
+                    		focusDestroyed = true;
+                    	}
+                    	
+                    	listOfBodies.remove(j);
+                    	
+                    	if (focusDestroyed == true){
+	                    	for (int k = 0; k < listOfBodies.size(); k++) {
+	                    		if (focusName == listOfBodies.get(k).name){
+	                    			RunSimulation.n = k;
+	                    			
+	                    		}
+	                    		
+	                    	}
+                    	}
+                    	
+                    } else {
+                    	
+                    	// Conservation of Momentum
+                    	Vector3 sumVel = listOfBodies.get(i).velVect.scl(listOfBodies.get(i).mass).add(listOfBodies.get(j).velVect.scl(listOfBodies.get(j).mass));
+                    	sumVel.scl(1/(listOfBodies.get(i).mass + listOfBodies.get(j).mass));
+                   
+                    	listOfBodies.get(i).velVect.set(sumVel);
+                    	
+                        listOfBodies.get(i).mass += listOfBodies.get(j).mass;
+
+                        //listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
+                        //listOfBodies.get(i).spriteWidth = listOfBodies.get(i).radius * 2;
+                        if (n >= listOfBodies.size()) {
+                            n -= n;
+                        }
+                        if (listOfBodies.get(n) == listOfBodies.get(j)){
+                    		n = i;
+                    	}
+                    	String focusName = listOfBodies.get(i).name;
+                       	boolean focusDestroyed = false;
+                    	if (j == n){
+                    		focusDestroyed = true;
+                    	}
+                    	
+                    	listOfBodies.remove(j);
+                    	
+                    	if (focusDestroyed == true){
+	                    	for (int k = 0; k < listOfBodies.size(); k++) {
+	                    		if (focusName == listOfBodies.get(k).name){
+	                    			RunSimulation.n = k;
+	                    		}
+	                    		
+	                    	}
+                    	}
+                    }
+                    
+                    checkAllCollisions();
+                    break;
+                    
+                	}
+            	}
+            }
     }
+
 
     public static boolean predictCollision(OrbitalBody body1, OrbitalBody body2) {
 		float distance = body1.predictedPosVect.dst(body2.predictedPosVect);

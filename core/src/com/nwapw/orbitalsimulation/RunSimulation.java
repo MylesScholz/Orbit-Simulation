@@ -23,6 +23,7 @@ import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -31,14 +32,32 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class RunSimulation extends ApplicationAdapter implements ApplicationListener {
+
+	/* CONTROLS
+	 * 
+	 * P - Purge all planets not near stars
+	 * X - new galaxy
+	 * CTRL - Focus on closest body to mouse
+	 * 
+	 */
+	
+
 	// Constant for the force of gravity, affects how much bodies accelerate
 	final static int gravConst = 100;
 	
@@ -50,14 +69,13 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	static final int WORLD_HEIGHT = 100;
 	
 	// Specifies time used to calculate numerical integration
-	// TODO Adaptive step-size control
 	static float deltaTime = (float) 0.01;
 	static float deltaPredictionTime = (float) 1;
 	
 	// The max number of iterations that the simulation runs
 	final static int numOfIterations = 100000000;
 	final static int numOfPredictions = 500;
-	
+
 	final static float drawLimit = 1000;
 	final static float predictedDrawLimit = 1000;
 	
@@ -80,6 +98,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	
 	// List of currently running bodies in the simulation
 	public static ArrayList<OrbitalBody> listOfBodies = new ArrayList<OrbitalBody>();
+
 	public static ArrayList<Float> PTOldX = new ArrayList<Float>();
 	public static ArrayList<Float> PTOldY = new ArrayList<Float>();
 	public static ArrayList<Float> PTNewX = new ArrayList<Float>();
@@ -120,9 +139,6 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	float focusedBodyOldX;
 	float focusedBodyOldY;
 	
-	OrbitalBody planet = new OrbitalBody();
-	OrbitalBody sun = new OrbitalBody();
-	
 	SpriteBatch batch;
 	Texture backgroundTexture;
 	ShapeRenderer shapeRenderer;
@@ -138,6 +154,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	
 	// zoom factor
 	static float zF = 1;
+	static float zFTransition = 0;
 	
 	static float placedBodySpeed = 0.5f;
 	
@@ -161,33 +178,123 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	String printAcc;
 	
 	static boolean sidePanelState = false;
-	int sidePanelWidth = 200;
+	float sidePanelWidth = 600f;
+	static boolean zoomLines = false;
+	static boolean purgeState = false;
+	static boolean collisionsOn = true;
 	
-	Skin skin;
+	static Skin skin;
+
 	Stage stage;
+	Table rootTable;
+	Table upperTable;
+	Table popupTable;
+	Table sidePanel;
+
+	Table dockTable;
+	
+	Stack interfaceStack;
 	static boolean pauseState = false;
+	static int savedIndicator = 0;
+	
 	InputMultiplexer multiplexer;
 	
 	@Override
-	public void create () {
-        /* SCENE2D*/
-		stage = new Stage(new ExtendViewport(640, 840)); 
+
+	public void create () {				
+        
+		/* SCENE2D*/
 		/*
-		skin = new Skin(Gdx.files.internal("data/uiskin.json"));
-		 final TextButton button = new TextButton("Click me", skin, "default");
-		 button.setWidth(200f);
-	     button.setHeight(20f);
-	     button.setPosition(Gdx.graphics.getWidth() /2 - 100f, Gdx.graphics.getHeight()/2 - 10f);   
+		stage = new Stage(new ExtendViewport(1366, 768)); 
 		
-	        button.addListener(new ClickListener(){
-	            @Override 
-	            public void clicked(InputEvent event, float x, float y){
-	                button.setText("You clicked the button");
+		rootTable = new Table();
+		rootTable.setFillParent(true);
+		stage.addActor(rootTable);
+		
+		rootTable.setDebug(true);
+
+		 skin = new Skin(Gdx.files.internal("uiskin.json"));
+		 
+		 final TextButton pauseButton = new TextButton("Pause", skin, "default");
+ 	     
+		 final TextButton saveButton = new TextButton("Save", skin, "default");
+  
+	     
+		 interfaceStack = new Stack();
+		 rootTable.add(interfaceStack).expand();
+		 
+		 //Label title = new Label("Orbital Simulation", skin ,"Roboto-Bold");
+		 //interfaceStack.add(title);
+		 
+		 
+	     
+	     upperTable = new Table();
+	     interfaceStack.add(upperTable);
+	     
+	     popupTable = new Table();
+	     upperTable.add(popupTable).width(600f).height(600f);
+	     
+	     Container imageContainer = new Container();
+	     Container textContainer = new Container();
+	     
+	     popupTable.add(imageContainer).height(400f).width(1000f);
+	     popupTable.row();
+	     
+	     //Label popupText = new Label();
+	     
+	     popupTable.add(textContainer).height(200f);
+	    
+	     
+	     sidePanel = new Table();
+	     rootTable.add(sidePanel).width(500f);
+	     
+	     rootTable.row();
+	     
+	     dockTable = new Table();
+	     rootTable.add(dockTable);
+	     
+	     dockTable.add(new TextButton("Zoom In", skin, "default")).width(75).height(Gdx.graphics.getHeight()/20);
+	     dockTable.add(new TextButton("Zoom Out", skin, "default")).width(75).pad(Gdx.graphics.getHeight()/40);
+	     dockTable.add(new TextButton("Cam Mode", skin, "default")).width(75).pad(Gdx.graphics.getHeight()/40);	     
+	     dockTable.add(new TextButton("Focus", skin, "default")).width(75).pad(Gdx.graphics.getHeight()/40);	  
+
+	     
+	     dockTable.add(pauseButton).pad(Gdx.graphics.getHeight()/40).width(75);
+	     dockTable.add(saveButton).pad(Gdx.graphics.getHeight()/40).width(75);
+	     dockTable.add(new TextButton("Load", skin, "default")).width(75).pad(Gdx.graphics.getHeight()/40);	
+	     dockTable.add(new TextButton("Debug", skin, "default")).width(75).pad(Gdx.graphics.getHeight()/40);	     
+	     dockTable.add(new TextButton("Objectives", skin, "default")).width(75).pad(Gdx.graphics.getHeight()/40);	  
+	    
+	     pauseButton.addListener(new ClickListener(){
+	    	 @Override 
+	    	 public void clicked(InputEvent event, float x, float y){
+	            
+	              if (pauseState == true){
+	            	  pauseState = false;
+	            	  pauseButton.setText("Pause");
+	              }
+	              else {
+	            	  pauseState = true;
+	            	  pauseButton.setText("Run");
+	              }	
+	            }
+	        });	  
+	     saveButton.addListener(new ClickListener(){
+	    	 @Override 
+	    	 public void clicked(InputEvent event, float x, float y){
+	            
+	    		savedIndicator = 50;
+
+	
 	            }
 	        });
 	     
-	    stage.addActor(button);		  
+	   // table.addActor(saveButton);	
+	   // table.row();
+	    //table.addActor(pauseButton);
 		*/
+	    
+
 		/* GRAPHICS & INPUTS*/
 		shapeRenderer = new ShapeRenderer();
 		batch = new SpriteBatch();
@@ -197,7 +304,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		// Allows chaining of multiple inputProcessors
 		multiplexer = new InputMultiplexer();
 		multiplexer.addProcessor(inputProcessor);
-		multiplexer.addProcessor(stage);
+		//multiplexer.addProcessor(stage);
 		Gdx.input.setInputProcessor(multiplexer);
 
 					
@@ -222,23 +329,23 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		FreeTypeFontParameter fText = new FreeTypeFontParameter();
 		FreeTypeFontParameter fFocus = new FreeTypeFontParameter();
 		
-		fTitle.size = 20;
+		fTitle.size = 35;
 		fTitle.shadowColor = Color.BLACK;
 		fTitle.shadowOffsetX = 2;
 		fTitle.shadowOffsetY = 2;
 		
-		fHeader.size = 18;
+		fHeader.size = 25;
 		fHeader.color = Color.GOLDENROD;
 		
 		//fHeader.color = new Color(28, 25, 54, 1f);
 		
-		fSubtitle.size = 16;
+		fSubtitle.size = 18;
 		fSubtitle.color = Color.CORAL;
 		
-		fText.size = 14;
+		fText.size = 18;
 		fText.color = Color.LIGHT_GRAY;
 		
-		fFocus.size = 16;
+		fFocus.size = 26;
 		fText.color = Color.WHITE;
 		
 		fontTitle = generator.generateFont(fTitle); 
@@ -299,9 +406,12 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
         if (listOfBodies.size() == 0) {
             loadFile();
         }
+        
+        zF = LibGDXTools.calculateDefaultZoom(listOfBodies.get(n).spriteWidth);
 	}
 
-	public void loadFile() {
+
+    public void loadFile() {
         String filePath = this.getClass().getClassLoader().getResource("").getPath();   // The path of the running file
         filePath = filePath.substring(0, filePath.indexOf("/desktop")) + "/core/assets/systems/count.txt";    //Navigate to system file
         filePath = filePath.replaceAll("%20", " ");
@@ -424,13 +534,12 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
         }
     }
 
-	
    	public void place() {		
 		if (Gdx.input.isButtonPressed(0) && !newPlanet && !newSun) {
 			//System.out.println("planetPlace");
 			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
 		    cam.unproject(mousePos);
-	    
+
 		    clickLeftPositionX = (int) (mousePos.x / zF);
 			clickLeftPositionY = (int) (mousePos.y / zF);		
 			
@@ -551,9 +660,21 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
+		if (purgeState == true) {
+			for (int i = 0; i < listOfBodies.size(); i++){
+				if (listOfBodies.get(i).accVect.len() < 0.1 && listOfBodies.get(i).mass < 10000){
+					listOfBodies.remove(i);
+				}
+			}			
+		}
+
+
+		
         if (listOfBodies.size() == 0){
-        	loadFile();
-        }
+        	LibGDXTools.bodyInitialize("Star", 10000, 25, 0, 0, 0, 0, 40);
+		}
+		
+
 
         if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)){
         RunSimulation.listOfBodies.get(RunSimulation.n).velVect.y += 3;
@@ -578,6 +699,21 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
         if (Gdx.input.isButtonPressed(Buttons.MIDDLE)){
         	zF = 1;
         }
+        
+
+        
+       // System.out.println(sidePanel.getWidth());
+        
+        
+        
+    
+       // else if (sidePanelState == false && popupTable.getWidth() != 0f){
+       // 	System.out.println("not 0f");
+       // }
+        
+
+        
+        
         
 		batch.setProjectionMatrix(cam.combined);
 		shapeRenderer.setProjectionMatrix(cam.combined);
@@ -617,38 +753,43 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		batch.begin();
 		for (int i = 0; i < listOfBodies.size(); i++) {
 			OrbitalBody renderBody = listOfBodies.get(i);
-			
-			float spriteWidth = renderBody.spriteWidth;
-			
-			float spriteX = (float) renderBody.posVect.x * zF - zF*(spriteWidth / 2);
-			float spriteY = (float) renderBody.posVect.y * zF - zF*(spriteWidth / 2);
-			
+
+
+            float spriteWidth = renderBody.spriteWidth;
+
+			float spriteX = (float) zF * (renderBody.posVect.x - (spriteWidth / 2));
+			float spriteY = (float) zF * (renderBody.posVect.y - (spriteWidth / 2));
+						
 			float frameX = 0;
 			float frameY = 0;
 			
-			if (!pauseState){
-				if (n >= listOfBodies.size()) {
-					n -= n;
-				}
-				if (listOfBodies.size() == 0) {
-					loadFile();
-				}
-				frameX = spriteX - 0.075f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
-				frameY = spriteY - 0.075f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);
-			} else {
+			
+			if (pauseState == false){
+		        if (n >= listOfBodies.size()) {
+		            n -= n;
+		        }
+			frameX = spriteX - 0.075f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
+			frameY = spriteY - 0.075f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);
+			}
+			else {
 				frameX = spriteX;
 				frameY = spriteY;
 			}
 			
-			if (i == n) {
-				fontFocus.draw(batch, renderBody.name, frameX + 0.7f*spriteWidth*zF/2, frameY + 1.5f*spriteWidth*zF/10);
 
-			} else {
-				fontSubtitle.draw(batch, renderBody.name, frameX + 0.7f*spriteWidth*zF/2, frameY + 1.5f*spriteWidth*zF/10);
-			}
+			//if (1/(Math.pow(zF, 3)) < spriteWidth) {
+				if (i == n){
+					fontFocus.draw(batch, renderBody.name, frameX + 0.7f*spriteWidth*zF/2, frameY + 1.25f*spriteWidth*zF/10);
+	
+				}
+				else {
+					fontSubtitle.draw(batch, renderBody.name, frameX + 0.7f*spriteWidth*zF/2, frameY + 1.25f*spriteWidth*zF/10);
+	
+				}
+			//}
 			
 			Texture spriteTexture = renderBody.texture;
-			batch.draw(spriteTexture, frameX, frameY, (float) (spriteWidth * zF), (float) (spriteWidth * zF));		
+			batch.draw(spriteTexture, frameX, frameY, (float) (spriteWidth * zF), (float) (spriteWidth * zF));
 		}
         float focusX = 0;
 		float focusY = 0;
@@ -668,6 +809,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		
 		focusX = (float) listOfBodies.get(n).posVect.x * zF - (listOfBodies.get(n).spriteWidth / 8)*zF;
         focusY = (float) listOfBodies.get(n).posVect.y * zF - (listOfBodies.get(n).spriteWidth / 8)*zF;
+
 		
 		if (sidePanelState == true){
 			focusX += sidePanelWidth;
@@ -683,17 +825,22 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
 		float frameX = 0;
 		float frameY = 0;
-
+				
 		if (pauseState == false){
 			frameX = camX - 0.05005f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
-			frameY = camY - 0.05005f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);	
-		} else {
+			frameY = camY - 0.0500f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);	
+		}
+		else {
 			frameX = camX;
 			frameY = camY;
 		}
+				
+
 		cam.position.set(camX, camY, 0);
 		cam.update();	
 
+
+		
 		if (sidePanelState == true && pauseState == true){
 			fontHeader.draw(batch, "PAUSED & SAVED", frameX - 0.97f*cam.viewportWidth/2, frameY + 8.3f*cam.viewportHeight/20);
 		} else if (sidePanelState == false && pauseState == true){
@@ -711,8 +858,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			Gdx.gl.glDisable(GL30.GL_BLEND);
 		}
 		
-		/*
+		
 		//Draw trail
+		/*
 		for (int i = 0; i < listOfBodies.size(); i++) {
 			if (listOfBodies.get(i).oldPosVect.isZero()) {
 			} else {
@@ -784,6 +932,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
         */
 		
         // Workaround to make side panel items appear above shapeRenderer transparent rectangle
+
 		batch.begin();
 		if(sidePanelState == true) {
 
@@ -794,28 +943,31 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			String printFocusNumber = "focused body: " + n;
 			String printMostAttraction = "Most Grav. Attraction: " + listOfBodies.get(n).mostPullingBodyName;
 
-			fontHeader.draw(batch, "CONTROLS", frameX + 2.5f*cam.viewportWidth/12, frameY + 9*cam.viewportHeight/20);			
-			fontSubtitle.draw(batch, LibGDXTools.underlineCalculation("CONTROLS") + "__", frameX + 2.5f*cam.viewportWidth/12,  frameY + 8.9f*cam.viewportHeight/20);
-			fontText.draw(batch, "(SCROLL) Zoom", frameX + 2.5f*cam.viewportWidth/12, frameY + 8*cam.viewportHeight/20);
-			fontText.draw(batch, "(LEFT CLICK) Create new planet", frameX + 2.5f*cam.viewportWidth/12, frameY + 7*cam.viewportHeight/20);
-			fontText.draw(batch, "(RIGHT CLICK) Create new star", frameX + 2.5f*cam.viewportWidth/12, frameY + 6*cam.viewportHeight/20);			
-			fontText.draw(batch, "(ARROW KEYS) Move Focused Body", frameX + 2.5f*cam.viewportWidth/12, frameY + 5*cam.viewportHeight/20);
-			fontText.draw(batch, "(SPACEBAR) Pause & Save (N) Change Focus", frameX + 2.5f*cam.viewportWidth/12, frameY + 4*cam.viewportHeight/20);
-			fontText.draw(batch, "(M) Reset Current Body's Velocity", frameX + 2.5f*cam.viewportWidth/12, frameY + 3*cam.viewportHeight/20);
-			fontText.draw(batch, "(N) Change Focus to the Next Body", frameX + 2.5f*cam.viewportWidth/12, frameY + 2*cam.viewportHeight/20);
-			
+			fontHeader.draw(batch, "CONTROLS", frameX + 2.5f*cam.viewportWidth/12, frameY + 11.1f*cam.viewportHeight/24);			
+			fontSubtitle.draw(batch, LibGDXTools.underlineCalculation("CONTROLS") + "____", frameX + 2.5f*cam.viewportWidth/12,  frameY + 10.85f*cam.viewportHeight/24);
+			fontText.draw(batch, "(SCROLL OR +/-) Zoom", frameX + 2.5f*cam.viewportWidth/12, frameY + 10*cam.viewportHeight/24);
+			fontText.draw(batch, "(LEFT CLICK) Create new planet", frameX + 2.5f*cam.viewportWidth/12, frameY + 9*cam.viewportHeight/24);
+			fontText.draw(batch, "(RIGHT CLICK) Create new star", frameX + 2.5f*cam.viewportWidth/12, frameY + 8*cam.viewportHeight/24);			
+			fontText.draw(batch, "(ARROW KEYS) Move Focused Body", frameX + 2.5f*cam.viewportWidth/12, frameY + 7*cam.viewportHeight/24);
+			fontText.draw(batch, "(SPACEBAR) Pause & Save", frameX + 2.5f*cam.viewportWidth/12, frameY + 6*cam.viewportHeight/24);
+			fontText.draw(batch, "(M) Reset Current Body's Velocity", frameX + 2.5f*cam.viewportWidth/12, frameY + 5*cam.viewportHeight/24);
+			fontText.draw(batch, "(N) Change Focus (B) Change Focus to Next Star", frameX + 2.5f*cam.viewportWidth/12, frameY + 4*cam.viewportHeight/24);
+			fontText.draw(batch, "( , ) Decrease dt  ( . ) Increase dt", frameX + 2.5f*cam.viewportWidth/12, frameY + 3*cam.viewportHeight/24);
 	
-			fontHeader.draw(batch, "SIMULATION SETTINGS", frameX + 2.5f*cam.viewportWidth/12, frameY + cam.viewportHeight/20);
-			fontSubtitle.draw(batch, "______________________", frameX + 2.5f*cam.viewportWidth/12, frameY + 0.9f*cam.viewportHeight/20);
-			fontText.draw(batch, printNumOfBodies, frameX + 2.5f*cam.viewportWidth/12, frameY);
-			fontText.draw(batch, printIterationStep, frameX + 2.5f*cam.viewportWidth/12, frameY - cam.viewportHeight/20);
-			fontText.draw(batch, printDeltaTime, frameX + 2.5f*cam.viewportWidth/12, frameY - 2*cam.viewportHeight/20);
-			fontText.draw(batch, "cam: follow", frameX + 2.5f*cam.viewportWidth/12, frameY - 3*cam.viewportHeight/20);
 			
-			fontHeader.draw(batch, printFocusPlanet, frameX + 2.5f*cam.viewportWidth/12, frameY - 4*cam.viewportHeight/20);
-			fontSubtitle.draw(batch, LibGDXTools.underlineCalculation(printFocusPlanet), frameX + 2.5f*cam.viewportWidth/12, frameY - 4.1f*cam.viewportHeight/20);
-			fontText.draw(batch, printMostAttraction, frameX + 2.5f*cam.viewportWidth/12, frameY - 5*cam.viewportHeight/20);
-			fontText.draw(batch, "Mass: " + listOfBodies.get(n).mass, frameX + 2.5f*cam.viewportWidth/12, frameY - 6*cam.viewportHeight/20);
+			
+			fontHeader.draw(batch, "SIMULATION SETTINGS", frameX + 2.5f*cam.viewportWidth/12, frameY + 1.1f*cam.viewportHeight/24);
+			fontSubtitle.draw(batch, "___________________________", frameX + 2.5f*cam.viewportWidth/12, frameY + 0.85f*cam.viewportHeight/24);
+			fontText.draw(batch, printNumOfBodies, frameX + 2.5f*cam.viewportWidth/12, frameY);
+			fontText.draw(batch, printIterationStep, frameX + 2.5f*cam.viewportWidth/12, frameY - cam.viewportHeight/24);
+			fontText.draw(batch, printDeltaTime, frameX + 2.5f*cam.viewportWidth/12, frameY - 2*cam.viewportHeight/24);
+			fontText.draw(batch, "cam: follow", frameX + 2.5f*cam.viewportWidth/12, frameY - 3*cam.viewportHeight/24);
+			fontHeader.draw(batch, printFocusPlanet.toUpperCase(), frameX + 2.5f*cam.viewportWidth/12, frameY - 5*cam.viewportHeight/24);
+			fontSubtitle.draw(batch, LibGDXTools.underlineCalculation(printFocusPlanet) + "____", frameX + 2.5f*cam.viewportWidth/12, frameY - 5.25f*cam.viewportHeight/24);
+			fontText.draw(batch, printMostAttraction, frameX + 2.5f*cam.viewportWidth/12, frameY - 6*cam.viewportHeight/24);
+			fontText.draw(batch, "Mass: " + listOfBodies.get(n).mass, frameX + 2.5f*cam.viewportWidth/12, frameY - 7*cam.viewportHeight/24);
+
+
 			if (iterationCounter % 6 == 0 || pauseState == true ) {
 				printPos = "Pos: ";
 				printVel = "Vel: ";
@@ -834,17 +986,18 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				currentVect.set(Math.round(currentVect.x*100f)/100f, Math.round(currentVect.y*100f)/100f, Math.round(currentVect.z*100f)/100f);
 				printAcc += currentVect;
 			} 
-			fontText.draw(batch, printPos, frameX + 2.5f*cam.viewportWidth/12, frameY - 7*cam.viewportHeight/20);
-			fontText.draw(batch, printVel, frameX + 2.5f*cam.viewportWidth/12, frameY - 8*cam.viewportHeight/20);
-			fontText.draw(batch, printAcc, frameX + 2.5f*cam.viewportWidth/12, frameY - 9*cam.viewportHeight/20);
+			fontText.draw(batch, printPos, frameX + 2.5f*cam.viewportWidth/12, frameY - 8*cam.viewportHeight/24);
+			fontText.draw(batch, printVel, frameX + 2.5f*cam.viewportWidth/12, frameY - 9*cam.viewportHeight/24);
+			fontText.draw(batch, printAcc, frameX + 2.5f*cam.viewportWidth/12, frameY - 10*cam.viewportHeight/24);
 			
 			fontTitle.draw(batch, "ORBITAL SIMULATION", frameX - 0.97f*cam.viewportWidth/2, frameY + 0.93f*cam.viewportHeight/2);	
-			fontText.draw(batch, "(press ESC for FULLSCREEN)", frameX - 0.97f*cam.viewportWidth/2, frameY - 0.93f*cam.viewportHeight/2);	
+			fontText.draw(batch, "(press ESC for FULLSCREEN)", frameX - 0.97f*cam.viewportWidth/2, frameY - 0.92f*cam.viewportHeight/2);	
 			
 		}
 		else {
-			fontTitle.draw(batch, "ORBITAL SIMULATION", frameX  - 1.3f*cam.viewportWidth/12, frameY + 0.93f*cam.viewportHeight/2);	
-			fontText.draw(batch, "(press ESC for more INFO)", frameX  - 1.1f*cam.viewportWidth/12, frameY - 0.93f*cam.viewportHeight/2);	
+			fontTitle.draw(batch, "ORBITAL SIMULATION", frameX  - 1.5f*cam.viewportWidth/12, frameY + 0.93f*cam.viewportHeight/2);	
+			fontHeader.draw(batch, "(press ESC for more INFO)", frameX  - 1.1f*cam.viewportWidth/12, frameY - 0.92f*cam.viewportHeight/2);	
+		
 		}
 		
 		batch.end();
@@ -853,11 +1006,11 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
 		// Draw anywhere on the screen.
-		stage.act(0.01f);
-		stage.draw();
+		//stage.act(0.01f);
+		//stage.draw();
 		
 		// Restore the stage's viewport.
-		stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+		//stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 		
 		OrbitalPhysics.passList(listOfBodies);
 		if(pauseState == false) {
@@ -1005,7 +1158,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	
 	public void resize(int width, int height) {
 		//stage.getViewport().update(width, height, true);
-		cam.viewportWidth = 1000f;
+		cam.viewportWidth = 1500f;
 		cam.viewportHeight = cam.viewportWidth * height/width;
 		cam.update();
 	}
