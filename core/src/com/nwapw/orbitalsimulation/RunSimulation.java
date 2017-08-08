@@ -1018,8 +1018,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			fontHeader.draw(batch, "CONTROLS", frameX + 2.5f*cam.viewportWidth/12, frameY + 11.1f*cam.viewportHeight/24);			
 			fontSubtitle.draw(batch, LibGDXTools.underlineCalculation("CONTROLS") + "____", frameX + 2.5f*cam.viewportWidth/12,  frameY + 10.85f*cam.viewportHeight/24);
 			fontText.draw(batch, "(SCROLL OR +/-) Zoom", frameX + 2.5f*cam.viewportWidth/12, frameY + 10*cam.viewportHeight/24);
-			fontText.draw(batch, "(LEFT CLICK) Create new planet", frameX + 2.5f*cam.viewportWidth/12, frameY + 9*cam.viewportHeight/24);
-			fontText.draw(batch, "(RIGHT CLICK) Create new star", frameX + 2.5f*cam.viewportWidth/12, frameY + 8*cam.viewportHeight/24);			
+			fontText.draw(batch, "(LEFT CLICK) Create New Planet", frameX + 2.5f*cam.viewportWidth/12, frameY + 9*cam.viewportHeight/24);
+			fontText.draw(batch, "(RIGHT CLICK) Create New Star", frameX + 2.5f*cam.viewportWidth/12, frameY + 8*cam.viewportHeight/24);			
 			fontText.draw(batch, "(ARROW KEYS) Move Focused Body", frameX + 2.5f*cam.viewportWidth/12, frameY + 7*cam.viewportHeight/24);
 			fontText.draw(batch, "(SPACEBAR) Pause & Save", frameX + 2.5f*cam.viewportWidth/12, frameY + 6*cam.viewportHeight/24);
 			fontText.draw(batch, "(CTRL) Focus on body closest to mouse", frameX + 2.5f*cam.viewportWidth/12, frameY + 5*cam.viewportHeight/24);
@@ -1027,15 +1027,16 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			fontText.draw(batch, "(N) Change Focus (B) Change Focus to Next Star", frameX + 2.5f*cam.viewportWidth/12, frameY + 3*cam.viewportHeight/24);
 			fontText.draw(batch, "(C) Switch Camera Modes  (WASD) Panning", frameX + 2.5f*cam.viewportWidth/12, frameY + 2*cam.viewportHeight/24);
 			fontText.draw(batch, "( , ) Decrease dt  ( . ) Increase dt", frameX + 2.5f*cam.viewportWidth/12, frameY + 1*cam.viewportHeight/24);
-				
+			fontText.draw(batch, "(X) Spawn a Star/Planets System", frameX + 2.5f*cam.viewportWidth/12, frameY + 0*cam.viewportHeight/24);
+							
 			
 			
-			fontHeader.draw(batch, "SIMULATION SETTINGS", frameX + 2.5f*cam.viewportWidth/12, frameY + 0.1f*cam.viewportHeight/24);
-			fontSubtitle.draw(batch, "___________________________", frameX + 2.5f*cam.viewportWidth/12, frameY -0.15f*cam.viewportHeight/24);
-			fontText.draw(batch, printNumOfBodies, frameX + 2.5f*cam.viewportWidth/12, frameY - cam.viewportHeight/24);
-			fontText.draw(batch, printIterationStep, frameX + 2.5f*cam.viewportWidth/12, frameY - 2*cam.viewportHeight/24);
-			fontText.draw(batch, printDeltaTime, frameX + 2.5f*cam.viewportWidth/12, frameY - 3*cam.viewportHeight/24);
-			fontText.draw(batch, printCamMode, frameX + 2.5f*cam.viewportWidth/12, frameY - 4*cam.viewportHeight/24);
+			fontHeader.draw(batch, "SIMULATION SETTINGS", frameX + 2.5f*cam.viewportWidth/12, frameY - 0.9f*cam.viewportHeight/24);
+			fontSubtitle.draw(batch, "___________________________", frameX + 2.5f*cam.viewportWidth/12, frameY -1.15f*cam.viewportHeight/24);
+			fontText.draw(batch, printNumOfBodies, frameX + 2.5f*cam.viewportWidth/12, frameY - 2*cam.viewportHeight/24);
+			fontText.draw(batch, printIterationStep, frameX + 2.5f*cam.viewportWidth/12, frameY - 3*cam.viewportHeight/24);
+			fontText.draw(batch, printDeltaTime, frameX + 2.5f*cam.viewportWidth/12, frameY - 4*cam.viewportHeight/24);
+			fontText.draw(batch, printCamMode, frameX + 2.5f*cam.viewportWidth/12, frameY - 5*cam.viewportHeight/24);
 			fontHeader.draw(batch, printFocusPlanet.toUpperCase(), frameX + 2.5f*cam.viewportWidth/12, frameY - 6*cam.viewportHeight/24);
 			fontSubtitle.draw(batch, LibGDXTools.underlineCalculation(printFocusPlanet) + "____", frameX + 2.5f*cam.viewportWidth/12, frameY - 6.25f*cam.viewportHeight/24);
 			fontText.draw(batch, printMostAttraction, frameX + 2.5f*cam.viewportWidth/12, frameY - 7*cam.viewportHeight/24);
