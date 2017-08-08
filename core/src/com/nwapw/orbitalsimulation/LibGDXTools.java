@@ -91,6 +91,8 @@ public class LibGDXTools {
 		body.velVect.y = velY;
 
 		body.setGravity(true);
+		body.setPredictedGravity(true);
+		body.setRemoved(false);
 		
 		RunSimulation.listOfBodies.add(body);
 		body.setTexture(bodyTextureChooser(mass));
@@ -111,6 +113,8 @@ public class LibGDXTools {
 		body.velVect.y = velY;
 
 		body.setGravity(false);
+		body.setPredictedGravity(false);
+		body.setRemoved(false);
 		
 		RunSimulation.listOfBodies.add(body);
 		body.setTexture(bodyTextureChooser(1 + (int)(Math.random() * 4)));
@@ -132,6 +136,8 @@ public class LibGDXTools {
 		body.velVect.y = velY;
 
 		body.setGravity(false);
+		body.setPredictedGravity(false);
+		body.setRemoved(false);
 		
 		RunSimulation.listOfBodies.add(body);
 		body.setTexture(bodyTextureChooser(mass));
@@ -330,8 +336,8 @@ public class LibGDXTools {
 		return border;
 	}
 	static float calculateDefaultZoom(float spriteWidth){
-		//float zF = 2 - spriteWidth/100f;
-		float zF = 1;
+		float zF = 2 - spriteWidth/100f;
+		//float zF = 1;
 		
 		//System.out.println(zF);
 		return zF;

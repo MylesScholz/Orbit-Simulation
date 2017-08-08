@@ -27,15 +27,16 @@ public class OrbitalPhysics {
 	
 	static ArrayList<OrbitalBody> listOfBodies = new ArrayList<OrbitalBody>();
 	static Vector3 sumOfAcc = new Vector3();
+	static Vector3 predictedSumOfAcc = new Vector3();
 	static Vector3 calculatedAcc = new Vector3();
+	static Vector3 predictedCalculatedAcc = new Vector3();
 	
 	final static int gravConst = 100;
 	final static int perturbationCalculationMethod = 0; // 0 = Cowell's Method
 	
-	final static float deltaTime = (float) 0.01;
-	final static int numOfIterations = 1000000;
+	static boolean indexOutOfBounds = false;
 	
-	static boolean indexOutOfBounds;
+		
 	
 	static void iterateSimulation(float deltaTime) {
 		// 1. Calculate net force and acceleration from acting on each body.
@@ -77,7 +78,6 @@ public class OrbitalPhysics {
 	}	
 	
 	static Vector3 cowellsFormulation(OrbitalBody currentBody, OrbitalBody pullingBody) {
-				
 		Vector3 currentPos = currentBody.posVect;
 		Vector3 pullingPos = pullingBody.posVect;
 		
@@ -115,6 +115,51 @@ public class OrbitalPhysics {
 		*/
 		return calculatedAcc;
 	}
+	
+	static void predictedIterateSimulation(float deltaPredictionTime) {
+		for (int i=0; i < listOfBodies.size(); i++) {			
+			if (listOfBodies.get(i).predictedGravity) {
+				OrbitalBody currentBody = listOfBodies.get(i);
+				predictedSumOfAcc.set(0,0,0);
+				listOfBodies.get(i).predictedMostPullingBodyAcc = 0;
+				for (int j = 0; j < listOfBodies.size() ; j++){
+					if (listOfBodies.get(j).predictedGravity) {
+						if (j != i){
+							OrbitalBody pullingBody = listOfBodies.get(j);
+							predictedCalculatedAcc.set(0,0,0);
+							if (perturbationCalculationMethod == 0){ // Cowell's Formulation
+								predictedCalculatedAcc = predictedCowellsFormulation(currentBody, pullingBody);				
+								if (predictedCalculatedAcc.len() >= listOfBodies.get(i).predictedMostPullingBodyAcc){
+									listOfBodies.get(i).predictedMostPullingBodyAcc = predictedCalculatedAcc.len();
+									listOfBodies.get(i).predictedMostPullingBodyName = listOfBodies.get(j).name;
+								}
+								predictedSumOfAcc.add(predictedCalculatedAcc);
+							}
+						}
+					}
+				}
+				currentBody.setPredictedAcceleration(predictedSumOfAcc.x, predictedSumOfAcc.y, predictedSumOfAcc.z);			
+				currentBody.predictedIterateVelThenPos(deltaPredictionTime);			
+			}
+		}	
+		predictAllCollisions();
+	}	
+	
+	static Vector3 predictedCowellsFormulation(OrbitalBody currentBody, OrbitalBody pullingBody) {
+		Vector3 currentPos = currentBody.predictedPosVect;
+		Vector3 pullingPos = pullingBody.predictedPosVect;
+		Vector3 diffOfPosVect = new Vector3();
+		
+		diffOfPosVect.add(pullingPos);
+		diffOfPosVect.scl(-1);
+		diffOfPosVect.add(currentPos);
+		Vector3 calculatedAcc = new Vector3(0,0,0);	
+		calculatedAcc.add(diffOfPosVect);
+		
+		calculatedAcc.scl((float) (-1*gravConst * pullingBody.mass / Math.pow(currentPos.dst(pullingPos), 3)));	
+		return calculatedAcc;
+	}
+	
 	static void passList(ArrayList<OrbitalBody> list) {
 		listOfBodies = list;
 	}
@@ -122,7 +167,7 @@ public class OrbitalPhysics {
 	static boolean passIndexError() {
 		return indexOutOfBounds;
 	}
-	
+		
     public static boolean checkCollision(OrbitalBody body1, OrbitalBody body2) {
 		//float distance = Math.sqrt((Math.pow(body1.posVect.x - body2.posVect.x, 2))+(Math.pow(body1.posVect.y - body2.posVect.y, 2)));
         float distance = body1.posVect.dst(body2.posVect);
@@ -155,7 +200,10 @@ public class OrbitalPhysics {
     							listOfBodies.remove(i);
     							
     							if (RunSimulation.passIndex() >= listOfBodies.size()) {
+    								System.out.println("Index Out Of Bounds");
     								indexOutOfBounds = true;
+    							} else {
+    								indexOutOfBounds = false;
     							}
     						} else if (listOfBodies.get(i).mass > listOfBodies.get(j).mass) {
     							// Conservation of Momentum
@@ -172,7 +220,10 @@ public class OrbitalPhysics {
     							listOfBodies.remove(j);
     							
     							if (RunSimulation.passIndex() >= listOfBodies.size()) {
+    								System.out.println("Index Out Of Bounds");
     								indexOutOfBounds = true;
+    							} else {
+    								indexOutOfBounds = false;
     							}
     						} else {
     							// Conservation of Momentum
@@ -188,7 +239,10 @@ public class OrbitalPhysics {
     							listOfBodies.remove(j);
     							
     							if (RunSimulation.passIndex() >= listOfBodies.size()) {
+    								System.out.println("Index Out Of Bounds");
     								indexOutOfBounds = true;
+    							} else {
+    								indexOutOfBounds = false;
     							}
     						}	
     						checkAllCollisions();
@@ -199,4 +253,40 @@ public class OrbitalPhysics {
     		}
     	}
     }
+
+    public static boolean predictCollision(OrbitalBody body1, OrbitalBody body2) {
+		float distance = body1.predictedPosVect.dst(body2.predictedPosVect);
+    	
+    	if (distance*RunSimulation.zF*1.2f <= body1.radius*RunSimulation.zF + body2.radius*RunSimulation.zF) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    public static void predictAllCollisions() {
+    	for (int i = 0; i < listOfBodies.size(); i++) {
+    		if (listOfBodies.get(i).predictedGravity && !listOfBodies.get(i).removed) {
+    			for (int j = 0; j < listOfBodies.size(); j++) {
+    				if(listOfBodies.get(j).predictedGravity && !listOfBodies.get(j).removed) {
+    					if (i != j && predictCollision(listOfBodies.get(i), listOfBodies.get(j))) {
+    						if (listOfBodies.get(i).mass < listOfBodies.get(j).mass) {
+    							listOfBodies.get(i).setRemoved(true);
+    							System.out.println("Body Removed: " + listOfBodies.get(i).name);
+    						} else if (listOfBodies.get(i).mass > listOfBodies.get(j).mass) {
+    							System.out.println("Body Removed: " + listOfBodies.get(j).name);
+    							listOfBodies.get(j).setRemoved(true);
+    						} else {
+    							System.out.println("Body Removed: " + listOfBodies.get(j).name);
+    							listOfBodies.get(j).setRemoved(true);
+    						}	
+    						predictAllCollisions();
+    						break;
+    					}
+    				}
+    			}
+    		}
+    	}
+    }
 }
+    

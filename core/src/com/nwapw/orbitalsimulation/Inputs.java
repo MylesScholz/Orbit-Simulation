@@ -40,9 +40,36 @@ public class Inputs implements InputProcessor {
 				RunSimulation.pauseState = false;
 			}
 	    }
-		
 
+		if (keycode == Input.Keys.PLUS || keycode == Input.Keys.EQUALS) {
+			RunSimulation.zF += 0.1f;
+			if (RunSimulation.zF <= 0.001){
+				RunSimulation.zF = 0.001f;
+			} else if (RunSimulation.zF >= 100){
+				RunSimulation.zF = 100f;
+			}
+			//System.out.println(RunSimulation.zF);
+			return false;
+		}
+
+		if (keycode == Input.Keys.MINUS) {
+			RunSimulation.zF -= 0.1f;
+			if (RunSimulation.zF <= 0.001){
+				RunSimulation.zF = 0.001f;
+			} else if (RunSimulation.zF >= 100){
+				RunSimulation.zF = 100f;
+			}
+			//System.out.println(RunSimulation.zF);
+			return false;
+		}
 		
+		if (keycode == Input.Keys.PERIOD) {
+			RunSimulation.deltaTime += RunSimulation.deltaTime / 10;
+		}
+		
+		if (keycode == Input.Keys.COMMA) {
+			RunSimulation.deltaTime -= RunSimulation.deltaTime / 10;
+		}
 		
 		return false;
 	}
@@ -87,21 +114,17 @@ public class Inputs implements InputProcessor {
 
 	@Override
 	public boolean scrolled(int amount) {
-		
 		if (amount == 1){
-			 RunSimulation.zF += -.01f;
-		}
-		else {
+			 RunSimulation.zF -= .01f;
+		} else {
 			 RunSimulation.zF += .01f;
 		}
 		
 		if (RunSimulation.zF <= 0.01){
 			RunSimulation.zF = 0.01f;
+		} else if (RunSimulation.zF >= 1000){
+			RunSimulation.zF = 1000f;
 		}
-		else if (RunSimulation.zF >= 10){
-			RunSimulation.zF = 10f;
-		}
-		
 		//System.out.println(RunSimulation.zF);
 		return false;
 	}
