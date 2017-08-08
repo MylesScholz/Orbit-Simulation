@@ -69,7 +69,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	static final int WORLD_HEIGHT = 100;
 	
 	// Specifies time used to calculate numerical integration
-	static float deltaTime = (float) 0.01;
+	static float deltaTime = (float) 0.05;
 	static float deltaPredictionTime = (float) 1;
 	
 	// The max number of iterations that the simulation runs
@@ -148,9 +148,13 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	float camY = 0;
 	float sourceX = 0;
 	float sourceY = 0;
-	
+	float frameX;
+	float frameY;
 	float adjustX = 0;
 	float adjustY = 0;
+	
+	static float panX = 0;
+	static float panY = 0;
 	
 	// zoom factor
 	static float zF = 1;
@@ -178,11 +182,10 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	String printAcc;
 	
 	static boolean sidePanelState = false;
-	float sidePanelWidth = 600f;
 	static boolean zoomLines = false;
 	static boolean purgeState = false;
 	static boolean collisionsOn = true;
-	
+	static boolean cameraPan = false;
 	static Skin skin;
 
 	Stage stage;
@@ -560,7 +563,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedPosition(clickLeftPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickLeftPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity((clickLeftPositionX - focusedBodyOldX) - (currentMousePositionX - listOfBodies.get(n).posVect.x), (clickLeftPositionY - focusedBodyOldY) - (currentMousePositionY - listOfBodies.get(n).posVect.y), 0);			
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedGravity(true);
-			predict(listOfBodies.get(listOfBodies.size() - 1), listOfBodies.get(n));
+			//predict(listOfBodies.get(listOfBodies.size() - 1), listOfBodies.get(n));
 		} else if (!Gdx.input.isButtonPressed(0) && newPlanet && !newSun) {
 			//System.out.println("planetMove");
 			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
@@ -598,7 +601,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedPosition(clickRightPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickRightPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity((clickRightPositionX - focusedBodyOldX) - (currentMousePositionX - listOfBodies.get(n).posVect.x), (clickRightPositionY - focusedBodyOldY) - (currentMousePositionY - listOfBodies.get(n).posVect.y), 0);			
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedGravity(true);
-			predict(listOfBodies.get(listOfBodies.size() - 1), listOfBodies.get(n));
+			//predict(listOfBodies.get(listOfBodies.size() - 1), listOfBodies.get(n));
 		} else if (!Gdx.input.isButtonPressed(1) && newSun && !newPlanet) {
 			//System.out.println("sunMove");
 			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
@@ -676,25 +679,28 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		
 
 
-        if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)){
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)){
         RunSimulation.listOfBodies.get(RunSimulation.n).velVect.y += 3;
         }
         
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)){
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)){
         	RunSimulation.listOfBodies.get(RunSimulation.n).velVect.y -= 3;
         }
         
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)){
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)){
         	RunSimulation.listOfBodies.get(RunSimulation.n).velVect.x -= 3;
         }
         
-        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)){
+        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
         	RunSimulation.listOfBodies.get(RunSimulation.n).velVect.x += 3;
         }
-			
+
+
+        
         if (Gdx.input.isKeyPressed(Input.Keys.M)){
         	RunSimulation.listOfBodies.get(RunSimulation.n).velVect.set(0,0,0);
         }
+ 
         
         if (Gdx.input.isButtonPressed(Buttons.MIDDLE)){
         	zF = 1;
@@ -806,36 +812,73 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		if (listOfBodies.size() == 0) {
 			loadFile();
 		}
-		
-		focusX = (float) listOfBodies.get(n).posVect.x * zF - (listOfBodies.get(n).spriteWidth / 8)*zF;
-        focusY = (float) listOfBodies.get(n).posVect.y * zF - (listOfBodies.get(n).spriteWidth / 8)*zF;
 
 		
 		if (sidePanelState == true){
-			focusX += sidePanelWidth;
-		}		
+			focusX += cam.viewportWidth/6;
+		}
+		if (cameraPan == false) {
+			
+			focusX = (float) listOfBodies.get(n).posVect.x * zF - (listOfBodies.get(n).spriteWidth / 8)*zF;
+	        focusY = (float) listOfBodies.get(n).posVect.y * zF - (listOfBodies.get(n).spriteWidth / 8)*zF;
 
-		float moveX = (camX - focusX) * 2/3;
-		float moveY = (camY - focusY) * 2/3;
-		
-		camX -= moveX;
-		camY -= moveY;
+			
 	
-		camX += 1.1f*cam.viewportHeight/40;
+			
+			float moveX = (camX - focusX) * 2/3;
+			float moveY = (camY - focusY) * 2/3;
+			
+			camX -= moveX;
+			camY -= moveY;
+		
+			camX += 1.1f*cam.viewportHeight/40;
 
-		float frameX = 0;
-		float frameY = 0;
-				
-		if (pauseState == false){
-			frameX = camX - 0.05005f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
-			frameY = camY - 0.0500f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);	
+			if (pauseState == false){
+				frameX = camX - 0.05005f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
+				frameY = camY - 0.0500f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);	
+			}
+			else {
+				frameX = camX;
+				frameY = camY;		
+			}
+			
 		}
 		else {
+					
+	        if (Gdx.input.isKeyPressed(Input.Keys.W)){
+	        	panY += 10;
+	        }
+	        
+	        if (Gdx.input.isKeyPressed(Input.Keys.S)){
+	        	panY -= 10;
+	        }
+	        
+	        if (Gdx.input.isKeyPressed(Input.Keys.A)){
+	        	panX -= 10;
+	        }
+	        
+	        if(Gdx.input.isKeyPressed(Input.Keys.D)){
+	        	panX += 10;
+	        }        
+	        focusX = panX;
+			focusY = panY;
+			
+			float moveX = (camX - focusX) * 2/3;
+			float moveY = (camY - focusY) * 2/3;
+			
+			camX -= moveX;
+			camY -= moveY;
+		
+			camX += 1.1f*cam.viewportHeight/40;
+			
 			frameX = camX;
 			frameY = camY;
+					        
 		}
-				
+		
 
+
+		
 		cam.position.set(camX, camY, 0);
 		cam.update();	
 
@@ -1020,7 +1063,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				removedBody();
 				place();
 				if((iterationCounter % dataDivision) == 0) {
-					fpsLogger.log();
+					//fpsLogger.log();
 				}
 			iterationCounter += 1;
 			}	

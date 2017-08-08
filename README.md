@@ -1,7 +1,7 @@
 # Orbital Simulator
 A Java-based Orbital Simulator built with LibGDX graphics libraries.
 
-* Features that have not been implemented
+&#42; Features that have not been implemented
 
 ## Physics
 This program attempts to simulate N-body simulations through continuous iterations by using Cowell's method, where acceleration is calculated for each body based on its attraction to other bodies, and this is used as a basis to calculate the velocity and position vectors.

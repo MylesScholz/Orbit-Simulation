@@ -13,6 +13,25 @@ public class Inputs implements InputProcessor {
 
 	@Override
 	public boolean keyDown(int keycode) {
+		if (keycode == Input.Keys.C) {
+			boolean cameraPan = RunSimulation.cameraPan;
+			
+			if (cameraPan == false){
+				cameraPan = true;
+				RunSimulation.panX = (float) RunSimulation.listOfBodies.get(RunSimulation.n).posVect.x * RunSimulation.zF - (RunSimulation.listOfBodies.get(RunSimulation.n).spriteWidth / 8)*RunSimulation.zF;
+				RunSimulation.panY = (float) RunSimulation.listOfBodies.get(RunSimulation.n).posVect.y * RunSimulation.zF - (RunSimulation.listOfBodies.get(RunSimulation.n).spriteWidth / 8)*RunSimulation.zF;
+				
+			}
+			else {
+				cameraPan = false;
+			}
+			RunSimulation.cameraPan = cameraPan;
+			
+			
+		}
+		
+		
+		
 		if (keycode == Input.Keys.CONTROL_LEFT) {
 			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
 			RunSimulation.cam.unproject(mousePos); 
