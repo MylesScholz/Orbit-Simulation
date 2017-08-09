@@ -77,7 +77,7 @@ public class Inputs implements InputProcessor {
 			if (RunSimulation.n >= RunSimulation.listOfBodies.size()) {
 				RunSimulation.n -= RunSimulation.n;
 			}
-			RunSimulation.zF = LibGDXTools.calculateDefaultZoom(RunSimulation.listOfBodies.get(RunSimulation.n).spriteWidth);
+			//RunSimulation.zF = LibGDXTools.calculateDefaultZoom(RunSimulation.listOfBodies.get(RunSimulation.n).spriteWidth);
 		}
 		if (keycode == Input.Keys.B){
 			

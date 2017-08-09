@@ -100,10 +100,11 @@ public class LibGDXTools {
 	
 	static void bodyCreatePlanet(float posX, float posY, float velX, float velY) {
 		OrbitalBody body = new OrbitalBody();
-		body.setMass(1 + (int)(Math.random() * 4));
+		float mass = 1 + (int)(Math.random() * 4);
+		body.setMass(mass);
 		body.setName(LibGDXTools.nameGen());
 		
-		body.setRadius((int) Math.sqrt(((1 + (int)(Math.random() * 4)) * 10) / Math.PI));
+		body.setRadius((int) Math.sqrt(((mass * 10) / Math.PI)));
 		body.spriteWidth = (int) Math.sqrt(((1 + (int)(Math.random() * 4)) * 10) / Math.PI) * 2;
 
 		body.posVect.x = posX;
@@ -117,12 +118,12 @@ public class LibGDXTools {
 		body.setRemoved(false);
 		
 		RunSimulation.listOfBodies.add(body);
-		body.setTexture(bodyTextureChooser(1 + (int)(Math.random() * 4)));
+		body.setTexture(bodyTextureChooser(mass));
 	}
 	
 	static void bodyCreateSun(float posX, float posY, float velX, float velY) {
 		OrbitalBody body = new OrbitalBody();
-		float mass = 1000 + (int)(Math.random() * 4000);
+		float mass = 10000 + (int)(Math.random() * 40000);
 		body.setMass(mass);
 		body.setName(LibGDXTools.nameGen());
 		
