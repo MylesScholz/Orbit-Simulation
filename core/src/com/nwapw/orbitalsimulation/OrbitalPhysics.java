@@ -72,7 +72,7 @@ public class OrbitalPhysics {
 		 predictAllCollisions();
 		}
 	}	
-	
+
 	static void cowellsFormulation(int i, OrbitalBody currentBody) {
 		sumOfAcc.set(0,0,0);
 		for (int j = 0; j < listOfBodies.size() ; j++){
@@ -89,6 +89,7 @@ public class OrbitalPhysics {
 						sumOfAcc.add(calculatedAcc);
 					}
 				}
+				currentBody.setAcceleration(sumOfAcc.x, sumOfAcc.y, sumOfAcc.z);
 			}
 		}
 		currentBody.setAcceleration(sumOfAcc.x, sumOfAcc.y, sumOfAcc.z);					

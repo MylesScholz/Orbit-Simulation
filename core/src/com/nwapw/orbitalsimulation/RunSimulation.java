@@ -675,13 +675,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			}			
 		}
 
-
-		
         if (listOfBodies.size() == 0){
         	loadFile();
         }
-		
-
 
         if (Gdx.input.isKeyPressed(Input.Keys.UP)){
         RunSimulation.listOfBodies.get(RunSimulation.n).velVect.y += 3;
@@ -919,8 +915,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		}
 		shapeRenderer.begin(ShapeType.Line);
 		
-	//	focusX -= zF*listOfBodies.get(n).spriteWidth/2;
-	//	focusY -= zF*listOfBodies.get(n).spriteWidth/2;
+		//focusX -= zF*listOfBodies.get(n).spriteWidth/2;
+		//focusY -= zF*listOfBodies.get(n).spriteWidth/2;
 		shapeRenderer.line(new Vector2(focusX - 10, focusY), new Vector2(focusX + 10, focusY));
 		shapeRenderer.line(new Vector2(focusX, focusY - 10), new Vector2(focusX, focusY+10));
 		
@@ -948,7 +944,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
                 Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
                 shapeRenderer.begin(ShapeType.Line);
 
-                while (listOfBodies.get(i).cometTailX.size() >= drawLimit) {
+                while (listOfBodies.get(i).cometTailX.size() >= drawLimit / 4) {
 					listOfBodies.get(i).cometTailX.remove(listOfBodies.get(i).cometTailX.size() - 1);
 					listOfBodies.get(i).cometTailY.remove(listOfBodies.get(i).cometTailY.size() - 1);
                 }
@@ -956,8 +952,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				shapeRenderer.setColor(0, 1, 1, 1);
 				shapeRenderer.line(tailNewX * zF, tailNewY * zF, tailOldX * zF, tailOldY * zF);
 
-				for (int j = 1; j < listOfBodies.get(i).cometTailX.size() - 1; j++) {
-					if (j == 1) {
+				for (int j = 1; j < listOfBodies.get(i).cometTailX.size(); j++) {
+					if (j == 1 && j < listOfBodies.get(i).cometTailX.size() - 1) {
 						listOfBodies.get(i).cometTailX.set(j + 1, listOfBodies.get(i).cometTailX.get(j + 1) + (tailOldX - tailNewX));
 						listOfBodies.get(i).cometTailY.set(j + 1, listOfBodies.get(i).cometTailY.get(j + 1) + (tailOldY - tailNewY));
 					} else {
@@ -967,7 +963,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				}
 
                 for (int j = 1; j < listOfBodies.get(i).cometTailX.size() - 1; j++) {
-                    shapeRenderer.setColor(0, 1, 1, 1);
+                    shapeRenderer.setColor(0, 1, 1, 0.75f);
                     shapeRenderer.line(listOfBodies.get(i).cometTailX.get(j) * zF, listOfBodies.get(i).cometTailY.get(j) * zF, listOfBodies.get(i).cometTailX.get(j + 1) * zF, listOfBodies.get(i).cometTailY.get(j + 1) * zF);
                 }
                 shapeRenderer.end();
