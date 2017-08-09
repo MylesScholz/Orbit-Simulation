@@ -963,7 +963,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				}
 
                 for (int j = 1; j < listOfBodies.get(i).cometTailX.size() - 1; j++) {
-                    shapeRenderer.setColor(0, 1, 1, 0.75f);
+                    shapeRenderer.setColor(0, 1, 1, 1 - (j / (float) listOfBodies.get(i).cometTailX.size()));
                     shapeRenderer.line(listOfBodies.get(i).cometTailX.get(j) * zF, listOfBodies.get(i).cometTailY.get(j) * zF, listOfBodies.get(i).cometTailX.get(j + 1) * zF, listOfBodies.get(i).cometTailY.get(j + 1) * zF);
                 }
                 shapeRenderer.end();
