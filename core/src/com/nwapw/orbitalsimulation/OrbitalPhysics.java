@@ -35,20 +35,22 @@ public class OrbitalPhysics {
 	final static int perturbationCalculationMethod = 0; // 0 = Cowell's Method
 
 	static boolean indexOutOfBounds = false;
+	
 	final static int numOfIterations = 1000000;
 
 	
 		
 	
 	static void iterateSimulation(float deltaTime) {
-       
 		for (int i = 0; i < listOfBodies.size(); i++){
-			listOfBodies.get(i).integrateLeapfrogPos(deltaTime);
-		}	
-		cowellsFormulation();
-		
-		for (int i = 0; i < listOfBodies.size(); i++){
-			listOfBodies.get(i).integrateLeapfrogVel(deltaTime);			
+			if (listOfBodies.get(i).gravity) {
+				OrbitalBody currentBody = listOfBodies.get(i);
+				listOfBodies.get(i).mostPullingBodyAcc = 0;
+				
+				listOfBodies.get(i).integrateLeapfrogVel(deltaTime);				
+				cowellsFormulation(i, currentBody);				
+				listOfBodies.get(i).integrateLeapfrogPos(deltaTime);
+			}
 		}
 		if (RunSimulation.collisionsOn) {
 		 checkAllCollisions();
@@ -56,30 +58,25 @@ public class OrbitalPhysics {
 	}
 	
 	static void predictedIterateSimulation(float deltaPredictionTime) {
-		
 		for (int i = 0; i < listOfBodies.size(); i++){
-			listOfBodies.get(i).integratePredictedLeapfrogPos(deltaPredictionTime);
-		}	
-		predictedCowellsFormulation();
-		
-		for (int i = 0; i < listOfBodies.size(); i++){
-			listOfBodies.get(i).integratePredictedLeapfrogVel(deltaPredictionTime);			
-		}	
-		predictAllCollisions();
+			if (listOfBodies.get(i).predictedGravity) {
+				OrbitalBody currentBody = listOfBodies.get(i);
+				listOfBodies.get(i).predictedMostPullingBodyAcc = 0;			
+				
+				listOfBodies.get(i).integratePredictedLeapfrogVel(deltaPredictionTime);				
+				predictedCowellsFormulation(i, currentBody);				
+				listOfBodies.get(i).integratePredictedLeapfrogPos(deltaPredictionTime);
+			}
+		}
+		if (RunSimulation.collisionsOn) {
+		 predictAllCollisions();
+		}
 	}	
 	
-
-
-
-	static void cowellsFormulation() {
-		for (int i=0; i < listOfBodies.size(); i++){
-			
-			OrbitalBody currentBody = listOfBodies.get(i);
-			sumOfAcc.set(0,0,0);
-			
-			listOfBodies.get(i).mostPullingBodyAcc = 0;
-			
-			for (int j = 0; j < listOfBodies.size() ; j++){
+	static void cowellsFormulation(int i, OrbitalBody currentBody) {
+		sumOfAcc.set(0,0,0);
+		for (int j = 0; j < listOfBodies.size() ; j++){
+			if (listOfBodies.get(j).gravity) {
 				if (j != i){
 					OrbitalBody pullingBody = listOfBodies.get(j);
 					calculatedAcc.set(0,0,0);
@@ -93,35 +90,28 @@ public class OrbitalPhysics {
 					}
 				}
 			}
-			currentBody.setAcceleration(sumOfAcc.x, sumOfAcc.y, sumOfAcc.z);					
 		}
+		currentBody.setAcceleration(sumOfAcc.x, sumOfAcc.y, sumOfAcc.z);					
 	}
-	static void predictedCowellsFormulation() {
-		for (int i=0; i < listOfBodies.size(); i++) {	
-			if (listOfBodies.get(i).predictedGravity) {
-				OrbitalBody currentBody = listOfBodies.get(i);
-				predictedSumOfAcc.set(0,0,0);
-				listOfBodies.get(i).predictedMostPullingBodyAcc = 0;
-				for (int j = 0; j < listOfBodies.size() ; j++){
-					if (listOfBodies.get(j).predictedGravity) {
-						if (j != i){
-							OrbitalBody pullingBody = listOfBodies.get(j);
-							predictedCalculatedAcc.set(0,0,0);
-								predictedCalculatedAcc = calculatePredictedGravAttraction(currentBody, pullingBody);				
-								if (predictedCalculatedAcc.len() >= listOfBodies.get(i).predictedMostPullingBodyAcc){
-									listOfBodies.get(i).predictedMostPullingBodyAcc = predictedCalculatedAcc.len();
-									listOfBodies.get(i).predictedMostPullingBodyName = listOfBodies.get(j).name;
-								}
-								predictedSumOfAcc.add(predictedCalculatedAcc);
-						}
+	
+	static void predictedCowellsFormulation(int i, OrbitalBody currentBody) {
+		predictedSumOfAcc.set(0,0,0);
+		for (int j = 0; j < listOfBodies.size() ; j++){
+			if (listOfBodies.get(j).predictedGravity) {
+				if (j != i){
+					OrbitalBody pullingBody = listOfBodies.get(j);
+					predictedCalculatedAcc.set(0,0,0);
+					predictedCalculatedAcc = calculatePredictedGravAttraction(currentBody, pullingBody);				
+					if (predictedCalculatedAcc.len() >= listOfBodies.get(i).predictedMostPullingBodyAcc){
+						listOfBodies.get(i).predictedMostPullingBodyAcc = predictedCalculatedAcc.len();
+						listOfBodies.get(i).predictedMostPullingBodyName = listOfBodies.get(j).name;
 					}
+					predictedSumOfAcc.add(predictedCalculatedAcc);
 				}
-				currentBody.setPredictedAcceleration(predictedSumOfAcc.x, predictedSumOfAcc.y, predictedSumOfAcc.z);			
-			
 			}
 		}
-		
-	}
+		currentBody.setPredictedAcceleration(predictedSumOfAcc.x, predictedSumOfAcc.y, predictedSumOfAcc.z);				
+	}	
 	
 	static Vector3 calculateGravAttraction(OrbitalBody currentBody, OrbitalBody pullingBody) {
 				
@@ -305,7 +295,7 @@ public class OrbitalPhysics {
     	if (distance*RunSimulation.zF*1.2f <= body1.radius*RunSimulation.zF + body2.radius*RunSimulation.zF) {
             return true;
         } else {
-        return false;
+        	return false;
         }
     }
     
@@ -316,8 +306,8 @@ public class OrbitalPhysics {
     				if(listOfBodies.get(j).predictedGravity && !listOfBodies.get(j).removed) {
     					if (i != j && predictCollision(listOfBodies.get(i), listOfBodies.get(j))) {
     						if (listOfBodies.get(i).mass < listOfBodies.get(j).mass) {
-    							listOfBodies.get(i).setRemoved(true);
     							System.out.println("Body Removed: " + listOfBodies.get(i).name);
+    							listOfBodies.get(i).setRemoved(true);
     						} else if (listOfBodies.get(i).mass > listOfBodies.get(j).mass) {
     							System.out.println("Body Removed: " + listOfBodies.get(j).name);
     							listOfBodies.get(j).setRemoved(true);
