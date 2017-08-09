@@ -994,8 +994,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				shapeRenderer.setColor(0, 1, 1, 1);
 				shapeRenderer.line(tailNewX * zF, tailNewY * zF, tailOldX * zF, tailOldY * zF);
 
-				for (int j = 1; j < listOfBodies.get(i).cometTailX.size() - 1; j++) {
-					if (j == 1) {
+				for (int j = 1; j < listOfBodies.get(i).cometTailX.size(); j++) {
+					if (j == 1 && j < listOfBodies.get(i).cometTailX.size() - 1) {
 						listOfBodies.get(i).cometTailX.set(j + 1, listOfBodies.get(i).cometTailX.get(j + 1) + (tailOldX - tailNewX));
 						listOfBodies.get(i).cometTailY.set(j + 1, listOfBodies.get(i).cometTailY.get(j + 1) + (tailOldY - tailNewY));
 					} else {
@@ -1005,7 +1005,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				}
 
                 for (int j = 1; j < listOfBodies.get(i).cometTailX.size() - 1; j++) {
-                    shapeRenderer.setColor(0, 1, 1, 1);
+                    shapeRenderer.setColor(0, 1, 1, 0.75f);
                     shapeRenderer.line(listOfBodies.get(i).cometTailX.get(j) * zF, listOfBodies.get(i).cometTailY.get(j) * zF, listOfBodies.get(i).cometTailX.get(j + 1) * zF, listOfBodies.get(i).cometTailY.get(j + 1) * zF);
                 }
                 shapeRenderer.end();
