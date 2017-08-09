@@ -164,7 +164,7 @@ public class Inputs implements InputProcessor {
 				RunSimulation.purgeState = false;
 			}
 	    }
-		
+		/*
 		if(keycode == Input.Keys.X){
 			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
 		    RunSimulation.cam.unproject(mousePos); 
@@ -204,7 +204,7 @@ public class Inputs implements InputProcessor {
 				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 2, spawnPosX - 1298*randScalar, spawnPosY -417*randScalar, -25f*randScalar, 42.148289f*randScalar);
 			}						
 	    }		
-		 
+		 */
 		return false;
 	}
 

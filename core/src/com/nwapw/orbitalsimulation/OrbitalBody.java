@@ -28,9 +28,12 @@ public class OrbitalBody {
 	
 	//Leap Frog
 	Vector3 backhalfstepVel = new Vector3();
+	Vector3 predictedbackhalfstepVel = new Vector3();
 	Vector3 forwardhalfstepVel = new Vector3();
+	Vector3 predictedforwardhalfstepVel = new Vector3();
 	
 	Vector3 prevstepPos = new Vector3();
+	Vector3 predictedprevstepPos = new Vector3();
 	
 	
 
@@ -163,14 +166,17 @@ public class OrbitalBody {
 	}
 	void integrateLeapfrogPos(float deltaTime){
 		oldPosVect.set(posVect); // for drawing orbit lines
+		predictedOldPosVect.set(predictedPosVect);
 		prevstepPos.set(posVect);
+		predictedprevstepPos.set(predictedPosVect);
 		posVect.set(prevstepPos.add(backhalfstepVel.scl(deltaTime)));
-		
+		predictedPosVect.set(predictedprevstepPos.add(backhalfstepVel.scl(deltaTime)));
 	}	
 	void integrateLeapfrogVel(float deltaTime){		
 		backhalfstepVel.set(velVect);
-		velVect.set(backhalfstepVel.add(accVect.scl(deltaTime)));		
-		
+		predictedbackhalfstepVel.set(predictedVelVect);
+		velVect.set(backhalfstepVel.add(accVect.scl(deltaTime)));
+		predictedVelVect.set(predictedbackhalfstepVel.add(predictedAccVect.scl(deltaTime)));
 	}	
 	void integratePredictedLeapfrogPos(float deltaTime){
 		predictedOldPosVect.set(predictedPosVect); // for drawing orbit lines
@@ -181,7 +187,6 @@ public class OrbitalBody {
 	void integratePredictedLeapfrogVel(float deltaTime){		
 		backhalfstepVel.set(predictedVelVect);
 		predictedVelVect.set(backhalfstepVel.add(predictedAccVect.scl(deltaTime)));		
-		
 	}		
 	
 	

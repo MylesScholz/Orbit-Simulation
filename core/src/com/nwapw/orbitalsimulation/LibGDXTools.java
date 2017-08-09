@@ -113,7 +113,7 @@ public class LibGDXTools {
 		body.velVect.y = velY;
 
 		body.setGravity(false);
-		body.setPredictedGravity(false);
+		body.setPredictedGravity(true);
 		body.setRemoved(false);
 		
 		RunSimulation.listOfBodies.add(body);
@@ -136,7 +136,7 @@ public class LibGDXTools {
 		body.velVect.y = velY;
 
 		body.setGravity(false);
-		body.setPredictedGravity(false);
+		body.setPredictedGravity(true);
 		body.setRemoved(false);
 		
 		RunSimulation.listOfBodies.add(body);
@@ -287,7 +287,7 @@ public class LibGDXTools {
 			
 			//newTexture = new Texture("planets/planet18.png");
 		}
-		else if (mass < 10000000){ // body is a "main sequence star"
+		else if (mass < 2000000){ // body is a "main sequence star"
             int listLength = RunSimulation.availableStarTextures.size();
             int randTexture = random.nextInt(listLength);
 
@@ -332,7 +332,6 @@ public class LibGDXTools {
 		float zF = 0;
 		
 
-		System.out.println(spriteWidth);
 		if (spriteWidth < 30) {
 			zF = 10 - 1f*spriteWidth;
 		}		
@@ -351,7 +350,7 @@ public class LibGDXTools {
 		else {
 			zF = 0.05f;
 		}
-		System.out.println(zF);
+
 		
 		return zF;
 	}
