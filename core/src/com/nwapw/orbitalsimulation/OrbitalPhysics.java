@@ -21,6 +21,8 @@ import java.awt.Shape;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
+
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector3;
 
 public class OrbitalPhysics {
@@ -73,27 +75,30 @@ public class OrbitalPhysics {
 
 	static void cowellsFormulation() {
 		for (int i=0; i < listOfBodies.size(); i++){
-			
-			OrbitalBody currentBody = listOfBodies.get(i);
-			sumOfAcc.set(0,0,0);
-			
-			listOfBodies.get(i).mostPullingBodyAcc = 0;
-			
-			for (int j = 0; j < listOfBodies.size() ; j++){
-				if (j != i){
-					OrbitalBody pullingBody = listOfBodies.get(j);
-					calculatedAcc.set(0,0,0);
-					if (perturbationCalculationMethod == 0){ // Cowell's Formulation
-						calculatedAcc = calculateGravAttraction(currentBody, pullingBody);
-						if (calculatedAcc.len() >= listOfBodies.get(i).mostPullingBodyAcc){	
-							listOfBodies.get(i).mostPullingBodyAcc = calculatedAcc.len();
-							listOfBodies.get(i).mostPullingBodyName = listOfBodies.get(j).name;
-						}												
-						sumOfAcc.add(calculatedAcc);
+			if (listOfBodies.get(i).gravity) {
+				OrbitalBody currentBody = listOfBodies.get(i);
+				sumOfAcc.set(0, 0, 0);
+
+				listOfBodies.get(i).mostPullingBodyAcc = 0;
+
+				for (int j = 0; j < listOfBodies.size(); j++) {
+					if (listOfBodies.get(j).gravity) {
+						if (j != i) {
+							OrbitalBody pullingBody = listOfBodies.get(j);
+							calculatedAcc.set(0, 0, 0);
+							if (perturbationCalculationMethod == 0) { // Cowell's Formulation
+								calculatedAcc = calculateGravAttraction(currentBody, pullingBody);
+								if (calculatedAcc.len() >= listOfBodies.get(i).mostPullingBodyAcc) {
+									listOfBodies.get(i).mostPullingBodyAcc = calculatedAcc.len();
+									listOfBodies.get(i).mostPullingBodyName = listOfBodies.get(j).name;
+								}
+								sumOfAcc.add(calculatedAcc);
+							}
+						}
 					}
 				}
+				currentBody.setAcceleration(sumOfAcc.x, sumOfAcc.y, sumOfAcc.z);
 			}
-			currentBody.setAcceleration(sumOfAcc.x, sumOfAcc.y, sumOfAcc.z);					
 		}
 	}
 	static void predictedCowellsFormulation() {
@@ -194,9 +199,21 @@ public class OrbitalPhysics {
                     	// Conservation of Momentum
                     	Vector3 sumVel = listOfBodies.get(i).velVect.scl(listOfBodies.get(i).mass).add(listOfBodies.get(j).velVect.scl(listOfBodies.get(j).mass));
                     	sumVel.scl(1/(listOfBodies.get(i).mass + listOfBodies.get(j).mass));
+                    	
+
+                    	
                     	listOfBodies.get(j).velVect.set(sumVel);
                     	
-                    	listOfBodies.get(j).mass += listOfBodies.get(i).mass;                      
+                    	listOfBodies.get(j).mass += listOfBodies.get(i).mass;      
+                    	
+                        if (listOfBodies.get(j).mass > 10000000) {
+                        	listOfBodies.get(j).texture = new Texture("blackhole.png");
+                        	if (Math.random() < 0.0001) {
+                        		listOfBodies.get(i).name = "Zuyghetti";
+                        	}
+                        	
+                        }
+                    	
                     	listOfBodies.get(j).radius = (int) Math.sqrt((listOfBodies.get(j).mass * 10) / Math.PI);
                     	listOfBodies.get(j).spriteWidth = (int) Math.sqrt((listOfBodies.get(j).mass * 10) / Math.PI) * 2;
                     	
@@ -231,7 +248,13 @@ public class OrbitalPhysics {
                     	sumVel.scl(1/(listOfBodies.get(i).mass + listOfBodies.get(j).mass));
                     	listOfBodies.get(i).velVect.set(sumVel);
                         
-                    	listOfBodies.get(i).mass += listOfBodies.get(j).mass;                   
+                    	listOfBodies.get(i).mass += listOfBodies.get(j).mass;           
+                    	
+
+                        if (listOfBodies.get(i).mass > 10000000) {
+                        	listOfBodies.get(i).texture = new Texture("blackhole.png");
+                        }
+                        
                     	listOfBodies.get(i).radius = (int) Math.sqrt((listOfBodies.get(i).mass * 10) / Math.PI);
                     	listOfBodies.get(i).spriteWidth = (int) Math.sqrt((listOfBodies.get(i).mass * 10) / Math.PI) * 2;
                     	
@@ -267,6 +290,11 @@ public class OrbitalPhysics {
                     	
                         listOfBodies.get(i).mass += listOfBodies.get(j).mass;
 
+                        if (listOfBodies.get(i).mass > 10000000) {
+                        	System.out.println("yes");
+                        	listOfBodies.get(i).texture = new Texture("blackhole.png");
+                        }
+                        
                         //listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
                         //listOfBodies.get(i).spriteWidth = listOfBodies.get(i).radius * 2;
                         if (n >= listOfBodies.size()) {

@@ -120,7 +120,10 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	public static ArrayList<Float> ptNewY = new ArrayList<Float>();
 	
 	//List of vectors for comet tails
-	ArrayList<Vector3> cometTail = new ArrayList<Vector3>();
+    float tailOldX;
+    float tailOldY;
+    float tailNewX;
+    float tailNewY;
 	
 	// Booleans for mouse input edge detection
 	boolean newPlanet = false;
@@ -163,6 +166,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	static float zFTransition = 0;
 	
 	static float placedBodySpeed = 0.5f;
+	
+	int placedBodies = 1; //for star/planet system
 	
 	Texture textures;
 	static ArrayList<Texture> availablePlanetTextures = new ArrayList<Texture>();
@@ -396,6 +401,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
             }
         }
         
+        
+        
 		int j = 1 + (int)(Math.random() * 8); 
         String backgroundFileName = "backgrounds/" + j + ".jpg";
         backgroundTexture = new Texture(backgroundFileName);		
@@ -403,8 +410,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
         
         /* INITIAL BODIES */
 		// Name, Mass, radius, posx, posy, velx, vely, spritewidth
+
         //LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 1, 250 , 250, 35, -35);
-        //LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 10000, 0, 0, 0, 0);        
+        //LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 10000, 0, 0, 0, 0);
         
         /* FILES */
         
@@ -540,84 +548,170 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
     }
 
    	public void place() {		
-		if (Gdx.input.isButtonPressed(0) && !newPlanet && !newSun) {
-			//System.out.println("planetPlace");
-			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-		    cam.unproject(mousePos);
-
-		    clickLeftPositionX = (int) (mousePos.x / zF);
-			clickLeftPositionY = (int) (mousePos.y / zF);		
+   		if (!Gdx.input.isKeyPressed(Input.Keys.X)) { 		
+			if (Gdx.input.isButtonPressed(0) && !newPlanet && !newSun) {
+				//System.out.println("planetPlace");
+				Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+			    cam.unproject(mousePos);
+	
+			    clickLeftPositionX = (int) (mousePos.x / zF);
+				clickLeftPositionY = (int) (mousePos.y / zF);		
+				
+				focusedBodyOldX = listOfBodies.get(n).posVect.x;
+				focusedBodyOldY = listOfBodies.get(n).posVect.y;
+				
+				LibGDXTools.bodyCreatePlanet(clickLeftPositionX , clickLeftPositionY, 0, 0);
+				newPlanet = true;
+			} else if(Gdx.input.isButtonPressed(0) && newPlanet && !newSun) {
+				//System.out.println("planetHold");
+				Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+			    cam.unproject(mousePos);
+			    
+			    currentMousePositionX = (int) (mousePos.x / zF);
+				currentMousePositionY = (int) (mousePos.y / zF);
+				
+				listOfBodies.get(listOfBodies.size() - 1).setPosition(clickLeftPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickLeftPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
+				listOfBodies.get(listOfBodies.size() - 1).setPredictedPosition(clickLeftPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickLeftPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
+				listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity((clickLeftPositionX - focusedBodyOldX) - (currentMousePositionX - listOfBodies.get(n).posVect.x), (clickLeftPositionY - focusedBodyOldY) - (currentMousePositionY - listOfBodies.get(n).posVect.y), 0);			
+				listOfBodies.get(listOfBodies.size() - 1).setPredictedGravity(true);
+				//predict(listOfBodies.get(listOfBodies.size() - 1), listOfBodies.get(n));
+			} else if (!Gdx.input.isButtonPressed(0) && newPlanet && !newSun) {
+				//System.out.println("planetMove");
+				Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+			    cam.unproject(mousePos);
+			    
+			    unclickLeftPositionX = (int) (mousePos.x / zF);
+				unclickLeftPositionY = (int) (mousePos.y / zF);
+				
+				listOfBodies.get(listOfBodies.size() - 1).setVelocity((clickLeftPositionX - focusedBodyOldX) - (unclickLeftPositionX - listOfBodies.get(n).posVect.x), (clickLeftPositionY - focusedBodyOldY) - (unclickLeftPositionY - listOfBodies.get(n).posVect.y), 0);
+				listOfBodies.get(listOfBodies.size() - 1).setGravity(true);
+				newPlanet = false;
+			} 
 			
-			focusedBodyOldX = listOfBodies.get(n).posVect.x;
-			focusedBodyOldY = listOfBodies.get(n).posVect.y;
-			
-			LibGDXTools.bodyCreatePlanet(clickLeftPositionX , clickLeftPositionY, 0, 0);
-			newPlanet = true;
-		} else if(Gdx.input.isButtonPressed(0) && newPlanet && !newSun) {
-			//System.out.println("planetHold");
-			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-		    cam.unproject(mousePos);
-		    
-		    currentMousePositionX = (int) (mousePos.x / zF);
-			currentMousePositionY = (int) (mousePos.y / zF);
-			
-			listOfBodies.get(listOfBodies.size() - 1).setPosition(clickLeftPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickLeftPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
-			listOfBodies.get(listOfBodies.size() - 1).setPredictedPosition(clickLeftPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickLeftPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
-			listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity((clickLeftPositionX - focusedBodyOldX) - (currentMousePositionX - listOfBodies.get(n).posVect.x), (clickLeftPositionY - focusedBodyOldY) - (currentMousePositionY - listOfBodies.get(n).posVect.y), 0);			
-			listOfBodies.get(listOfBodies.size() - 1).setPredictedGravity(true);
-			//predict(listOfBodies.get(listOfBodies.size() - 1), listOfBodies.get(n));
-		} else if (!Gdx.input.isButtonPressed(0) && newPlanet && !newSun) {
-			//System.out.println("planetMove");
-			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-		    cam.unproject(mousePos);
-		    
-		    unclickLeftPositionX = (int) (mousePos.x / zF);
-			unclickLeftPositionY = (int) (mousePos.y / zF);
-			
-			listOfBodies.get(listOfBodies.size() - 1).setVelocity((clickLeftPositionX - focusedBodyOldX) - (unclickLeftPositionX - listOfBodies.get(n).posVect.x), (clickLeftPositionY - focusedBodyOldY) - (unclickLeftPositionY - listOfBodies.get(n).posVect.y), 0);
-			listOfBodies.get(listOfBodies.size() - 1).setGravity(true);
-			newPlanet = false;
-		} 
+			if (Gdx.input.isButtonPressed(1) && !newSun && !newPlanet) {
+				//System.out.println("sunPlace");
+				Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+			    cam.unproject(mousePos);
+			    
+			    clickRightPositionX = (int) (mousePos.x / zF);
+				clickRightPositionY = (int) (mousePos.y / zF);
+				focusedBodyOldX = listOfBodies.get(n).posVect.x;
+				focusedBodyOldY = listOfBodies.get(n).posVect.y;
+				
+				LibGDXTools.bodyCreateSun(clickRightPositionX , clickRightPositionY, 0, 0);
+				newSun = true;
+			} else if(Gdx.input.isButtonPressed(1) && newSun && !newPlanet) {
+				//System.out.println("sunHold");
+				Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+			    cam.unproject(mousePos);
+			    
+			    currentMousePositionX = (int) (mousePos.x / zF);
+				currentMousePositionY = (int) (mousePos.y / zF);
+				
+				listOfBodies.get(listOfBodies.size() - 1).setPosition(clickRightPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickRightPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
+				listOfBodies.get(listOfBodies.size() - 1).setPredictedPosition(clickRightPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickRightPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
+				listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity((clickRightPositionX - focusedBodyOldX) - (currentMousePositionX - listOfBodies.get(n).posVect.x), (clickRightPositionY - focusedBodyOldY) - (currentMousePositionY - listOfBodies.get(n).posVect.y), 0);			
+				listOfBodies.get(listOfBodies.size() - 1).setPredictedGravity(true);
+				//predict(listOfBodies.get(listOfBodies.size() - 1), listOfBodies.get(n));
+			} else if (!Gdx.input.isButtonPressed(1) && newSun && !newPlanet) {
+				//System.out.println("sunMove");
+				Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
+			    
+				cam.unproject(mousePos);
+			    unclickRightPositionX = (int) (mousePos.x / zF);
+				unclickRightPositionY = (int) (mousePos.y / zF);	
+				
+				listOfBodies.get(listOfBodies.size() - 1).setPosition(clickRightPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickRightPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
+				listOfBodies.get(listOfBodies.size() - 1).setVelocity((clickRightPositionX - focusedBodyOldX) - (unclickRightPositionX - listOfBodies.get(n).posVect.x), (clickRightPositionY - focusedBodyOldY) - (unclickRightPositionY - listOfBodies.get(n).posVect.y), 0);
+				listOfBodies.get(listOfBodies.size() - 1).setGravity(true);
+				
+				newSun = false;
+			}
 		
-		if (Gdx.input.isButtonPressed(1) && !newSun && !newPlanet) {
-			//System.out.println("sunPlace");
-			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-		    cam.unproject(mousePos);
-		    
-		    clickRightPositionX = (int) (mousePos.x / zF);
-			clickRightPositionY = (int) (mousePos.y / zF);
-			focusedBodyOldX = listOfBodies.get(n).posVect.x;
-			focusedBodyOldY = listOfBodies.get(n).posVect.y;
+		
+   		}
+   		/*
+   		else {
+			if (Gdx.input.isButtonPressed(0) && !newPlanet && !newSun) {
+				//System.out.println("planetPlace");
+				Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+			    cam.unproject(mousePos);
+	
+			    float spawnPosX = (int) (mousePos.x / zF);
+				float spawnPosY = (int) (mousePos.y / zF);		
+				
+				focusedBodyOldX = listOfBodies.get(n).posVect.x;
+				focusedBodyOldY = listOfBodies.get(n).posVect.y;
+				
+				Random random = new Random();
+				float randScalar = 1 + (random.nextFloat() - 0.5f)/4;
+				randScalar *= 0.0001;
+				
+				if (random.nextFloat() < 0.5){
+					randScalar *= -1;
+				}
+				
+				
+				
+				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 43779 + randScalar*1000, spawnPosX, spawnPosY ,0,0);
+				
+				placedBodies = 1;
+				
+				if (random.nextFloat() < 0.5){
+					LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 3, spawnPosX + 1709*randScalar, spawnPosY - 123*randScalar, 2.2944372f*randScalar, -34.84709f*randScalar);	
+					placedBodies++;
+				}
+				if (random.nextFloat() < 0.5){
+					LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 4, spawnPosX + 842*randScalar, spawnPosY - 172*randScalar, 36f*randScalar, 60f*randScalar);	
+					placedBodies++;
+				}				
+				if (random.nextFloat() < 0.5){
+					LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 4, spawnPosX - 1127*randScalar, spawnPosY - 101*randScalar, 6.7067494f*randScalar, 55.26426f*randScalar);
+					placedBodies++;
+				}			
+				if (random.nextFloat() < 0.5){
+					LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 1, spawnPosX +480*randScalar, spawnPosY - 51*randScalar, 18.085638f*randScalar, -92.809425f*randScalar);
+					placedBodies++;
+				}			
+				if (random.nextFloat() < 0.5){
+					LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 3, spawnPosX +589*randScalar, spawnPosY - 71*randScalar, -10.085638f*randScalar, 83.809425f*randScalar);
+					placedBodies++;
+				}
+				if (random.nextFloat() < 0.5){
+					LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 4, spawnPosX + 4*randScalar, spawnPosY -127*randScalar, 98.83999f*randScalar, 25.148289f*randScalar);
+					placedBodies++;
+				}
+				if (random.nextFloat() < 0.5){
+					LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 2, spawnPosX - 1298*randScalar, spawnPosY -417*randScalar, -25f*randScalar, 42.148289f*randScalar);
+					placedBodies++;
+				}	
+				
+				newPlanet = true;
 			
-			LibGDXTools.bodyCreateSun(clickRightPositionX , clickRightPositionY, 0, 0);
-			newSun = true;
-		} else if(Gdx.input.isButtonPressed(1) && newSun && !newPlanet) {
-			//System.out.println("sunHold");
-			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-		    cam.unproject(mousePos);
-		    
-		    currentMousePositionX = (int) (mousePos.x / zF);
-			currentMousePositionY = (int) (mousePos.y / zF);
-			
-			listOfBodies.get(listOfBodies.size() - 1).setPosition(clickRightPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickRightPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
-			listOfBodies.get(listOfBodies.size() - 1).setPredictedPosition(clickRightPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickRightPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
-			listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity((clickRightPositionX - focusedBodyOldX) - (currentMousePositionX - listOfBodies.get(n).posVect.x), (clickRightPositionY - focusedBodyOldY) - (currentMousePositionY - listOfBodies.get(n).posVect.y), 0);			
-			listOfBodies.get(listOfBodies.size() - 1).setPredictedGravity(true);
-			//predict(listOfBodies.get(listOfBodies.size() - 1), listOfBodies.get(n));
-		} else if (!Gdx.input.isButtonPressed(1) && newSun && !newPlanet) {
-			//System.out.println("sunMove");
-			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
-		    
-			cam.unproject(mousePos);
-		    unclickRightPositionX = (int) (mousePos.x / zF);
-			unclickRightPositionY = (int) (mousePos.y / zF);	
-			
-			listOfBodies.get(listOfBodies.size() - 1).setPosition(clickRightPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickRightPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
-			listOfBodies.get(listOfBodies.size() - 1).setVelocity((clickRightPositionX - focusedBodyOldX) - (unclickRightPositionX - listOfBodies.get(n).posVect.x), (clickRightPositionY - focusedBodyOldY) - (unclickRightPositionY - listOfBodies.get(n).posVect.y), 0);
-			listOfBodies.get(listOfBodies.size() - 1).setGravity(true);
-			
-			newSun = false;
-		}
+			} else if (!Gdx.input.isButtonPressed(0) && newPlanet && !newSun) {
+				//System.out.println("planetMove");
+				Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+			    cam.unproject(mousePos);
+			    
+			    unclickLeftPositionX = (int) (mousePos.x / zF);
+				unclickLeftPositionY = (int) (mousePos.y / zF);
+				
+				float velocityX = (clickLeftPositionX - focusedBodyOldX) - (unclickLeftPositionX - listOfBodies.get(n).posVect.x);
+				float velocityY = (clickLeftPositionY - focusedBodyOldY) - (unclickLeftPositionY - listOfBodies.get(n).posVect.y);
+				
+				
+				for (int i = 0; i < placedBodies + 1; i++) {				
+					listOfBodies.get(listOfBodies.size()- 1 - i).addVelocity(velocityX/2, velocityY/2);
+				
+				}
+				
+				
+				
+				newPlanet = false;
+			} 
+					
+   		}
+		*/
 	}
 	
    	public void predict (OrbitalBody newBody, OrbitalBody focusedBody) {
@@ -673,13 +767,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			}			
 		}
 
-
-		
         if (listOfBodies.size() == 0){
-        	LibGDXTools.bodyInitialize("Star", 10000, 25, 0, 0, 0, 0, 40);
+        	loadFile();
 		}
-		
-
 
         if (Gdx.input.isKeyPressed(Input.Keys.UP)){
         RunSimulation.listOfBodies.get(RunSimulation.n).velVect.y += 3;
@@ -864,6 +954,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 					
 	        if (Gdx.input.isKeyPressed(Input.Keys.W)){
 	        	panY += 10;
+	        	
 	        }
 	        
 	        if (Gdx.input.isKeyPressed(Input.Keys.S)){
@@ -880,16 +971,18 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	        focusX = panX;
 			focusY = panY;
 			
-			float moveX = (camX - focusX) * 2/3;
-			float moveY = (camY - focusY) * 2/3;
+			float moveX = (camX - panX) * 2/3;
+			float moveY = (camY - panY) * 2/3;
 			
 			camX -= moveX;
 			camY -= moveY;
 		
 			camX += 1.1f*cam.viewportHeight/40;
 			
+
 			frameX = camX;
-			frameY = camY;					        
+			frameY = camY;		
+		        
 		}
 		
 
@@ -925,7 +1018,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		
 		shapeRenderer.end();
 		//Draw trail
-		/*
+
 		for (int i = 0; i < listOfBodies.size(); i++) {
 			if (listOfBodies.get(i).oldPosVect.isZero()) {
 			} else {
@@ -942,7 +1035,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 						shapeRenderer.setColor(1, 1, 1, x / drawLimit);
 						//System.outystem.out.println(shapeRenderer.getColor().a);
 						shapeRenderer.line(PTOldX.get(x)*zF, PTOldY.get(x)*zF, PTNewX.get(x)*zF, PTNewY.get(x)*zF);
-						
+
 					}	
 				} else {
 					PTOldX.remove(0);
@@ -965,37 +1058,54 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		}
 		
 		//Draw comet tails
+
         for (int i = 0; i < listOfBodies.size(); i++) {
             if (listOfBodies.get(i).mass == 1) {
-                Vector3 distToStar = new Vector3();
                 for (int j = 0; j < listOfBodies.size(); j++) {
-                    if (listOfBodies.get(j).mass >= 10000) {
-                        distToStar = listOfBodies.get(i).posVect.add(listOfBodies.get(j).posVect).scl(-1);
+                    if (listOfBodies.get(j).mass >= 10000 && listOfBodies.get(i).mostPullingBodyName == listOfBodies.get(j).name) {
+                        tailOldX = (listOfBodies.get(i).posVect.x + ((listOfBodies.get(i).posVect.x - listOfBodies.get(j).posVect.x) / listOfBodies.get(i).posVect.dst(listOfBodies.get(j).posVect)));
+                        tailOldY = (listOfBodies.get(i).posVect.y + ((listOfBodies.get(i).posVect.y - listOfBodies.get(j).posVect.y) / listOfBodies.get(i).posVect.dst(listOfBodies.get(j).posVect)));
+                        tailNewX = (listOfBodies.get(i).posVect.x);
+                        tailNewY = (listOfBodies.get(i).posVect.y);
+
+						listOfBodies.get(i).cometTailX.add(0, (float) tailOldX);
+						listOfBodies.get(i).cometTailY.add(0, (float) tailOldY);
+						listOfBodies.get(i).cometTailX.add(0, (float) tailNewX);
+						listOfBodies.get(i).cometTailY.add(0, (float) tailNewY);
                     }
                 }
-                cometTail.add(distToStar);
 
                 Gdx.gl.glEnable(GL30.GL_BLEND);
                 Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
                 shapeRenderer.begin(ShapeType.Line);
-                if (cometTail.size() < drawLimit / 2) {
-                    for (int j = 1; j < cometTail.size(); j++) {
-                        shapeRenderer.setColor(0, 0, 1, j / drawLimit);
-                        shapeRenderer.line(cometTail.get(j - 1).x * zF, cometTail.get(j - 1).y * zF, cometTail.get(j).x * zF, cometTail.get(j).y * zF);
-                    }
-                } else {
-                    cometTail.remove(0);
-                    for (int j = 1; j < cometTail.size(); j++) {
-                        shapeRenderer.setColor(0, 0, 1, j / drawLimit);
-                        shapeRenderer.line(cometTail.get(j - 1).x * zF, cometTail.get(j - 1).y * zF, cometTail.get(j).x * zF, cometTail.get(j).y * zF);
-                    }
+
+                while (listOfBodies.get(i).cometTailX.size() >= drawLimit / 4) {
+					listOfBodies.get(i).cometTailX.remove(listOfBodies.get(i).cometTailX.size() - 1);
+					listOfBodies.get(i).cometTailY.remove(listOfBodies.get(i).cometTailY.size() - 1);
+                }
+
+				shapeRenderer.setColor(0, 1, 1, 1);
+				shapeRenderer.line(tailNewX * zF, tailNewY * zF, tailOldX * zF, tailOldY * zF);
+
+				for (int j = 1; j < listOfBodies.get(i).cometTailX.size() - 1; j++) {
+					if (j == 1) {
+						listOfBodies.get(i).cometTailX.set(j + 1, listOfBodies.get(i).cometTailX.get(j + 1) + (tailOldX - tailNewX));
+						listOfBodies.get(i).cometTailY.set(j + 1, listOfBodies.get(i).cometTailY.get(j + 1) + (tailOldY - tailNewY));
+					} else {
+						listOfBodies.get(i).cometTailX.set(j, listOfBodies.get(i).cometTailX.get(j) + (tailOldX - tailNewX));
+						listOfBodies.get(i).cometTailY.set(j, listOfBodies.get(i).cometTailY.get(j) + (tailOldY - tailNewY));
+					}
+				}
+
+                for (int j = 1; j < listOfBodies.get(i).cometTailX.size() - 1; j++) {
+                    shapeRenderer.setColor(0, 1, 1, 1);
+                    shapeRenderer.line(listOfBodies.get(i).cometTailX.get(j) * zF, listOfBodies.get(i).cometTailY.get(j) * zF, listOfBodies.get(i).cometTailX.get(j + 1) * zF, listOfBodies.get(i).cometTailY.get(j + 1) * zF);
                 }
                 shapeRenderer.end();
                 Gdx.gl.glDisable(GL30.GL_BLEND);
             }
         }
-        */
-		
+
         // Workaround to make side panel items appear above shapeRenderer transparent rectangle
 
 		batch.begin();

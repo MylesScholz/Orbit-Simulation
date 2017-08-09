@@ -42,6 +42,10 @@ public class OrbitalBody {
 	Vector3 velVect = new Vector3();
 	Vector3 predictedVelVect = new Vector3();
 	Vector3 accVect = new Vector3();
+
+	ArrayList<Float> cometTailX = new ArrayList<Float>();
+	ArrayList<Float> cometTailY = new ArrayList<Float>();
+
 	Vector3 predictedAccVect = new Vector3();
 	
 	Sprite sprite;
@@ -93,6 +97,11 @@ public class OrbitalBody {
 	void setPredictedVelocity(float x, float y, float z) {
 		predictedVelVect.set(x,y,z);
 	}
+	void addVelocity(float x, float y){
+		velVect.x += x;
+		velVect.y += y;
+	}
+	
 	
 	void setAcceleration(float x, float y, float z){
 		accVect.set(x,y,z);

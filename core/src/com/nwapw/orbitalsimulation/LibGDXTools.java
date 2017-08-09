@@ -287,15 +287,17 @@ public class LibGDXTools {
 			
 			//newTexture = new Texture("planets/planet18.png");
 		}
-		else if (mass < 150000){ // body is a "main sequence star"
+		else if (mass < 10000000){ // body is a "main sequence star"
             int listLength = RunSimulation.availableStarTextures.size();
             int randTexture = random.nextInt(listLength);
 
             newTexture = RunSimulation.availableStarTextures.get(randTexture);
             //RunSimulation.availablePlanetTextures.remove(randTexture);
 		}
-		else { // body is a "giant" star
-			newTexture = new Texture("stars/giant/star_blue_giant01.png");
+		else { // body is a blackhole
+			newTexture = new Texture("blackhole.png");
+
+			
 		}
 		
 		RunSimulation.runningTextures.add(newTexture);
@@ -329,12 +331,27 @@ public class LibGDXTools {
 	static float calculateDefaultZoom(float spriteWidth){		
 		float zF = 0;
 		
-		if (spriteWidth > 200){
-			zF = (float) (300000f/Math.pow(spriteWidth, 2));
+
+		System.out.println(spriteWidth);
+		if (spriteWidth < 30) {
+			zF = 10 - 1f*spriteWidth;
+		}		
+		else if (spriteWidth < 100){
+			zF = 2f;
+		}
+		else if (spriteWidth < 500){
+			zF = 1f;
+		}
+		else if (spriteWidth < 1000){
+			zF = 0.5f;
+		}
+		else if (spriteWidth < 10000) {
+			zF = 0.1f;
 		}
 		else {
-			zF = 10 - 1f*spriteWidth;
+			zF = 0.05f;
 		}
+		System.out.println(zF);
 		
 		return zF;
 	}
