@@ -21,6 +21,8 @@ import java.awt.Shape;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
+
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector3;
 
 public class OrbitalPhysics {
@@ -47,6 +49,8 @@ public class OrbitalPhysics {
 				OrbitalBody currentBody = listOfBodies.get(i);
 				listOfBodies.get(i).mostPullingBodyAcc = 0;
 
+				//listOfBodies.get(i).integrateEuler(deltaTime, i, currentBody);
+
 				listOfBodies.get(i).integrateLeapfrogVel(deltaTime);				
 				cowellsFormulation(i, currentBody);				
 				listOfBodies.get(i).integrateLeapfrogPos(deltaTime);
@@ -63,6 +67,8 @@ public class OrbitalPhysics {
 				OrbitalBody currentBody = listOfBodies.get(i);
 				listOfBodies.get(i).predictedMostPullingBodyAcc = 0;			
 
+				//listOfBodies.get(i).integratePredictedEuler(deltaPredictionTime, i, currentBody);
+				
 				listOfBodies.get(i).integratePredictedLeapfrogVel(deltaPredictionTime);				
 				predictedCowellsFormulation(i, currentBody);				
 				listOfBodies.get(i).integratePredictedLeapfrogPos(deltaPredictionTime);
@@ -174,6 +180,7 @@ public class OrbitalPhysics {
     public static void checkAllCollisions() {
         int n = RunSimulation.n;
     	for (int i = 0; i < listOfBodies.size(); i++) {
+
     		if (listOfBodies.get(i).gravity) {
     			for (int j = 0; j < listOfBodies.size(); j++) {
     				if (listOfBodies.get(j).gravity) {
@@ -185,6 +192,12 @@ public class OrbitalPhysics {
     							// Conservation of Momentum
     							Vector3 sumVel = listOfBodies.get(i).velVect.scl(listOfBodies.get(i).mass).add(listOfBodies.get(j).velVect.scl(listOfBodies.get(j).mass));
     							sumVel.scl(1/(listOfBodies.get(i).mass + listOfBodies.get(j).mass));
+    							
+    	                        if (listOfBodies.get(j).mass > 2000000) {
+    	                        	listOfBodies.get(j).texture = new Texture("blackhole.png");
+    	                        }
+    	                    	
+    	                        
     							listOfBodies.get(j).velVect.set(sumVel);
     							
     							listOfBodies.get(j).mass += listOfBodies.get(i).mass;                      
@@ -200,7 +213,6 @@ public class OrbitalPhysics {
     							if (i == n){
     								focusDestroyed = true;
     							}
-    							
 								
     							listOfBodies.remove(i);
     							
@@ -209,7 +221,7 @@ public class OrbitalPhysics {
     								for (int k = 0; k < listOfBodies.size(); k++) {
     									if (focusName == listOfBodies.get(k).name){
     										RunSimulation.n = k;
-    										RunSimulation.zF = LibGDXTools.calculateDefaultZoom(RunSimulation.listOfBodies.get(RunSimulation.n).spriteWidth);
+											RunSimulation.zF = LibGDXTools.calculateDefaultZoom(RunSimulation.listOfBodies.get(RunSimulation.n).spriteWidth);
     									}
     								}
     							}
@@ -222,7 +234,13 @@ public class OrbitalPhysics {
     							sumVel.scl(1/(listOfBodies.get(i).mass + listOfBodies.get(j).mass));
     							listOfBodies.get(i).velVect.set(sumVel);
     							
-    							listOfBodies.get(i).mass += listOfBodies.get(j).mass;                   
+    							
+    							listOfBodies.get(i).mass += listOfBodies.get(j).mass;  
+    	                        if (listOfBodies.get(i).mass > 2000000) {
+    	                        	listOfBodies.get(i).texture = new Texture("blackhole.png");
+    	                        }
+    	                    	
+    	                        
     							listOfBodies.get(i).radius = (int) Math.sqrt((listOfBodies.get(i).mass * 10) / Math.PI);
     							listOfBodies.get(i).spriteWidth = (int) Math.sqrt((listOfBodies.get(i).mass * 10) / Math.PI) * 2;
     							
@@ -235,7 +253,6 @@ public class OrbitalPhysics {
     							if (j == n){
     								focusDestroyed = true;
     							}
-
     							
     							listOfBodies.remove(j);
     							
@@ -243,7 +260,7 @@ public class OrbitalPhysics {
     								for (int k = 0; k < listOfBodies.size(); k++) {
     									if (focusName == listOfBodies.get(k).name){
     										RunSimulation.n = k;
-    										RunSimulation.zF = LibGDXTools.calculateDefaultZoom(RunSimulation.listOfBodies.get(RunSimulation.n).spriteWidth);
+											RunSimulation.zF = LibGDXTools.calculateDefaultZoom(RunSimulation.listOfBodies.get(RunSimulation.n).spriteWidth);
     									}		
     								}
     							}
@@ -257,7 +274,10 @@ public class OrbitalPhysics {
     							listOfBodies.get(i).velVect.set(sumVel);
     							
     							listOfBodies.get(i).mass += listOfBodies.get(j).mass;
-    							
+    	                        if (listOfBodies.get(i).mass > 2000000) {
+    	                        	listOfBodies.get(i).texture = new Texture("blackhole.png");
+    	                        }
+    	                    	
     							//listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
     							//listOfBodies.get(i).spriteWidth = listOfBodies.get(i).radius * 2;
     							if (n >= listOfBodies.size()) {
@@ -272,14 +292,13 @@ public class OrbitalPhysics {
     								focusDestroyed = true;
     							}
 
-    							
     							listOfBodies.remove(j);
     							
     							if (focusDestroyed == true){
     								for (int k = 0; k < listOfBodies.size(); k++) {
     									if (focusName == listOfBodies.get(k).name){
     										RunSimulation.n = k;
-    										RunSimulation.zF = LibGDXTools.calculateDefaultZoom(RunSimulation.listOfBodies.get(RunSimulation.n).spriteWidth);
+											RunSimulation.zF = LibGDXTools.calculateDefaultZoom(RunSimulation.listOfBodies.get(RunSimulation.n).spriteWidth);
         								}							
     								}
     							}
@@ -310,13 +329,13 @@ public class OrbitalPhysics {
     					if (listOfBodies.get(i) == listOfBodies.get(listOfBodies.size() - 1) || listOfBodies.get(j) == listOfBodies.get(listOfBodies.size() - 1)) {
     						if (i != j && predictCollision(listOfBodies.get(i), listOfBodies.get(j))) {
     							if (listOfBodies.get(i).mass < listOfBodies.get(j).mass) {
-    								System.out.println("Body Removed: " + listOfBodies.get(i).name);
+    								//System.out.println("Body Removed: " + listOfBodies.get(i).name);
     								listOfBodies.get(i).setRemoved(true);
     							} else if (listOfBodies.get(i).mass > listOfBodies.get(j).mass) {
-    								System.out.println("Body Removed: " + listOfBodies.get(j).name);
+    								//System.out.println("Body Removed: " + listOfBodies.get(j).name);
     								listOfBodies.get(j).setRemoved(true);
     							} else {
-    								System.out.println("Body Removed: " + listOfBodies.get(j).name);
+    								//System.out.println("Body Removed: " + listOfBodies.get(j).name);
     								listOfBodies.get(j).setRemoved(true);
     							}	
     							predictAllCollisions();

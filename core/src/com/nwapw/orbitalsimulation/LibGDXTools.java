@@ -100,10 +100,11 @@ public class LibGDXTools {
 	
 	static void bodyCreatePlanet(float posX, float posY, float velX, float velY) {
 		OrbitalBody body = new OrbitalBody();
-		body.setMass(1 + (int)(Math.random() * 4));
+		float mass = 1 + (int)(Math.random() * 4);
+		body.setMass(mass);
 		body.setName(LibGDXTools.nameGen());
 		
-		body.setRadius((int) Math.sqrt(((1 + (int)(Math.random() * 4)) * 10) / Math.PI));
+		body.setRadius((int) Math.sqrt(((mass * 10) / Math.PI)));
 		body.spriteWidth = (int) Math.sqrt(((1 + (int)(Math.random() * 4)) * 10) / Math.PI) * 2;
 
 		body.posVect.x = posX;
@@ -117,12 +118,12 @@ public class LibGDXTools {
 		body.setRemoved(false);
 		
 		RunSimulation.listOfBodies.add(body);
-		body.setTexture(bodyTextureChooser(1 + (int)(Math.random() * 4)));
+		body.setTexture(bodyTextureChooser(mass));
 	}
 	
 	static void bodyCreateSun(float posX, float posY, float velX, float velY) {
 		OrbitalBody body = new OrbitalBody();
-		float mass = 1000 + (int)(Math.random() * 4000);
+		float mass = 10000 + (int)(Math.random() * 40000);
 		body.setMass(mass);
 		body.setName(LibGDXTools.nameGen());
 		
@@ -287,15 +288,17 @@ public class LibGDXTools {
 			
 			//newTexture = new Texture("planets/planet18.png");
 		}
-		else if (mass < 150000){ // body is a "main sequence star"
+		else if (mass < 2000000){ // body is a "main sequence star"
             int listLength = RunSimulation.availableStarTextures.size();
             int randTexture = random.nextInt(listLength);
 
             newTexture = RunSimulation.availableStarTextures.get(randTexture);
             //RunSimulation.availablePlanetTextures.remove(randTexture);
 		}
-		else { // body is a "giant" star
-			newTexture = new Texture("stars/giant/star_blue_giant01.png");
+		else { // body is a blackhole
+			newTexture = new Texture("blackhole.png");
+
+			
 		}
 		
 		RunSimulation.runningTextures.add(newTexture);
@@ -329,12 +332,26 @@ public class LibGDXTools {
 	static float calculateDefaultZoom(float spriteWidth){		
 		float zF = 0;
 		
-		if (spriteWidth > 200){
-			zF = (float) (300000f/Math.pow(spriteWidth, 2));
+
+		if (spriteWidth < 30) {
+			zF = 10 - 1f*spriteWidth;
+		}		
+		else if (spriteWidth < 100){
+			zF = 2f;
+		}
+		else if (spriteWidth < 500){
+			zF = 1f;
+		}
+		else if (spriteWidth < 1000){
+			zF = 0.5f;
+		}
+		else if (spriteWidth < 10000) {
+			zF = 0.1f;
 		}
 		else {
-			zF = 10 - 1f*spriteWidth;
+			zF = 0.05f;
 		}
+
 		
 		return zF;
 	}

@@ -100,6 +100,11 @@ public class OrbitalBody {
 	void setPredictedVelocity(float x, float y, float z) {
 		predictedVelVect.set(x,y,z);
 	}
+	void addVelocity(float x, float y){
+		velVect.x += x;
+		velVect.y += y;
+	}
+	
 	
 	void setAcceleration(float x, float y, float z){
 		accVect.set(x,y,z);
@@ -199,7 +204,6 @@ public class OrbitalBody {
 	
 	void integratePredictedLeapfrogPos(float deltaTime){
 		predictedOldPosVect.set(predictedPosVect); // for drawing orbit lines
-		//prevstepPos.set(predictedPosVect);
 		predictedPosVect.set(predictedPosVect.add(predictedbackhalfstepVel.scl(deltaTime)));
 	}	
 	
