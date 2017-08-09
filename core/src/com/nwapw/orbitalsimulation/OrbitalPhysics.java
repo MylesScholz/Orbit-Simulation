@@ -200,8 +200,6 @@ public class OrbitalPhysics {
     							if (i == n){
     								focusDestroyed = true;
     							}
-    							
-    							RunSimulation.zF = LibGDXTools.calculateDefaultZoom(RunSimulation.listOfBodies.get(RunSimulation.n).spriteWidth);
 								
     							listOfBodies.remove(i);
     							
@@ -210,6 +208,7 @@ public class OrbitalPhysics {
     								for (int k = 0; k < listOfBodies.size(); k++) {
     									if (focusName == listOfBodies.get(k).name){
     										RunSimulation.n = k;
+											RunSimulation.zF = LibGDXTools.calculateDefaultZoom(RunSimulation.listOfBodies.get(RunSimulation.n).spriteWidth);
     									}
     								}
     							}
@@ -235,8 +234,6 @@ public class OrbitalPhysics {
     							if (j == n){
     								focusDestroyed = true;
     							}
-
-    							RunSimulation.zF = LibGDXTools.calculateDefaultZoom(RunSimulation.listOfBodies.get(RunSimulation.n).spriteWidth);
     							
     							listOfBodies.remove(j);
     							
@@ -244,6 +241,7 @@ public class OrbitalPhysics {
     								for (int k = 0; k < listOfBodies.size(); k++) {
     									if (focusName == listOfBodies.get(k).name){
     										RunSimulation.n = k;
+											RunSimulation.zF = LibGDXTools.calculateDefaultZoom(RunSimulation.listOfBodies.get(RunSimulation.n).spriteWidth);
     									}		
     								}
     							}
@@ -271,8 +269,6 @@ public class OrbitalPhysics {
     							if (j == n){
     								focusDestroyed = true;
     							}
-
-    							RunSimulation.zF = LibGDXTools.calculateDefaultZoom(RunSimulation.listOfBodies.get(RunSimulation.n).spriteWidth);
     							
     							listOfBodies.remove(j);
     							
@@ -280,6 +276,7 @@ public class OrbitalPhysics {
     								for (int k = 0; k < listOfBodies.size(); k++) {
     									if (focusName == listOfBodies.get(k).name){
     										RunSimulation.n = k;
+											RunSimulation.zF = LibGDXTools.calculateDefaultZoom(RunSimulation.listOfBodies.get(RunSimulation.n).spriteWidth);
         								}							
     								}
     							}

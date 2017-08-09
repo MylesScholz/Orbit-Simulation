@@ -924,21 +924,31 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		
 		//Draw comet tails
 
+		boolean starsPresent = false;
+
         for (int i = 0; i < listOfBodies.size(); i++) {
             if (listOfBodies.get(i).mass == 1) {
+            	starsPresent = false;
                 for (int j = 0; j < listOfBodies.size(); j++) {
-                    if (listOfBodies.get(j).mass >= 10000 && listOfBodies.get(i).mostPullingBodyName == listOfBodies.get(j).name) {
-                        tailOldX = (listOfBodies.get(i).posVect.x + ((listOfBodies.get(i).posVect.x - listOfBodies.get(j).posVect.x) / listOfBodies.get(i).posVect.dst(listOfBodies.get(j).posVect)));
-                        tailOldY = (listOfBodies.get(i).posVect.y + ((listOfBodies.get(i).posVect.y - listOfBodies.get(j).posVect.y) / listOfBodies.get(i).posVect.dst(listOfBodies.get(j).posVect)));
-                        tailNewX = (listOfBodies.get(i).posVect.x);
-                        tailNewY = (listOfBodies.get(i).posVect.y);
+                    if (listOfBodies.get(j).mass >= 10000) {
+						starsPresent = true;
+						if (listOfBodies.get(i).mostPullingBodyName == listOfBodies.get(j).name) {
+							tailOldX = (listOfBodies.get(i).posVect.x + ((listOfBodies.get(i).posVect.x - listOfBodies.get(j).posVect.x) / listOfBodies.get(i).posVect.dst(listOfBodies.get(j).posVect)));
+							tailOldY = (listOfBodies.get(i).posVect.y + ((listOfBodies.get(i).posVect.y - listOfBodies.get(j).posVect.y) / listOfBodies.get(i).posVect.dst(listOfBodies.get(j).posVect)));
+							tailNewX = (listOfBodies.get(i).posVect.x);
+							tailNewY = (listOfBodies.get(i).posVect.y);
 
-						listOfBodies.get(i).cometTailX.add(0, (float) tailOldX);
-						listOfBodies.get(i).cometTailY.add(0, (float) tailOldY);
-						listOfBodies.get(i).cometTailX.add(0, (float) tailNewX);
-						listOfBodies.get(i).cometTailY.add(0, (float) tailNewY);
+							listOfBodies.get(i).cometTailX.add(0, (float) tailOldX);
+							listOfBodies.get(i).cometTailY.add(0, (float) tailOldY);
+							listOfBodies.get(i).cometTailX.add(0, (float) tailNewX);
+							listOfBodies.get(i).cometTailY.add(0, (float) tailNewY);
+						}
                     }
                 }
+				if (!starsPresent) {
+					listOfBodies.get(i).cometTailX.clear();
+					listOfBodies.get(i).cometTailY.clear();
+				}
 
                 Gdx.gl.glEnable(GL30.GL_BLEND);
                 Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
@@ -949,8 +959,10 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 					listOfBodies.get(i).cometTailY.remove(listOfBodies.get(i).cometTailY.size() - 1);
                 }
 
-				shapeRenderer.setColor(0, 1, 1, 1);
-				shapeRenderer.line(tailNewX * zF, tailNewY * zF, tailOldX * zF, tailOldY * zF);
+                if (starsPresent) {
+					shapeRenderer.setColor(0, 1, 1, 1);
+					shapeRenderer.line(tailNewX * zF, tailNewY * zF, tailOldX * zF, tailOldY * zF);
+				}
 
 				for (int j = 1; j < listOfBodies.get(i).cometTailX.size(); j++) {
 					if (j == 1 && j < listOfBodies.get(i).cometTailX.size() - 1) {
