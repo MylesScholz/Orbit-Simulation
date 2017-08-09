@@ -563,7 +563,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedGravity(true);
 			listOfBodies.get(listOfBodies.size() - 1).setPosition(clickLeftPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickLeftPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedPosition(clickLeftPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickLeftPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
-			//listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity(5, 5, 0);			
+			//listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity(0, 0, 0);			
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity((clickLeftPositionX - focusedBodyOldX) - (currentMousePositionX - listOfBodies.get(n).posVect.x), (clickLeftPositionY - focusedBodyOldY) - (currentMousePositionY - listOfBodies.get(n).posVect.y), 0);			
 			predict(listOfBodies.get(listOfBodies.size() - 1), listOfBodies.get(n));
 		} else if (!Gdx.input.isButtonPressed(0) && newPlanet && !newSun) {
@@ -595,14 +595,13 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			//System.out.println("sunHold");
 			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
 		    cam.unproject(mousePos);
-		    
 		    currentMousePositionX = (int) (mousePos.x / zF);
 			currentMousePositionY = (int) (mousePos.y / zF);
 			
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedGravity(true);
 			listOfBodies.get(listOfBodies.size() - 1).setPosition(clickRightPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickRightPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedPosition(clickRightPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickRightPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
-			//listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity(5, 5, 0);			
+			//listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity(0, 0, 0);			
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity((clickRightPositionX - focusedBodyOldX) - (currentMousePositionX - listOfBodies.get(n).posVect.x), (clickRightPositionY - focusedBodyOldY) - (currentMousePositionY - listOfBodies.get(n).posVect.y), 0);			
 			predict(listOfBodies.get(listOfBodies.size() - 1), listOfBodies.get(n));
 		} else if (!Gdx.input.isButtonPressed(1) && newSun && !newPlanet) {
@@ -632,7 +631,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 					FTNewX.add(newBody.predictedPosVect.x);
 					FTNewY.add(newBody.predictedPosVect.y);
 				} else {
-					System.out.println("Removed: " + predictionCounter + ", "  + iterationCounter);
+					//System.out.println("Removed: " + predictionCounter + ", "  + iterationCounter);
 				}
 				OrbitalPhysics.predictedIterateSimulation(deltaPredictionTime);
 				Gdx.gl.glEnable(GL30.GL_BLEND);
@@ -657,9 +656,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				FTNewX.remove(0);
 				FTNewY.remove(0);
 				listOfBodies.get(listOfBodies.size() - 1).setRemoved(false);
-				System.out.println("Reset");
+				//System.out.println("Reset");
+				predictionCounter = 0;
 			}
-			predictionCounter = 0;
 		}
    	}
    	
@@ -679,8 +678,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
 		
         if (listOfBodies.size() == 0){
-        	LibGDXTools.bodyInitialize("Star", 10000, 25, 0, 0, 0, 0, 40);
-		}
+        	loadFile();
+        }
 		
 
 
@@ -699,8 +698,6 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
         if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
         	RunSimulation.listOfBodies.get(RunSimulation.n).velVect.x += 3;
         }
-
-
         
         if (Gdx.input.isKeyPressed(Input.Keys.M)){
         	RunSimulation.listOfBodies.get(RunSimulation.n).velVect.set(0,0,0);

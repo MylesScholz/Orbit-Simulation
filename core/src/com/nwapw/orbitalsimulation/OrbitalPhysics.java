@@ -48,8 +48,8 @@ public class OrbitalPhysics {
 				listOfBodies.get(i).mostPullingBodyAcc = 0;
 				
 				listOfBodies.get(i).integrateLeapfrogVel(deltaTime);				
-				cowellsFormulation(i, currentBody);				
 				listOfBodies.get(i).integrateLeapfrogPos(deltaTime);
+				cowellsFormulation(i, currentBody);				
 			}
 		}
 		if (RunSimulation.collisionsOn) {
@@ -64,8 +64,8 @@ public class OrbitalPhysics {
 				listOfBodies.get(i).predictedMostPullingBodyAcc = 0;			
 				
 				listOfBodies.get(i).integratePredictedLeapfrogVel(deltaPredictionTime);				
-				predictedCowellsFormulation(i, currentBody);				
 				listOfBodies.get(i).integratePredictedLeapfrogPos(deltaPredictionTime);
+				predictedCowellsFormulation(i, currentBody);				
 			}
 		}
 		if (RunSimulation.collisionsOn) {
@@ -200,7 +200,8 @@ public class OrbitalPhysics {
     								focusDestroyed = true;
     							}
     							
-    							
+    							RunSimulation.zF = LibGDXTools.calculateDefaultZoom(RunSimulation.listOfBodies.get(RunSimulation.n).spriteWidth);
+								
     							listOfBodies.remove(i);
     							
     							
@@ -209,7 +210,6 @@ public class OrbitalPhysics {
     									if (focusName == listOfBodies.get(k).name){
     										RunSimulation.n = k;
     									}
-    									
     								}
     							}
     							
@@ -234,6 +234,8 @@ public class OrbitalPhysics {
     							if (j == n){
     								focusDestroyed = true;
     							}
+
+    							RunSimulation.zF = LibGDXTools.calculateDefaultZoom(RunSimulation.listOfBodies.get(RunSimulation.n).spriteWidth);
     							
     							listOfBodies.remove(j);
     							
@@ -241,9 +243,7 @@ public class OrbitalPhysics {
     								for (int k = 0; k < listOfBodies.size(); k++) {
     									if (focusName == listOfBodies.get(k).name){
     										RunSimulation.n = k;
-    										
-    									}
-    									
+    									}		
     								}
     							}
     							
@@ -270,6 +270,8 @@ public class OrbitalPhysics {
     							if (j == n){
     								focusDestroyed = true;
     							}
+
+    							RunSimulation.zF = LibGDXTools.calculateDefaultZoom(RunSimulation.listOfBodies.get(RunSimulation.n).spriteWidth);
     							
     							listOfBodies.remove(j);
     							
@@ -277,7 +279,7 @@ public class OrbitalPhysics {
     								for (int k = 0; k < listOfBodies.size(); k++) {
     									if (focusName == listOfBodies.get(k).name){
     										RunSimulation.n = k;
-    									}							
+        								}							
     								}
     							}
     						}
@@ -306,13 +308,13 @@ public class OrbitalPhysics {
     				if(listOfBodies.get(j).predictedGravity && !listOfBodies.get(j).removed) {
     					if (i != j && predictCollision(listOfBodies.get(i), listOfBodies.get(j))) {
     						if (listOfBodies.get(i).mass < listOfBodies.get(j).mass) {
-    							System.out.println("Body Removed: " + listOfBodies.get(i).name);
+    							//System.out.println("Body Removed: " + listOfBodies.get(i).name);
     							listOfBodies.get(i).setRemoved(true);
     						} else if (listOfBodies.get(i).mass > listOfBodies.get(j).mass) {
-    							System.out.println("Body Removed: " + listOfBodies.get(j).name);
+    							//System.out.println("Body Removed: " + listOfBodies.get(j).name);
     							listOfBodies.get(j).setRemoved(true);
     						} else {
-    							System.out.println("Body Removed: " + listOfBodies.get(j).name);
+    							//System.out.println("Body Removed: " + listOfBodies.get(j).name);
     							listOfBodies.get(j).setRemoved(true);
     						}	
     						predictAllCollisions();
