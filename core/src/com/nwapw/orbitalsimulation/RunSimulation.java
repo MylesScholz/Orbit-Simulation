@@ -72,12 +72,12 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	// Specifies time used to calculate numerical integration
 
 	static float deltaTime = (float) 0.05;
-	static float deltaPredictionTime = (float) 1;
+	static float deltaPredictionTime = (float) 0.05;
 
 	
 	// The max number of iterations that the simulation runs
 	final static int numOfIterations = 100000000;
-	final static int numOfPredictions = 100;
+	final static int numOfPredictions = 1000;
 	final static float drawLimit = 1000;
 	final static float predictedDrawLimit = 1000;
 	
@@ -106,13 +106,11 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	public static ArrayList<Float> PTNewX = new ArrayList<Float>();
 	public static ArrayList<Float> PTNewY = new ArrayList<Float>();
 	public static ArrayList<Integer> PTBody = new ArrayList<Integer>();
-	public static ArrayList<Integer> createdBody = new ArrayList<Integer>();
 	
 	public static ArrayList<Float> FTOldX = new ArrayList<Float>();
 	public static ArrayList<Float> FTOldY = new ArrayList<Float>();
 	public static ArrayList<Float> FTNewX = new ArrayList<Float>();
 	public static ArrayList<Float> FTNewY = new ArrayList<Float>();
-	public static ArrayList<Integer> FTBody = new ArrayList<Integer>();
 	
 	//List of vectors for comet tails
     float tailOldX;
@@ -562,6 +560,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedGravity(true);
 			listOfBodies.get(listOfBodies.size() - 1).setPosition(clickLeftPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickLeftPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
+			//listOfBodies.get(listOfBodies.size() - 1).setPredictedPosition(250, 250, 0);
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedPosition(clickLeftPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickLeftPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
 			//listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity(0, 0, 0);			
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity((clickLeftPositionX - focusedBodyOldX) - (currentMousePositionX - listOfBodies.get(n).posVect.x), (clickLeftPositionY - focusedBodyOldY) - (currentMousePositionY - listOfBodies.get(n).posVect.y), 0);			
@@ -600,6 +599,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedGravity(true);
 			listOfBodies.get(listOfBodies.size() - 1).setPosition(clickRightPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickRightPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
+			//listOfBodies.get(listOfBodies.size() - 1).setPredictedPosition(250, 250, 0);
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedPosition(clickRightPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickRightPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
 			//listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity(0, 0, 0);			
 			listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity((clickRightPositionX - focusedBodyOldX) - (currentMousePositionX - listOfBodies.get(n).posVect.x), (clickRightPositionY - focusedBodyOldY) - (currentMousePositionY - listOfBodies.get(n).posVect.y), 0);			
@@ -631,31 +631,34 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 					FTNewX.add(newBody.predictedPosVect.x);
 					FTNewY.add(newBody.predictedPosVect.y);
 				} else {
-					//System.out.println("Removed: " + predictionCounter + ", "  + iterationCounter);
+					System.out.println("Removed: " + predictionCounter + ", "  + iterationCounter + ", " + listOfBodies.get(listOfBodies.size() - 1).name);
 				}
-				OrbitalPhysics.predictedIterateSimulation(deltaPredictionTime);
+				
 				Gdx.gl.glEnable(GL30.GL_BLEND);
 		   		Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
+		   		OrbitalPhysics.predictedIterateSimulation(deltaPredictionTime);
 				shapeRenderer.begin(ShapeType.Line);
 				for (int x = 0; x < FTOldX.size(); x++) {
-					while (FTOldX.size() >= predictedDrawLimit) {
-						FTOldX.remove(0);
-						FTOldY.remove(0);
-						FTNewX.remove(0);
-						FTNewY.remove(0);
-					}
 					shapeRenderer.setColor(1, 0, 0, x / (float) FTOldX.size());
 					shapeRenderer.line(FTOldX.get(x)*zF, FTOldY.get(x)*zF, FTNewX.get(x)*zF, FTNewY.get(x)*zF);
 				}
 				shapeRenderer.end();
 				Gdx.gl.glDisable(GL30.GL_BLEND);
 			}
+			while (FTOldX.size() >= predictedDrawLimit) {
+				FTOldX.remove(0);
+				FTOldY.remove(0);
+				FTNewX.remove(0);
+				FTNewY.remove(0);
+			}
 			while (!FTOldX.isEmpty()) {
 				FTOldX.remove(0);
 				FTOldY.remove(0);
 				FTNewX.remove(0);
 				FTNewY.remove(0);
-				listOfBodies.get(listOfBodies.size() - 1).setRemoved(false);
+				for (int i = 0; i < listOfBodies.size(); i++) {
+					listOfBodies.get(i).setRemoved(false);					
+				}
 				//System.out.println("Reset");
 				predictionCounter = 0;
 			}

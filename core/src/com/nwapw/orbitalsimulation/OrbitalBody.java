@@ -29,8 +29,8 @@ public class OrbitalBody {
 	//Leap Frog
 	Vector3 backhalfstepVel = new Vector3();
 	Vector3 predictedbackhalfstepVel = new Vector3();
-	Vector3 forwardhalfstepVel = new Vector3();
-	Vector3 predictedforwardhalfstepVel = new Vector3();
+	//Vector3 forwardhalfstepVel = new Vector3();
+	//Vector3 predictedforwardhalfstepVel = new Vector3();
 	
 	Vector3 prevstepPos = new Vector3();
 	Vector3 predictedprevstepPos = new Vector3();
@@ -139,7 +139,7 @@ public class OrbitalBody {
 		return value;
 	}
 	
-	void integrateEuler(float deltaTime) {
+	void integrateEuler(float deltaTime, int i, OrbitalBody currentBody) {
 		
 		currentPos.set(posVect.x, posVect.y, posVect.z);
 		currentVel.set(velVect.x, velVect.y, velVect.z);
@@ -149,43 +149,62 @@ public class OrbitalBody {
 		predictedOldPosVect.set(currentPos);
 		
 		// Integrates Acceleration to Velocity
-
+		
+		backhalfstepVel.set(velVect);
 		currentVel = currentVel.add(currentAcc.scl(deltaTime));
 		velVect.set(currentVel);
 		predictedVelVect.set(currentVel);
 
+		OrbitalPhysics.cowellsFormulation(i, currentBody);
+		
 		// Integrates Velocity to Position
-		currentPos = currentPos.add(currentVel.scl(deltaTime));
+		currentPos = currentPos.add(backhalfstepVel.scl(deltaTime));
 		posVect.set(currentPos);
 
 	}
+	
 	void integrateLeapfrogPos(float deltaTime){
 		oldPosVect.set(posVect); // for drawing orbit lines
-		predictedOldPosVect.set(predictedPosVect);
-		prevstepPos.set(posVect);
-		predictedprevstepPos.set(predictedPosVect);
-		posVect.set(prevstepPos.add(backhalfstepVel.scl(deltaTime)));
-		predictedPosVect.set(predictedprevstepPos.add(backhalfstepVel.scl(deltaTime)));
-	}	
+		predictedOldPosVect.set(posVect);
+		posVect.set(posVect.add(backhalfstepVel.scl(deltaTime)));
+		predictedPosVect.set(posVect.add(backhalfstepVel.scl(deltaTime)));
+	}
+	
 	void integrateLeapfrogVel(float deltaTime){		
 		backhalfstepVel.set(velVect);
-		predictedbackhalfstepVel.set(predictedVelVect);
 		velVect.set(backhalfstepVel.add(accVect.scl(deltaTime)));
-		predictedVelVect.set(predictedbackhalfstepVel.add(predictedAccVect.scl(deltaTime)));
+		predictedVelVect.set(backhalfstepVel.add(accVect.scl(deltaTime)));
 	}	
+	
+	void integratePredictedEuler(float deltaTime, int i, OrbitalBody currentBody) {
+		
+		currentPos.set(predictedPosVect.x, predictedPosVect.y, predictedPosVect.z);
+		currentVel.set(predictedVelVect.x, predictedVelVect.y, predictedVelVect.z);
+		currentAcc.set(predictedAccVect.x, predictedAccVect.y, predictedAccVect.z);
+		
+		predictedOldPosVect.set(currentPos);
+		
+		// Integrates Acceleration to Velocity
+
+		predictedbackhalfstepVel.set(predictedVelVect);
+		currentVel = currentVel.add(currentAcc.scl(deltaTime));
+		predictedVelVect.set(currentVel);
+
+		OrbitalPhysics.predictedCowellsFormulation(i, currentBody);
+		
+		// Integrates Velocity to Position
+		currentPos = currentPos.add(predictedbackhalfstepVel.scl(deltaTime));
+		predictedPosVect.set(currentPos);
+	}
+	
 	void integratePredictedLeapfrogPos(float deltaTime){
 		predictedOldPosVect.set(predictedPosVect); // for drawing orbit lines
-		prevstepPos.set(predictedPosVect);
-		predictedPosVect.set(prevstepPos.add(backhalfstepVel.scl(deltaTime)));
-		
+		//prevstepPos.set(predictedPosVect);
+		predictedPosVect.set(predictedPosVect.add(predictedbackhalfstepVel.scl(deltaTime)));
 	}	
+	
 	void integratePredictedLeapfrogVel(float deltaTime){		
-		backhalfstepVel.set(predictedVelVect);
-		predictedVelVect.set(backhalfstepVel.add(predictedAccVect.scl(deltaTime)));		
+		predictedbackhalfstepVel.set(predictedVelVect);
+		predictedVelVect.set(predictedbackhalfstepVel.add(predictedAccVect.scl(deltaTime)));		
 	}		
-	
-	
-	
-	
-	
 }
