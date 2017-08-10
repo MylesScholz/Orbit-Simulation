@@ -145,7 +145,7 @@ public class OrbitalBody {
 	}
 	
 	void integrateEuler(float deltaTime, int i, OrbitalBody currentBody) {
-		
+		OrbitalPhysics.cowellsFormulation(i, currentBody);
 		currentPos.set(posVect.x, posVect.y, posVect.z);
 		currentVel.set(velVect.x, velVect.y, velVect.z);
 		currentAcc.set(accVect.x, accVect.y, accVect.z);
@@ -155,17 +155,17 @@ public class OrbitalBody {
 		
 		// Integrates Acceleration to Velocity
 		
-		backhalfstepVel.set(velVect);
+		//backhalfstepVel.set(velVect);
 		currentVel = currentVel.add(currentAcc.scl(deltaTime));
 		velVect.set(currentVel);
 		predictedVelVect.set(currentVel);
-
-		OrbitalPhysics.cowellsFormulation(i, currentBody);
+		
 		
 		// Integrates Velocity to Position
-		currentPos = currentPos.add(backhalfstepVel.scl(deltaTime));
+		//currentPos = currentPos.add(backhalfstepVel.scl(deltaTime));
+		currentPos = currentPos.add(currentVel.scl(deltaTime));
 		posVect.set(currentPos);
-
+		predictedPosVect.set(currentPos);
 	}
 	
 	void integrateLeapfrogPos(float deltaTime){
@@ -175,14 +175,14 @@ public class OrbitalBody {
 		predictedPosVect.set(posVect.add(backhalfstepVel.scl(deltaTime)));
 	}
 	
-	void integrateLeapfrogVel(float deltaTime){		
+	void integrateLeapfrogVel(float deltaTime){
 		backhalfstepVel.set(velVect);
 		velVect.set(backhalfstepVel.add(accVect.scl(deltaTime)));
 		predictedVelVect.set(backhalfstepVel.add(accVect.scl(deltaTime)));
-	}	
+	}
 	
 	void integratePredictedEuler(float deltaTime, int i, OrbitalBody currentBody) {
-		
+		OrbitalPhysics.predictedCowellsFormulation(i, currentBody);
 		currentPos.set(predictedPosVect.x, predictedPosVect.y, predictedPosVect.z);
 		currentVel.set(predictedVelVect.x, predictedVelVect.y, predictedVelVect.z);
 		currentAcc.set(predictedAccVect.x, predictedAccVect.y, predictedAccVect.z);
@@ -190,15 +190,15 @@ public class OrbitalBody {
 		predictedOldPosVect.set(currentPos);
 		
 		// Integrates Acceleration to Velocity
-
-		predictedbackhalfstepVel.set(predictedVelVect);
+		
+		//predictedbackhalfstepVel.set(predictedVelVect);
 		currentVel = currentVel.add(currentAcc.scl(deltaTime));
 		predictedVelVect.set(currentVel);
-
-		OrbitalPhysics.predictedCowellsFormulation(i, currentBody);
+		
 		
 		// Integrates Velocity to Position
-		currentPos = currentPos.add(predictedbackhalfstepVel.scl(deltaTime));
+		//currentPos = currentPos.add(predictedbackhalfstepVel.scl(deltaTime));
+		currentPos = currentPos.add(currentVel.scl(deltaTime));
 		predictedPosVect.set(currentPos);
 	}
 	

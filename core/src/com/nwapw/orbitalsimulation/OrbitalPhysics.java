@@ -49,11 +49,11 @@ public class OrbitalPhysics {
 				OrbitalBody currentBody = listOfBodies.get(i);
 				listOfBodies.get(i).mostPullingBodyAcc = 0;
 
-				//listOfBodies.get(i).integrateEuler(deltaTime, i, currentBody);
+				listOfBodies.get(i).integrateEuler(deltaTime, i, currentBody);
 
-				listOfBodies.get(i).integrateLeapfrogVel(deltaTime);				
-				cowellsFormulation(i, currentBody);				
-				listOfBodies.get(i).integrateLeapfrogPos(deltaTime);
+				//listOfBodies.get(i).integrateLeapfrogVel(deltaTime);				
+				//cowellsFormulation(i, currentBody);				
+				//listOfBodies.get(i).integrateLeapfrogPos(deltaTime);
 			}
 		}
 		if (RunSimulation.collisionsOn) {
@@ -67,11 +67,11 @@ public class OrbitalPhysics {
 				OrbitalBody currentBody = listOfBodies.get(i);
 				listOfBodies.get(i).predictedMostPullingBodyAcc = 0;			
 
-				//listOfBodies.get(i).integratePredictedEuler(deltaPredictionTime, i, currentBody);
+				listOfBodies.get(i).integratePredictedEuler(deltaPredictionTime, i, currentBody);
 				
-				listOfBodies.get(i).integratePredictedLeapfrogVel(deltaPredictionTime);				
-				predictedCowellsFormulation(i, currentBody);				
-				listOfBodies.get(i).integratePredictedLeapfrogPos(deltaPredictionTime);
+				//listOfBodies.get(i).integratePredictedLeapfrogVel(deltaPredictionTime);				
+				//predictedCowellsFormulation(i, currentBody);				
+				//listOfBodies.get(i).integratePredictedLeapfrogPos(deltaPredictionTime);
 			}
 		}
 		if (RunSimulation.collisionsOn) {
@@ -96,9 +96,11 @@ public class OrbitalPhysics {
 					}
 				}
 				currentBody.setAcceleration(sumOfAcc.x, sumOfAcc.y, sumOfAcc.z);
+				currentBody.setPredictedAcceleration(sumOfAcc.x, sumOfAcc.y, sumOfAcc.z);
 			}
 		}
 		currentBody.setAcceleration(sumOfAcc.x, sumOfAcc.y, sumOfAcc.z);					
+		currentBody.setPredictedAcceleration(sumOfAcc.x, sumOfAcc.y, sumOfAcc.z);
 	}
 	
 	static void predictedCowellsFormulation(int i, OrbitalBody currentBody) {
@@ -115,6 +117,7 @@ public class OrbitalPhysics {
 					}
 					predictedSumOfAcc.add(predictedCalculatedAcc);
 				}
+				currentBody.setPredictedAcceleration(predictedSumOfAcc.x, predictedSumOfAcc.y, predictedSumOfAcc.z);				
 			}
 		}
 		currentBody.setPredictedAcceleration(predictedSumOfAcc.x, predictedSumOfAcc.y, predictedSumOfAcc.z);				
@@ -200,7 +203,7 @@ public class OrbitalPhysics {
     	                        
     							listOfBodies.get(j).velVect.set(sumVel);
     							
-    							listOfBodies.get(j).mass += listOfBodies.get(i).mass;                      
+    							listOfBodies.get(j).mass += listOfBodies.get(i).mass;
     							listOfBodies.get(j).radius = (int) Math.sqrt((listOfBodies.get(j).mass * 10) / Math.PI);
     							listOfBodies.get(j).spriteWidth = (int) Math.sqrt((listOfBodies.get(j).mass * 10) / Math.PI) * 2;
     							

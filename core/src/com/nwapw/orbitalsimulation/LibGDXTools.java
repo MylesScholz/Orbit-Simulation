@@ -101,18 +101,19 @@ public class LibGDXTools {
 	static void bodyCreatePlanet(float posX, float posY, float velX, float velY) {
 		OrbitalBody body = new OrbitalBody();
 		float mass = 1 + (int)(Math.random() * 4);
+		
 		body.setMass(mass);
 		body.setName(LibGDXTools.nameGen());
 		
-		body.setRadius((int) Math.sqrt(((mass * 10) / Math.PI)));
-		body.spriteWidth = (int) Math.sqrt(((1 + (int)(Math.random() * 4)) * 10) / Math.PI) * 2;
-
+		body.setRadius((int) Math.sqrt((mass * 10) / Math.PI));
+		body.spriteWidth = (int) Math.sqrt((mass * 10) / Math.PI) * 2;
+		
 		body.posVect.x = posX;
 		body.posVect.y = posY;
-
+		
 		body.velVect.x = velX;
 		body.velVect.y = velY;
-
+		
 		body.setGravity(false);
 		body.setPredictedGravity(true);
 		body.setRemoved(false);
@@ -127,8 +128,8 @@ public class LibGDXTools {
 		body.setMass(mass);
 		body.setName(LibGDXTools.nameGen());
 		
-		body.setRadius((int) Math.sqrt(mass / Math.PI));
-		body.spriteWidth = (int) Math.sqrt(mass / Math.PI) * 2;
+		body.setRadius((int) Math.sqrt((mass * 10) / Math.PI));
+		body.spriteWidth = (int) Math.sqrt((mass * 10) / Math.PI) * 2;
 
 		body.posVect.x = posX;
 		body.posVect.y = posY;

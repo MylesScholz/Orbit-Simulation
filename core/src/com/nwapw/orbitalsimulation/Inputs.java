@@ -164,47 +164,6 @@ public class Inputs implements InputProcessor {
 				RunSimulation.purgeState = false;
 			}
 	    }
-		/*
-		if(keycode == Input.Keys.X){
-			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
-		    RunSimulation.cam.unproject(mousePos); 
-		    
-		    int spawnPosX = (int) (mousePos.x / RunSimulation.zF);
-			int spawnPosY = (int) (mousePos.y / RunSimulation.zF);		
-			
-			Random random = new Random();
-			float randScalar = 1 + (random.nextFloat() - 0.5f)/4;
-			
-			if (random.nextFloat() < 0.5){
-				randScalar *= -1;
-			}
-			
-			LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 43779 + randScalar*1000, spawnPosX, spawnPosY ,0,0);
-			
-			
-			if (random.nextFloat() < 0.5){
-				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 3, spawnPosX + 1709*randScalar, spawnPosY - 123*randScalar, 2.2944372f*randScalar, -34.84709f*randScalar);	
-			}
-			if (random.nextFloat() < 0.5){
-				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 4, spawnPosX + 842*randScalar, spawnPosY - 172*randScalar, 36f*randScalar, 60f*randScalar);	
-							}				
-			if (random.nextFloat() < 0.5){
-				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 4, spawnPosX - 1127*randScalar, spawnPosY - 101*randScalar, 6.7067494f*randScalar, 55.26426f*randScalar);
-			}			
-			if (random.nextFloat() < 0.5){
-				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 1, spawnPosX +480*randScalar, spawnPosY - 51*randScalar, 18.085638f*randScalar, -92.809425f*randScalar);
-			}			
-			if (random.nextFloat() < 0.5){
-				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 3, spawnPosX +589*randScalar, spawnPosY - 71*randScalar, -10.085638f*randScalar, 83.809425f*randScalar);
-			}
-			if (random.nextFloat() < 0.5){
-				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 4, spawnPosX + 4*randScalar, spawnPosY -127*randScalar, 98.83999f*randScalar, 25.148289f*randScalar);
-			}
-			if (random.nextFloat() < 0.5){
-				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 2, spawnPosX - 1298*randScalar, spawnPosY -417*randScalar, -25f*randScalar, 42.148289f*randScalar);
-			}						
-	    }		
-		 */
 		return false;
 	}
 
@@ -259,17 +218,15 @@ public class Inputs implements InputProcessor {
 			orderOfMag *= 10;
 			orderOfMagCounter += 1;			
 		}
+		
 		orderOfMagCounter -= orderOfMag/10;
-
 		zf += 0.2f / (Math.pow(10, orderOfMagCounter));
-				
 		
 		if (amount == 1){
 			zf *= -1;
 		}
 		
 		RunSimulation.zF += zf;
-
 		
 		if (RunSimulation.zF <= 0){
 			RunSimulation.zF = 0.000001f;
@@ -277,7 +234,6 @@ public class Inputs implements InputProcessor {
 		else if (RunSimulation.zF >= 15){
 			RunSimulation.zF = 15f;
 		}
-		
 		
 		//System.out.println(RunSimulation.zF);
 		return false;
