@@ -473,7 +473,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
    			listOfBodies.get(listOfBodies.size() - 1).setPredictedPosition(clickLeftPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickLeftPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
    			listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity((clickLeftPositionX - focusedBodyOldX) - (currentMousePositionX - listOfBodies.get(n).posVect.x), (clickLeftPositionY - focusedBodyOldY) - (currentMousePositionY - listOfBodies.get(n).posVect.y), 0);			
    			listOfBodies.get(listOfBodies.size() - 1).setPredictedGravity(true);
-   			predict(listOfBodies.get(listOfBodies.size() - 1), listOfBodies.get(n));
+   			//predict(listOfBodies.get(listOfBodies.size() - 1), listOfBodies.get(n));
    		} else if (!Gdx.input.isButtonPressed(0) && newPlanet && !newSun && !newSystem) {
    			//System.out.println("planetMove");
    			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
@@ -512,7 +512,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
    			listOfBodies.get(listOfBodies.size() - 1).setPredictedPosition(clickRightPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickRightPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
    			listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity((clickRightPositionX - focusedBodyOldX) - (currentMousePositionX - listOfBodies.get(n).posVect.x), (clickRightPositionY - focusedBodyOldY) - (currentMousePositionY - listOfBodies.get(n).posVect.y), 0);			
    			listOfBodies.get(listOfBodies.size() - 1).setPredictedGravity(true);
-			predict(listOfBodies.get(listOfBodies.size() - 1), listOfBodies.get(n));
+			//predict(listOfBodies.get(listOfBodies.size() - 1), listOfBodies.get(n));
    		} else if (!Gdx.input.isButtonPressed(1) && newSun && !newPlanet && !newSystem) {
    			//System.out.println("sunMove");
    			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
@@ -716,6 +716,11 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				PTNewY.remove(0);
 				PTBody.remove(0);
 			}
+			
+			if (n >= listOfBodies.size()) {
+				n -=n;
+			}
+			
 			float velX = -0.002f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
 			float velY = -0.002f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);
 			
@@ -1087,8 +1092,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		if (zoomLines){
 		
 		for (int k = 0; k < 3; k++) {
-			float xSpacing = (float) ((k-1) * 300 * zF * Math.pow(10, orderOfMagCounter));
-			float ySpacing = (float) ((k-1) * 300 * zF * Math.pow(10, orderOfMagCounter));
+			float xSpacing = (float) ((k-1) * 300 * zF * Math.pow(12, orderOfMagCounter));
+			float ySpacing = (float) ((k-1) * 300 * zF * Math.pow(12, orderOfMagCounter));
 			shapeRenderer.line(new Vector2(focusX - cam.viewportWidth, focusY + ySpacing), new Vector2(focusX + cam.viewportWidth, focusY + ySpacing));
 			shapeRenderer.line(new Vector2(focusX + xSpacing, focusY - cam.viewportHeight), new Vector2(focusX + xSpacing, focusY + cam.viewportHeight));
 		}
