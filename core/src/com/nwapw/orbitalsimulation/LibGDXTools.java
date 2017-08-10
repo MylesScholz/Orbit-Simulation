@@ -81,8 +81,8 @@ public class LibGDXTools {
 		body.setMass(mass);
 		body.setName(name);
 		
-		body.setRadius((int) Math.sqrt(mass * 10/ Math.PI));
-		body.spriteWidth = (int) Math.sqrt(mass * 10/ Math.PI) * 2;
+		body.setRadius((int) Math.cbrt(mass * 10/ (4/3) * Math.PI));
+		body.spriteWidth = (int) Math.cbrt(mass * 10/ (4/3) * Math.PI) * 2;
 
 		body.posVect.x = posX;
 		body.posVect.y = posY;
@@ -104,10 +104,10 @@ public class LibGDXTools {
 		
 		body.setMass(mass);
 		body.setName(LibGDXTools.nameGen());
-		
-		body.setRadius((int) Math.sqrt((mass * 10) / Math.PI));
-		body.spriteWidth = (int) Math.sqrt((mass * 10) / Math.PI) * 2;
-		
+
+		body.setRadius((int) Math.cbrt(((mass * 10) / (4/3) * Math.PI)));
+		body.spriteWidth = (int) Math.cbrt(((1 + (int)(Math.random() * 4)) * 10) / (4/3) * Math.PI) * 2;
+
 		body.posVect.x = posX;
 		body.posVect.y = posY;
 		
@@ -127,9 +127,9 @@ public class LibGDXTools {
 		float mass = 10000 + (int)(Math.random() * 40000);
 		body.setMass(mass);
 		body.setName(LibGDXTools.nameGen());
-		
-		body.setRadius((int) Math.sqrt((mass * 10) / Math.PI));
-		body.spriteWidth = (int) Math.sqrt((mass * 10) / Math.PI) * 2;
+
+		body.setRadius((int) Math.cbrt(mass / (4/3) * Math.PI));
+		body.spriteWidth = (int) Math.cbrt(mass / (4/3) * Math.PI) * 2;
 
 		body.posVect.x = posX;
 		body.posVect.y = posY;
@@ -355,11 +355,15 @@ public class LibGDXTools {
 		else if (spriteWidth < 50000) {
 			zF = 0.1f;
 		}
-		else {
-			zF = 0.01f;
+		else if (spriteWidth < 100000) {
+			zF = 0.05f;
 		}
-
-		
+		else if (spriteWidth < 1000000){
+			zF = 0.001f;
+		}
+		else {
+			zF = 0.0001f;
+		}
 		return zF;
 	}
 
