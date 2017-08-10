@@ -174,7 +174,7 @@ public class Inputs implements InputProcessor {
 		if(keycode == Input.Keys.J){
 			if (RunSimulation.coolBackground == true){
 				RunSimulation.coolBackground = false;
-				RunSimulation.backgroundTexture = new Texture("backgrounds/9.jpg");
+				RunSimulation.backgroundTexture = new Texture("backgrounds/10.jpg");
 		        RunSimulation.backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 			}
 			else {
