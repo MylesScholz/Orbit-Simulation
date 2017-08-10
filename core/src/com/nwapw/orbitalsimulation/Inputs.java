@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector3;
 
 public class Inputs implements InputProcessor {
@@ -209,6 +210,23 @@ public class Inputs implements InputProcessor {
 				RunSimulation.purgeState = false;
 			}
 	    }
+		if(keycode == Input.Keys.J){
+			if (RunSimulation.coolBackground == true){
+				RunSimulation.coolBackground = false;
+				RunSimulation.backgroundTexture = new Texture("backgrounds/9.jpg");
+		        RunSimulation.backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+			}
+			else {
+				RunSimulation.coolBackground = true;
+				int j = 1 + (int)(Math.random() * 8); 
+		        String backgroundFileName = "backgrounds/" + j + ".jpg";
+		        RunSimulation.backgroundTexture = new Texture(backgroundFileName);
+		        RunSimulation.backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+			}
+	
+		
+	    }
+		
 		return false;
 	}
 
@@ -280,7 +298,7 @@ public class Inputs implements InputProcessor {
 			RunSimulation.zF = 15f;
 		}
 		
-		System.out.println(RunSimulation.zF);
+		//System.out.println(RunSimulation.zF);
 		return false;
 	}
 

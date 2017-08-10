@@ -33,7 +33,7 @@ public class OrbitalPhysics {
 	static Vector3 calculatedAcc = new Vector3();
 	static Vector3 predictedCalculatedAcc = new Vector3();
 	
-	final static int gravConst = 100;
+	final static int gravConst = 1000;
 	final static int perturbationCalculationMethod = 0; // 0 = Cowell's Method
 	static int integrationMethod = 0;
 
@@ -208,8 +208,8 @@ public class OrbitalPhysics {
     							listOfBodies.get(j).velVect.set(sumVel);
     							
     							listOfBodies.get(j).mass += listOfBodies.get(i).mass;
-    							listOfBodies.get(j).radius = (int) Math.sqrt((listOfBodies.get(j).mass * 10) / Math.PI);
-    							listOfBodies.get(j).spriteWidth = (int) Math.sqrt((listOfBodies.get(j).mass * 10) / Math.PI) * 2;
+    							listOfBodies.get(j).radius = (int) Math.cbrt((listOfBodies.get(j).mass * 10) / (4/3) * Math.PI);
+    							listOfBodies.get(j).spriteWidth = (int) Math.cbrt((listOfBodies.get(j).mass * 10) / (4/3) * Math.PI) * 2;
     							
     							// listOfBodies.get(j).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(i).radius, 2) * 2));
     							// listOfBodies.get(j).spriteWidth = listOfBodies.get(i).radius * 2;
@@ -248,8 +248,8 @@ public class OrbitalPhysics {
     	                        }
     	                    	
     	                        
-    							listOfBodies.get(i).radius = (int) Math.sqrt((listOfBodies.get(i).mass * 10) / Math.PI);
-    							listOfBodies.get(i).spriteWidth = (int) Math.sqrt((listOfBodies.get(i).mass * 10) / Math.PI) * 2;
+    							listOfBodies.get(i).radius = (int) Math.cbrt((listOfBodies.get(i).mass * 10) / (4/3) * Math.PI);
+    							listOfBodies.get(i).spriteWidth = (int) Math.cbrt((listOfBodies.get(i).mass * 10) / (4/3) * Math.PI) * 2;
     							
     							//listOfBodies.get(i).radius += Math.round(Math.sqrt(Math.pow(listOfBodies.get(j).radius, 2) * 2));
     							// listOfBodies.get(i).spriteWidth = listOfBodies.get(j).radius * 2;
