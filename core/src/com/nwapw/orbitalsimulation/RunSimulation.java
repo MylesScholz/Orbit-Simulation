@@ -62,13 +62,13 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	// Specifies time used to calculate numerical integration
 
 	static float deltaTime = (float) 0.05;
-	static float deltaPredictionTime = (float) 0.5;
+	static float deltaPredictionTime = (float) 0.05;
 
 	
 	// The max number of iterations that the simulation runs
-	final static int numOfIterations = 100000000;
+	final static int numOfIterations = 10000;
 	final static int numOfPredictions = 1000;
-	final static float drawLimit = 10000;
+	final static float drawLimit = 1000;
 	final static float predictedDrawLimit = 1000;
 	
 	
@@ -997,17 +997,17 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			
 			fontHeader.draw(batch, "CONTROLS", frameX + 2.5f*cam.viewportWidth/12, frameY + 11.1f*cam.viewportHeight/24);			
 			fontSubtitle.draw(batch, LibGDXTools.underlineCalculation("CONTROLS") + "____", frameX + 2.5f*cam.viewportWidth/12,  frameY + 10.85f*cam.viewportHeight/24);
-			fontText.draw(batch, "(SCROLL OR +/-) Zoom", frameX + 2.5f*cam.viewportWidth/12, frameY + 10*cam.viewportHeight/24);
-			fontText.draw(batch, "(LEFT CLICK) Create New Planet", frameX + 2.5f*cam.viewportWidth/12, frameY + 9*cam.viewportHeight/24);
-			fontText.draw(batch, "(RIGHT CLICK) Create New Star", frameX + 2.5f*cam.viewportWidth/12, frameY + 8*cam.viewportHeight/24);			
-			fontText.draw(batch, "(ARROW KEYS) Move Focused Body", frameX + 2.5f*cam.viewportWidth/12, frameY + 7*cam.viewportHeight/24);
-			fontText.draw(batch, "(SPACEBAR) Pause & Save", frameX + 2.5f*cam.viewportWidth/12, frameY + 6*cam.viewportHeight/24);
+			fontText.draw(batch, "(SCROLL OR +/-) Zoom  (Z) Zoom lines", frameX + 2.5f*cam.viewportWidth/12, frameY + 10*cam.viewportHeight/24);
+			fontText.draw(batch, "(LEFT CLICK) Create New Planet (Q) Step method", frameX + 2.5f*cam.viewportWidth/12, frameY + 9*cam.viewportHeight/24);
+			fontText.draw(batch, "(RIGHT CLICK) Create New Star (U) Collisions On/Off", frameX + 2.5f*cam.viewportWidth/12, frameY + 8*cam.viewportHeight/24);			
+			fontText.draw(batch, "(ARROW KEYS) Move Focused Body (I) Reset dT", frameX + 2.5f*cam.viewportWidth/12, frameY + 7*cam.viewportHeight/24);
+			fontText.draw(batch, "(SPACEBAR) Pause & Save  (V) Predictions On/Off", frameX + 2.5f*cam.viewportWidth/12, frameY + 6*cam.viewportHeight/24);
 			fontText.draw(batch, "(CTRL) Focus on body closest to mouse", frameX + 2.5f*cam.viewportWidth/12, frameY + 5*cam.viewportHeight/24);
 			fontText.draw(batch, "(M) Reset Vel  (P) Purge extraneous planets", frameX + 2.5f*cam.viewportWidth/12, frameY + 4*cam.viewportHeight/24);
 			fontText.draw(batch, "(N) Change Focus (B) Change Focus to Next Star", frameX + 2.5f*cam.viewportWidth/12, frameY + 3*cam.viewportHeight/24);
 			fontText.draw(batch, "(C) Switch Camera Modes  (WASD) Panning", frameX + 2.5f*cam.viewportWidth/12, frameY + 2*cam.viewportHeight/24);
 			fontText.draw(batch, "( , ) Decrease dt  ( . ) Increase dt", frameX + 2.5f*cam.viewportWidth/12, frameY + 1*cam.viewportHeight/24);
-			fontText.draw(batch, "(X) Spawn a Star/Planets System", frameX + 2.5f*cam.viewportWidth/12, frameY + 0*cam.viewportHeight/24);
+			fontText.draw(batch, "(O) Spawn a Star/Planets System", frameX + 2.5f*cam.viewportWidth/12, frameY + 0*cam.viewportHeight/24);
 							
 			
 			
