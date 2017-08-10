@@ -13,6 +13,43 @@ public class Inputs implements InputProcessor {
 
 	@Override
 	public boolean keyDown(int keycode) {
+		if (keycode == Input.Keys.V) {
+			if (RunSimulation.predictions == true){
+        		RunSimulation.predictions = false;
+        	} else {
+        		RunSimulation.predictions = true;
+        	}
+		}
+		
+		if (keycode == Input.Keys.U) {
+			if (RunSimulation.collisionsOn == true){
+        		RunSimulation.collisionsOn = false;
+        	} else {
+        		RunSimulation.collisionsOn = true;
+        	}
+		}
+		
+		if (keycode == Input.Keys.Q) {
+			if (OrbitalPhysics.integrationMethod == 0){
+        		OrbitalPhysics.integrationMethod = 1;
+        	} else {
+        		OrbitalPhysics.integrationMethod = 0;
+        	}
+		}
+		
+		if (keycode == Input.Keys.X) {
+			if (RunSimulation.slingShot == 1){
+        		RunSimulation.slingShot = -1;
+        	} else {
+        		RunSimulation.slingShot = 1;
+        	}
+		}
+		
+		if (keycode == Input.Keys.I) {
+			RunSimulation.deltaTime = (float) 0.05;
+			RunSimulation.deltaPredictionTime = (float) 0.5;
+		}
+		
 		if (keycode == Input.Keys.C) {
 			boolean cameraPan = RunSimulation.cameraPan;
 			
@@ -148,10 +185,12 @@ public class Inputs implements InputProcessor {
 		
 		if (keycode == Input.Keys.PERIOD) {
 			RunSimulation.deltaTime += RunSimulation.deltaTime / 10;
+			RunSimulation.deltaPredictionTime += RunSimulation.deltaPredictionTime / 10;
 		}
 		
 		if (keycode == Input.Keys.COMMA) {
 			RunSimulation.deltaTime -= RunSimulation.deltaTime / 10;
+			RunSimulation.deltaPredictionTime += RunSimulation.deltaPredictionTime / 10;
 		}
 
 		if(keycode == Input.Keys.Z){
