@@ -34,23 +34,29 @@ public class Inputs implements InputProcessor {
 		
 		if (keycode == Input.Keys.CONTROL_LEFT) {
 			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
-			RunSimulation.cam.unproject(mousePos); 
+			RunSimulation.cam.unproject(mousePos);
 		    mousePos.scl(1/RunSimulation.zF);
-		    
+		    		   
 		    float closestDist = RunSimulation.listOfBodies.get(0).posVect.dst(mousePos);
+		    //closestDist +=  RunSimulation.listOfBodies.get(0).velVect.len() * (-100f * RunSimulation.zF * RunSimulation.deltaTime * 20);
+		   
+		    
 		    int closestN = 0;
 		   
-		    for (int i = 1; i < RunSimulation.listOfBodies.size()-1; i++){
-		    	if (RunSimulation.listOfBodies.get(i).posVect.dst(mousePos) < closestDist ) {
-		    		//System.out.println(RunSimulation.listOfBodies.get(i).name);
-		    		//System.out.println((RunSimulation.listOfBodies.get(i).posVect.dst(mousePos)));
+		    for (int i = 1; i < RunSimulation.listOfBodies.size(); i++){
+		    	
+		    	float checkClosestDist = RunSimulation.listOfBodies.get(i).posVect.dst(mousePos);
+		    	//checkClosestDist +=  RunSimulation.listOfBodies.get(i).velVect.len() * (-100f * RunSimulation.zF * RunSimulation.deltaTime * 20);
+		    	
+		    	if (checkClosestDist < closestDist ) {
 		    		closestN = i;
-		    		
+		    		closestDist = checkClosestDist;
 		    	}		    	
 	
 		    }
 		    RunSimulation.n = closestN;
-		    
+
+
 		    
 		}
 		
@@ -148,7 +154,7 @@ public class Inputs implements InputProcessor {
 			RunSimulation.deltaTime -= RunSimulation.deltaTime / 10;
 		}
 
-		if(keycode == Input.Keys.L){
+		if(keycode == Input.Keys.Z){
 			if (RunSimulation.zoomLines == false){
 				RunSimulation.zoomLines = true;
 			}
@@ -164,47 +170,6 @@ public class Inputs implements InputProcessor {
 				RunSimulation.purgeState = false;
 			}
 	    }
-		/*
-		if(keycode == Input.Keys.X){
-			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
-		    RunSimulation.cam.unproject(mousePos); 
-		    
-		    int spawnPosX = (int) (mousePos.x / RunSimulation.zF);
-			int spawnPosY = (int) (mousePos.y / RunSimulation.zF);		
-			
-			Random random = new Random();
-			float randScalar = 1 + (random.nextFloat() - 0.5f)/4;
-			
-			if (random.nextFloat() < 0.5){
-				randScalar *= -1;
-			}
-			
-			LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 43779 + randScalar*1000, spawnPosX, spawnPosY ,0,0);
-			
-			
-			if (random.nextFloat() < 0.5){
-				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 3, spawnPosX + 1709*randScalar, spawnPosY - 123*randScalar, 2.2944372f*randScalar, -34.84709f*randScalar);	
-			}
-			if (random.nextFloat() < 0.5){
-				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 4, spawnPosX + 842*randScalar, spawnPosY - 172*randScalar, 36f*randScalar, 60f*randScalar);	
-							}				
-			if (random.nextFloat() < 0.5){
-				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 4, spawnPosX - 1127*randScalar, spawnPosY - 101*randScalar, 6.7067494f*randScalar, 55.26426f*randScalar);
-			}			
-			if (random.nextFloat() < 0.5){
-				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 1, spawnPosX +480*randScalar, spawnPosY - 51*randScalar, 18.085638f*randScalar, -92.809425f*randScalar);
-			}			
-			if (random.nextFloat() < 0.5){
-				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 3, spawnPosX +589*randScalar, spawnPosY - 71*randScalar, -10.085638f*randScalar, 83.809425f*randScalar);
-			}
-			if (random.nextFloat() < 0.5){
-				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 4, spawnPosX + 4*randScalar, spawnPosY -127*randScalar, 98.83999f*randScalar, 25.148289f*randScalar);
-			}
-			if (random.nextFloat() < 0.5){
-				LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 2, spawnPosX - 1298*randScalar, spawnPosY -417*randScalar, -25f*randScalar, 42.148289f*randScalar);
-			}						
-	    }		
-		 */
 		return false;
 	}
 
@@ -259,27 +224,24 @@ public class Inputs implements InputProcessor {
 			orderOfMag *= 10;
 			orderOfMagCounter += 1;			
 		}
+		
 		orderOfMagCounter -= orderOfMag/10;
-
 		zf += 0.2f / (Math.pow(10, orderOfMagCounter));
-				
 		
 		if (amount == 1){
 			zf *= -1;
 		}
 		
 		RunSimulation.zF += zf;
-
 		
-		if (RunSimulation.zF <= 0){
-			RunSimulation.zF = 0.000001f;
+		if (RunSimulation.zF <= 0.00009f){
+			RunSimulation.zF = 0.00009f;
 		}
-		else if (RunSimulation.zF >= 15){
+		else if (RunSimulation.zF >= 15f){
 			RunSimulation.zF = 15f;
 		}
 		
-		
-		//System.out.println(RunSimulation.zF);
+		System.out.println(RunSimulation.zF);
 		return false;
 	}
 
