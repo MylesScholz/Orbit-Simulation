@@ -68,9 +68,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	
 	// The max number of iterations that the simulation runs
 	final static int numOfIterations = 100000000;
-	final static int numOfPredictions = 1000;
+	final static int numOfPredictions = 100;
 	final static float drawLimit = 1000;
-	final static float predictedDrawLimit = 1000;
+	final static float predictedDrawLimit = 100;
 	
 	// 0 = Focus on a particular body, 1 = free movement
 	static int cameraMode = 0;
@@ -496,7 +496,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
    		}
    		
    		if (Gdx.input.isKeyPressed(52) && !newPlanet && !newSun && !newSystem) {
-   			System.out.println("X Click");
+   			//System.out.println("X Click");
    			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
    			cam.unproject(mousePos);
    			
@@ -505,7 +505,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
    			
    			newSystem = true;
    		} else if (!Gdx.input.isKeyPressed(52) && newSystem && !newPlanet && !newSun) {
-   			System.out.println("X Unclick");
+   			//System.out.println("X Unclick");
    			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
    			cam.unproject(mousePos);
    			
@@ -515,9 +515,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
    			float velocityX = (unclickLeftPositionX - clickLeftPositionX)*placedBodySpeed/4;
    			float velocityY = (unclickLeftPositionY - clickLeftPositionY)*placedBodySpeed/4;
    			
-   			System.out.println(velocityX);
-   			System.out.println(velocityY);
-   			System.out.println("");
+   			//System.out.println(velocityX);
+   			//System.out.println(velocityY);
+   			//System.out.println("");
    			Random random = new Random();
    			float randScalar = 1 + (random.nextFloat() - 0.5f)/4;
    			
@@ -584,7 +584,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
             		float velY = -0.002f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);
             		
 					shapeRenderer.setColor(1, 0, 0, x / (float) FTOldX.size());
-					shapeRenderer.line(FTOldX.get(x) * zF * velX * zF, FTOldY.get(x) * zF * velY * zF, FTNewX.get(x) * zF * velX * zF, FTNewY.get(x) * zF * velY * zF);
+					shapeRenderer.line(FTOldX.get(x) * zF + velX * zF, FTOldY.get(x) * zF + velY * zF, FTNewX.get(x) * zF + velX * zF, FTNewY.get(x) * zF + velY * zF);
 				}
 				shapeRenderer.end();
 				Gdx.gl.glDisable(GL30.GL_BLEND);
@@ -601,7 +601,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				FTNewX.remove(0);
 				FTNewY.remove(0);
 				for (int i = 0; i < listOfBodies.size(); i++) {
-					listOfBodies.get(i).setRemoved(false);					
+					listOfBodies.get(i).setRemoved(false);
 				}
 				//System.out.println("Reset");
 				predictionCounter = 0;
@@ -682,6 +682,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				PTNewX.remove(0);
 				PTNewY.remove(0);
 				PTBody.remove(0);
+			}
+			if (n >= listOfBodies.size()) {
+				n -= n;
 			}
 			float velX = -0.002f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
 			float velY = -0.002f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);
@@ -1053,9 +1056,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		
 		if (zoomLines){
 		
-		for (int k = 0; k < 3; k++) {
-			float xSpacing = (float) ((k-1) * 300 * zF * Math.pow(10, orderOfMagCounter));
-			float ySpacing = (float) ((k-1) * 300 * zF * Math.pow(10, orderOfMagCounter));
+		for (int k = 0; k < 200; k++) {
+			float xSpacing = (float) ((k-100) * 300 * zF * Math.pow(18, orderOfMagCounter));
+			float ySpacing = (float) ((k-100) * 300 * zF * Math.pow(18, orderOfMagCounter));
 			shapeRenderer.line(new Vector2(focusX - cam.viewportWidth, focusY + ySpacing), new Vector2(focusX + cam.viewportWidth, focusY + ySpacing));
 			shapeRenderer.line(new Vector2(focusX + xSpacing, focusY - cam.viewportHeight), new Vector2(focusX + xSpacing, focusY + cam.viewportHeight));
 		}
