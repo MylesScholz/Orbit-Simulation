@@ -172,9 +172,19 @@ public class Inputs implements InputProcessor {
 			}
 	    }
 		if(keycode == Input.Keys.J){
+			if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
+			
 			if (RunSimulation.coolBackground == true){
 				RunSimulation.coolBackground = false;
-				RunSimulation.backgroundTexture = new Texture("backgrounds/10.jpg");
+				int j=1;
+				if (Math.random() < 0.5){
+					j = 10;
+				}
+				else {
+					j = 11;
+				}
+		        String backgroundFileName = "backgrounds/" + j + ".jpg";
+		        RunSimulation.backgroundTexture = new Texture(backgroundFileName);
 		        RunSimulation.backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 			}
 			else {
@@ -185,7 +195,7 @@ public class Inputs implements InputProcessor {
 		        RunSimulation.backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 			}
 	
-		
+			}
 	    }
 		
 		return false;
