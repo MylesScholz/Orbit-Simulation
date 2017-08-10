@@ -81,8 +81,8 @@ public class LibGDXTools {
 		body.setMass(mass);
 		body.setName(name);
 		
-		body.setRadius((int) Math.sqrt(mass * 10/ Math.PI));
-		body.spriteWidth = (int) Math.sqrt(mass * 10/ Math.PI) * 2;
+		body.setRadius((int) Math.cbrt(mass * 10/ (4/3) * Math.PI));
+		body.spriteWidth = (int) Math.cbrt(mass * 10/ (4/3) * Math.PI) * 2;
 
 		body.posVect.x = posX;
 		body.posVect.y = posY;
@@ -104,8 +104,8 @@ public class LibGDXTools {
 		body.setMass(mass);
 		body.setName(LibGDXTools.nameGen());
 		
-		body.setRadius((int) Math.sqrt(((mass * 10) / Math.PI)));
-		body.spriteWidth = (int) Math.sqrt(((1 + (int)(Math.random() * 4)) * 10) / Math.PI) * 2;
+		body.setRadius((int) Math.cbrt(((mass * 10) / (4/3) * Math.PI)));
+		body.spriteWidth = (int) Math.cbrt(((1 + (int)(Math.random() * 4)) * 10) / (4/3) * Math.PI) * 2;
 
 		body.posVect.x = posX;
 		body.posVect.y = posY;
@@ -127,8 +127,8 @@ public class LibGDXTools {
 		body.setMass(mass);
 		body.setName(LibGDXTools.nameGen());
 		
-		body.setRadius((int) Math.sqrt(mass / Math.PI));
-		body.spriteWidth = (int) Math.sqrt(mass / Math.PI) * 2;
+		body.setRadius((int) Math.cbrt(mass / (4/3) * Math.PI));
+		body.spriteWidth = (int) Math.cbrt(mass / (4/3) * Math.PI) * 2;
 
 		body.posVect.x = posX;
 		body.posVect.y = posY;

@@ -50,15 +50,6 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class RunSimulation extends ApplicationAdapter implements ApplicationListener {
 
-	/* CONTROLS
-	 * 
-	 * P - Purge all planets not near stars
-	 * X - new galaxy
-	 * CTRL - Focus on closest body to mouse
-	 * 
-	 */
-	
-
 	// Constant for the force of gravity, affects how much bodies accelerate
 	final static int gravConst = 100;
 	
@@ -106,13 +97,11 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	public static ArrayList<Float> PTNewX = new ArrayList<Float>();
 	public static ArrayList<Float> PTNewY = new ArrayList<Float>();
 	public static ArrayList<Integer> PTBody = new ArrayList<Integer>();
-	public static ArrayList<Integer> createdBody = new ArrayList<Integer>();
 	
 	public static ArrayList<Float> FTOldX = new ArrayList<Float>();
 	public static ArrayList<Float> FTOldY = new ArrayList<Float>();
 	public static ArrayList<Float> FTNewX = new ArrayList<Float>();
 	public static ArrayList<Float> FTNewY = new ArrayList<Float>();
-	public static ArrayList<Integer> FTBody = new ArrayList<Integer>();
 	
 	//List of vectors for comet tails
     float tailOldX;
@@ -135,54 +124,56 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	int clickRightPositionY;
 	int unclickRightPositionX;
 	int unclickRightPositionY;
-	
+
+	//The x and y positions of the focused body from the previous iteration
 	float focusedBodyOldX;
 	float focusedBodyOldY;
-	
+
+	//Graphics objects
 	SpriteBatch batch;
 	Texture backgroundTexture;
 	ShapeRenderer shapeRenderer;
-	
+
+	//Camera coordinate variables
 	static OrthographicCamera cam;
 	float camX = 0;
 	float camY = 0;
-	float sourceX = 0;
-	float sourceY = 0;
 	float frameX;
 	float frameY;
-	float adjustX = 0;
-	float adjustY = 0;
 	
 	static float panX = 0;
 	static float panY = 0;
 	
 	// zoom factor
 	static float zF = 1;
-	static float zFTransition = 0;
 	
 	static float placedBodySpeed = 0.5f;
-	
-	int placedBodies = 1; //for star/planet system
-	
+
+	//Lists of all available textures for planets and stars
 	Texture textures;
 	static ArrayList<Texture> availablePlanetTextures = new ArrayList<Texture>();
     static ArrayList<Texture> availableStarTextures = new ArrayList<Texture>();
 
+    //List of colors of stars for texture choosing
     static String[] starColors = new String[5];
-	
+
+    //List of all the textures currently being used
 	static ArrayList<Texture> runningTextures = new ArrayList<Texture>();
-	
+
+	//Font objects
 	BitmapFont font;
 	BitmapFont fontTitle;
 	BitmapFont fontHeader;
 	BitmapFont fontText;
 	BitmapFont fontSubtitle;
 	BitmapFont fontFocus;
-	
+
+	//Text to display the position, velocity, and acceleration
 	String printPos;
 	String printVel;
 	String printAcc;
-	
+
+	//Booleans for interface
 	static boolean sidePanelState = false;
 	static boolean zoomLines = false;
 	static boolean purgeState = false;
@@ -190,117 +181,18 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	static boolean cameraPan = false;
 	static Skin skin;
 
-	Stage stage;
-	Table rootTable;
-	Table upperTable;
-	Table popupTable;
-	Table sidePanel;
-
-	Table dockTable;
-	
-	Stack interfaceStack;
 	static boolean pauseState = false;
-	static int savedIndicator = 0;
-	
+
+	//Input processor object
 	InputMultiplexer multiplexer;
 	
 	@Override
 
-	public void create () {				
-        
-		/* SCENE2D*/
-		/*
-		stage = new Stage(new ExtendViewport(1366, 768)); 
-		
-		rootTable = new Table();
-		rootTable.setFillParent(true);
-		stage.addActor(rootTable);
-		
-		rootTable.setDebug(true);
-
-		 skin = new Skin(Gdx.files.internal("uiskin.json"));
-		 
-		 final TextButton pauseButton = new TextButton("Pause", skin, "default");
- 	     
-		 final TextButton saveButton = new TextButton("Save", skin, "default");
-  
-	     
-		 interfaceStack = new Stack();
-		 rootTable.add(interfaceStack).expand();
-		 
-		 //Label title = new Label("Orbital Simulation", skin ,"Roboto-Bold");
-		 //interfaceStack.add(title);
-		 
-		 
-	     
-	     upperTable = new Table();
-	     interfaceStack.add(upperTable);
-	     
-	     popupTable = new Table();
-	     upperTable.add(popupTable).width(600f).height(600f);
-	     
-	     Container imageContainer = new Container();
-	     Container textContainer = new Container();
-	     
-	     popupTable.add(imageContainer).height(400f).width(1000f);
-	     popupTable.row();
-	     
-	     //Label popupText = new Label();
-	     
-	     popupTable.add(textContainer).height(200f);
-	    
-	     
-	     sidePanel = new Table();
-	     rootTable.add(sidePanel).width(500f);
-	     
-	     rootTable.row();
-	     
-	     dockTable = new Table();
-	     rootTable.add(dockTable);
-	     
-	     dockTable.add(new TextButton("Zoom In", skin, "default")).width(75).height(Gdx.graphics.getHeight()/20);
-	     dockTable.add(new TextButton("Zoom Out", skin, "default")).width(75).pad(Gdx.graphics.getHeight()/40);
-	     dockTable.add(new TextButton("Cam Mode", skin, "default")).width(75).pad(Gdx.graphics.getHeight()/40);	     
-	     dockTable.add(new TextButton("Focus", skin, "default")).width(75).pad(Gdx.graphics.getHeight()/40);	  
-
-	     
-	     dockTable.add(pauseButton).pad(Gdx.graphics.getHeight()/40).width(75);
-	     dockTable.add(saveButton).pad(Gdx.graphics.getHeight()/40).width(75);
-	     dockTable.add(new TextButton("Load", skin, "default")).width(75).pad(Gdx.graphics.getHeight()/40);	
-	     dockTable.add(new TextButton("Debug", skin, "default")).width(75).pad(Gdx.graphics.getHeight()/40);	     
-	     dockTable.add(new TextButton("Objectives", skin, "default")).width(75).pad(Gdx.graphics.getHeight()/40);	  
-	    
-	     pauseButton.addListener(new ClickListener(){
-	    	 @Override 
-	    	 public void clicked(InputEvent event, float x, float y){
-	            
-	              if (pauseState == true){
-	            	  pauseState = false;
-	            	  pauseButton.setText("Pause");
-	              }
-	              else {
-	            	  pauseState = true;
-	            	  pauseButton.setText("Run");
-	              }	
-	            }
-	        });	  
-	     saveButton.addListener(new ClickListener(){
-	    	 @Override 
-	    	 public void clicked(InputEvent event, float x, float y){
-	            
-	    		savedIndicator = 50;
-
-	
-	            }
-	        });
-	     
-	   // table.addActor(saveButton);	
-	   // table.row();
-	    //table.addActor(pauseButton);
-		*/
-	    
+	public void create () {
 
 		/* GRAPHICS & INPUTS*/
+
+		//Initialize graphics objects and input processor
 		shapeRenderer = new ShapeRenderer();
 		batch = new SpriteBatch();
 		
@@ -309,22 +201,26 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		// Allows chaining of multiple inputProcessors
 		multiplexer = new InputMultiplexer();
 		multiplexer.addProcessor(inputProcessor);
-		//multiplexer.addProcessor(stage);
 		Gdx.input.setInputProcessor(multiplexer);
 
-					
 		/* CAMERA */
+
+		//Height and width of window
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
-		
+
+		//Set initial camera position
 		cam = new OrthographicCamera(30, 30 * (h / w));
 		cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
-		
+
+		//Initialize text to display position, velocity, and acceleration
 		printPos = "Pos: (0.0, 0.0, 0.0)";
 		printVel = "Vel: (0.0, 0.0, 0.0)";
 		printAcc = "Acc: (0.0, 0.0, 0.0)";
 		
-		/* FONTS */ 		 
+		/* FONTS */
+
+		//Initialize font objects for text
 		font = new BitmapFont();
 		font.setUseIntegerPositions(false);
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Roboto-Bold.ttf"));
@@ -333,7 +229,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		FreeTypeFontParameter fSubtitle = new FreeTypeFontParameter();
 		FreeTypeFontParameter fText = new FreeTypeFontParameter();
 		FreeTypeFontParameter fFocus = new FreeTypeFontParameter();
-		
+
+		//Set size, position ,and color
 		fTitle.size = 35;
 		fTitle.shadowColor = Color.BLACK;
 		fTitle.shadowOffsetX = 2;
@@ -352,7 +249,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		
 		fFocus.size = 26;
 		fText.color = Color.WHITE;
-		
+
+		//Set up generator and format text
 		fontTitle = generator.generateFont(fTitle); 
 		
 		generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Roboto-Regular.ttf"));
@@ -369,13 +267,17 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		fontFocus.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		
 		generator.dispose();
+
 		/* TEXTURES */
+
+		//Adds names of colors to star color list
         starColors[0] = "blue";
         starColors[1] = "orange";
         starColors[2] = "red";
         starColors[3] = "white";
         starColors[4] = "yellow";
 
+        //Loops through file names of available planet textures and adds them to available textures list
 		for (int i = 1; i < 8; i++){
 			String planetFileName = "planets/planet" + i + ".png";
 			textures = new Texture(planetFileName);
@@ -388,6 +290,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			availablePlanetTextures.add(textures);
 		}
 
+		//Loops through file names of available star textures and adds them to available textures list
         for (int i = 0; i < 5; i++){
             for (int j = 1; j < 5; j++) {
             	String starFileName = "stars/mainsequence/star_" + starColors[i] + "0" + j + ".png";
@@ -396,243 +299,210 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
             }
         }
         
-        
-        
+		//Selects a random background texture and sets it to wrap
 		int j = 1 + (int)(Math.random() * 8); 
         String backgroundFileName = "backgrounds/" + j + ".jpg";
-        backgroundTexture = new Texture(backgroundFileName);		
+        backgroundTexture = new Texture(backgroundFileName);
         backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
         
         /* INITIAL BODIES */
+
 		// Name, Mass, radius, posx, posy, velx, vely, spritewidth
 
         //LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 1, 250 , 250, 35, -35);
         //LibGDXTools.bodyCreate(LibGDXTools.nameGen(), 10000, 0, 0, 0, 0);
         
         /* FILES */
-        
+
+        //If there are no bodies in the system, attempt to load file
         if (listOfBodies.size() == 0) {
             loadFile();
         }
-        
+
+        //Sets the zoom factor to the default zoom
         zF = LibGDXTools.calculateDefaultZoom(listOfBodies.get(n).spriteWidth);
 	}
 
 
     public void loadFile() {
-        String filePath = this.getClass().getClassLoader().getResource("").getPath();   // The path of the running file
+		//Gets file path of current file
+        String filePath = this.getClass().getClassLoader().getResource("").getPath();   //The path of the running file
         filePath = filePath.substring(0, filePath.indexOf("/desktop")) + "/core/assets/systems/count.txt";    //Navigate to system file
-        filePath = filePath.replaceAll("%20", " ");
+        filePath = filePath.replaceAll("%20", " ");    //Remove space placeholder in file path
 
+		//Define file readers
         File systemFile;
         FileReader in;
         BufferedReader readFile;
         String textLine;
 
+        //Variables for loading files
         boolean fileLoaded = false;
         int i = 0;
         int fileCount = 0;
 
+        //Read the current file number from count.txt
         try {
+        	//Initialize file readers
             systemFile = new File(filePath);
             in = new FileReader(systemFile);
             readFile = new BufferedReader(in);
 
+            //Read count.txt and put it into fileCount
             fileCount = Integer.parseInt(readFile.readLine().trim());
         } catch (FileNotFoundException e) {
+        	//Catch file not found exception
             System.out.println("File Not Found: " + e.getMessage());
         } catch (IOException e) {
+        	//Catch IO exception
             System.out.println("Problem Reading File: " + e.getMessage());
         }
+        //Define variables of data
         String nameStr;
         float massFlt, posXFlt, posYFlt, velXFlt, velYFlt;
 
+        //Change working file path to the system file
         filePath = filePath.substring(0, filePath.lastIndexOf("/"));
         filePath = filePath + "/system" + fileCount + ".txt";
 
         while (fileLoaded == false && i < 2) {
             try {
+            	//Initialize file readers
                 systemFile = new File(filePath);
                 in = new FileReader(systemFile);
                 readFile = new BufferedReader(in);
 
+                //Loop through the file line by line
                 while ((textLine = readFile.readLine()) != null) {
-                    nameStr = textLine.substring(0, textLine.indexOf(","));
-                    textLine = textLine.substring(textLine.indexOf(",") + 1);
-                    massFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
-                    textLine = textLine.substring(textLine.indexOf(",") + 1);
-                    posXFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
-                    textLine = textLine.substring(textLine.indexOf(",") + 1);
-                    posYFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
-                    textLine = textLine.substring(textLine.indexOf(",") + 1);
-                    velXFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
-                    textLine = textLine.substring(textLine.indexOf(",") + 1);
-                    velYFlt = (float) Double.parseDouble(textLine.substring(0, textLine.length()));
+                    nameStr = textLine.substring(0, textLine.indexOf(","));		//Read name
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
 
-                    LibGDXTools.bodyCreate(nameStr, massFlt, posXFlt, posYFlt, velXFlt, velYFlt);
+                    massFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));		//Read mass
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+
+                    posXFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));		//Read x position
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+
+                    posYFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));		//Read y position
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+
+                    velXFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));		//Read x velocity
+                    textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+
+                    velYFlt = (float) Double.parseDouble(textLine.substring(0, textLine.length()));		//Read y velocity
+
+                    LibGDXTools.bodyCreate(nameStr, massFlt, posXFlt, posYFlt, velXFlt, velYFlt);	//Create body with data from file
                 }
                 readFile.close();
                 in.close();
 
                 fileLoaded = true;
             } catch (FileNotFoundException e) {
+				//Catch file not found exception
                 System.out.println("File Not Found: " + e.getMessage());
                 System.out.println("Loading Default File...");
 
+                //Change file path to default file and loop again
                 filePath = filePath.substring(0, filePath.lastIndexOf("/"));
                 filePath = filePath + "/default.txt";
                 i++;
             } catch (IOException e) {
+				//Catch IO exception
                 System.out.println("Problem Reading File: " + e.getMessage());
             }
         }
     }
 
-    public void loadFile(String fileName) {
-        String filePath = this.getClass().getClassLoader().getResource("").getPath();   // The path of the running file
-        filePath = filePath.substring(0, filePath.indexOf("/desktop")) + "/core/assets/systems/" + fileName;    //Navigate to system file
-        filePath = filePath.replaceAll("%20", " ");
-
-        File systemFile;
-        FileReader in;
-        BufferedReader readFile;
-        String textLine;
-
-        boolean fileLoaded = false;
-        int i = 0;
-
-        String nameStr;
-        float massFlt, posXFlt, posYFlt, velXFlt, velYFlt;
-
-        while (fileLoaded == false && i < 2) {
-            try {
-                systemFile = new File(filePath);
-                in = new FileReader(systemFile);
-                readFile = new BufferedReader(in);
-
-                while ((textLine = readFile.readLine()) != null) {
-                    nameStr = textLine.substring(0, textLine.indexOf(","));
-                    textLine = textLine.substring(textLine.indexOf(",") + 1);
-                    massFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
-                    textLine = textLine.substring(textLine.indexOf(",") + 1);
-                    posXFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
-                    textLine = textLine.substring(textLine.indexOf(",") + 1);
-                    posYFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
-                    textLine = textLine.substring(textLine.indexOf(",") + 1);
-                    velXFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));
-                    textLine = textLine.substring(textLine.indexOf(",") + 1);
-                    velYFlt = (float) Double.parseDouble(textLine.substring(0, textLine.length()));
-
-                    LibGDXTools.bodyCreate(nameStr, massFlt, posXFlt, posYFlt, velXFlt, velYFlt);
-                }
-                readFile.close();
-                in.close();
-
-                fileLoaded = true;
-            } catch (FileNotFoundException e) {
-                System.out.println("File Not Found: " + e.getMessage());
-                System.out.println("Loading Default File...");
-
-                filePath = filePath.substring(0, filePath.lastIndexOf("/"));
-                filePath = filePath + "/default.txt";
-                i++;
-            } catch (IOException e) {
-                System.out.println("Problem Reading File: " + e.getMessage());
-            }
-        }
-    }
-
-   	public void place() {		
-   		if (!Gdx.input.isKeyPressed(Input.Keys.X)) { 		
+   	public void place() {
+   		if (!Gdx.input.isKeyPressed(Input.Keys.X)) {
+   			//Create planet on left click
 			if (Gdx.input.isButtonPressed(0) && !newPlanet && !newSun) {
 				//System.out.println("planetPlace");
 				Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-			    cam.unproject(mousePos);
-	
-			    clickLeftPositionX = (int) (mousePos.x / zF);
-				clickLeftPositionY = (int) (mousePos.y / zF);		
-				
+				cam.unproject(mousePos);
+
+				clickLeftPositionX = (int) (mousePos.x / zF);
+				clickLeftPositionY = (int) (mousePos.y / zF);
+
 				focusedBodyOldX = listOfBodies.get(n).posVect.x;
 				focusedBodyOldY = listOfBodies.get(n).posVect.y;
-				
-				LibGDXTools.bodyCreatePlanet(clickLeftPositionX , clickLeftPositionY, 0, 0);
+
+				LibGDXTools.bodyCreatePlanet(clickLeftPositionX, clickLeftPositionY, 0, 0);
 				newPlanet = true;
-			} else if(Gdx.input.isButtonPressed(0) && newPlanet && !newSun) {
+			} else if (Gdx.input.isButtonPressed(0) && newPlanet && !newSun) {
 				//System.out.println("planetHold");
 				Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-			    cam.unproject(mousePos);
-			    
-			    currentMousePositionX = (int) (mousePos.x / zF);
+				cam.unproject(mousePos);
+
+				currentMousePositionX = (int) (mousePos.x / zF);
 				currentMousePositionY = (int) (mousePos.y / zF);
-				
+
 				listOfBodies.get(listOfBodies.size() - 1).setPosition(clickLeftPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickLeftPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
 				listOfBodies.get(listOfBodies.size() - 1).setPredictedPosition(clickLeftPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickLeftPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
-				listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity((clickLeftPositionX - focusedBodyOldX) - (currentMousePositionX - listOfBodies.get(n).posVect.x), (clickLeftPositionY - focusedBodyOldY) - (currentMousePositionY - listOfBodies.get(n).posVect.y), 0);			
+				listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity((clickLeftPositionX - focusedBodyOldX) - (currentMousePositionX - listOfBodies.get(n).posVect.x), (clickLeftPositionY - focusedBodyOldY) - (currentMousePositionY - listOfBodies.get(n).posVect.y), 0);
 				listOfBodies.get(listOfBodies.size() - 1).setPredictedGravity(true);
 				//predict(listOfBodies.get(listOfBodies.size() - 1), listOfBodies.get(n));
 			} else if (!Gdx.input.isButtonPressed(0) && newPlanet && !newSun) {
 				//System.out.println("planetMove");
 				Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-			    cam.unproject(mousePos);
-			    
-			    unclickLeftPositionX = (int) (mousePos.x / zF);
+				cam.unproject(mousePos);
+
+				unclickLeftPositionX = (int) (mousePos.x / zF);
 				unclickLeftPositionY = (int) (mousePos.y / zF);
-				
+
 				listOfBodies.get(listOfBodies.size() - 1).setVelocity((clickLeftPositionX - focusedBodyOldX) - (unclickLeftPositionX - listOfBodies.get(n).posVect.x), (clickLeftPositionY - focusedBodyOldY) - (unclickLeftPositionY - listOfBodies.get(n).posVect.y), 0);
 				listOfBodies.get(listOfBodies.size() - 1).setGravity(true);
 				newPlanet = false;
-			} 
-			
+			}
+
+			//Create star on right click
 			if (Gdx.input.isButtonPressed(1) && !newSun && !newPlanet) {
 				//System.out.println("sunPlace");
 				Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-			    cam.unproject(mousePos);
-			    
-			    clickRightPositionX = (int) (mousePos.x / zF);
+				cam.unproject(mousePos);
+
+				clickRightPositionX = (int) (mousePos.x / zF);
 				clickRightPositionY = (int) (mousePos.y / zF);
 				focusedBodyOldX = listOfBodies.get(n).posVect.x;
 				focusedBodyOldY = listOfBodies.get(n).posVect.y;
-				
-				LibGDXTools.bodyCreateSun(clickRightPositionX , clickRightPositionY, 0, 0);
+
+				LibGDXTools.bodyCreateSun(clickRightPositionX, clickRightPositionY, 0, 0);
 				newSun = true;
-			} else if(Gdx.input.isButtonPressed(1) && newSun && !newPlanet) {
+			} else if (Gdx.input.isButtonPressed(1) && newSun && !newPlanet) {
 				//System.out.println("sunHold");
 				Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-			    cam.unproject(mousePos);
-			    
-			    currentMousePositionX = (int) (mousePos.x / zF);
+				cam.unproject(mousePos);
+
+				currentMousePositionX = (int) (mousePos.x / zF);
 				currentMousePositionY = (int) (mousePos.y / zF);
-				
+
 				listOfBodies.get(listOfBodies.size() - 1).setPosition(clickRightPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickRightPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
 				listOfBodies.get(listOfBodies.size() - 1).setPredictedPosition(clickRightPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickRightPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
-				listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity((clickRightPositionX - focusedBodyOldX) - (currentMousePositionX - listOfBodies.get(n).posVect.x), (clickRightPositionY - focusedBodyOldY) - (currentMousePositionY - listOfBodies.get(n).posVect.y), 0);			
+				listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity((clickRightPositionX - focusedBodyOldX) - (currentMousePositionX - listOfBodies.get(n).posVect.x), (clickRightPositionY - focusedBodyOldY) - (currentMousePositionY - listOfBodies.get(n).posVect.y), 0);
 				listOfBodies.get(listOfBodies.size() - 1).setPredictedGravity(true);
 				//predict(listOfBodies.get(listOfBodies.size() - 1), listOfBodies.get(n));
 			} else if (!Gdx.input.isButtonPressed(1) && newSun && !newPlanet) {
 				//System.out.println("sunMove");
-				Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
-			    
+				Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+
 				cam.unproject(mousePos);
-			    unclickRightPositionX = (int) (mousePos.x / zF);
-				unclickRightPositionY = (int) (mousePos.y / zF);	
-				
+				unclickRightPositionX = (int) (mousePos.x / zF);
+				unclickRightPositionY = (int) (mousePos.y / zF);
+
 				listOfBodies.get(listOfBodies.size() - 1).setPosition(clickRightPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickRightPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
 				listOfBodies.get(listOfBodies.size() - 1).setVelocity((clickRightPositionX - focusedBodyOldX) - (unclickRightPositionX - listOfBodies.get(n).posVect.x), (clickRightPositionY - focusedBodyOldY) - (unclickRightPositionY - listOfBodies.get(n).posVect.y), 0);
 				listOfBodies.get(listOfBodies.size() - 1).setGravity(true);
-				
+
 				newSun = false;
 			}
-
-		
-   		}
-   		
-   		else {
+		} else {
+   			//Create solar system on X press and left click
 			if (Gdx.input.isButtonPressed(0) && !newPlanet) {
 						Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
 					    cam.unproject(mousePos);
 				    
 					    clickLeftPositionX = (int) (mousePos.x / zF);
-						clickLeftPositionY = (int) (mousePos.y / zF);		
+						clickLeftPositionY = (int) (mousePos.y / zF);
 						
 						newPlanet = true;
 					} else if (!Gdx.input.isButtonPressed(0) && newPlanet) {
@@ -641,7 +511,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 					    cam.unproject(mousePos);
 				    
 					    float unclickLeftPositionX = (int) (mousePos.x / zF);
-						float unclickLeftPositionY = (int) (mousePos.y / zF);		
+						float unclickLeftPositionY = (int) (mousePos.y / zF);
 			
 						
 						float velocityX = (unclickLeftPositionX - clickLeftPositionX)*placedBodySpeed/4;
@@ -691,33 +561,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 						
 						newPlanet = false;
 					}
-			/*
-					if (Gdx.input.isButtonPressed(1) && !newSun) {
-						Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
-					    cam.unproject(mousePos);
-				    
-					    clickRightPositionX = (int) (mousePos.x / zF);
-						clickRightPositionY = (int) (mousePos.y / zF);		
-					
-						newSun = true;
-					} else if (!Gdx.input.isButtonPressed(1) && newSun) {		
-						Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
-					    cam.unproject(mousePos);
-				    
-					    unclickRightPositionX = (int) (mousePos.x / zF);
-						unclickRightPositionY = (int) (mousePos.y / zF);	
-							
-						int randomMass = 10000 + (int)(Math.random() * 40000);
-						
-						String sunName = LibGDXTools.nameGen();
-						
-						LibGDXTools.bodyCreate(sunName, randomMass, clickRightPositionX , clickRightPositionY, (unclickRightPositionX - clickRightPositionX)*placedBodySpeed, (unclickRightPositionY - clickRightPositionY)*placedBodySpeed);
-						newSun = false;
-			
-					}
-			*/
    			}
-		
 	}
 	
    	public void predict (OrbitalBody newBody, OrbitalBody focusedBody) {
@@ -1184,8 +1028,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		
 	public static void saveFile() {
         String filePath = RunSimulation.class.getProtectionDomain().getCodeSource().getLocation().getPath();    //The path of the RunSimulation
-        
-        filePath = filePath.substring(0, filePath.indexOf("/bin")) + "/assets/systems/count.txt";    //Navigate to system file
+        filePath = filePath.substring(0, filePath.indexOf("/build")) + "/assets/systems/count.txt";    //Navigate to system file
         filePath = filePath.replaceAll("%20", " ");
 
         File systemFile;
@@ -1259,56 +1102,6 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
             }
         }
     }
-
-    public static void saveFile(String fileName) {
-        String filePath = RunSimulation.class.getProtectionDomain().getCodeSource().getLocation().getPath();   //The path of the RunSimulation
-        filePath = filePath.substring(0, filePath.indexOf("/build")) + "/assets/systems/" + fileName;    //Navigate to system file
-        filePath = filePath.replaceAll("%20", " ");
-
-        File systemFile;
-        FileWriter out;
-        BufferedWriter writeFile;
-
-        Boolean fileWritten = false;
-        int i = 0;
-        String textLine = "";
-
-        while (fileWritten == false && i < 2) {
-            try {
-                //Write data to system file
-                systemFile = new File(filePath);
-                out = new FileWriter(systemFile);
-                writeFile = new BufferedWriter(out);
-
-                for (int j = 0; j < listOfBodies.size(); j++) {
-                    textLine = listOfBodies.get(j).name + "," + listOfBodies.get(j).mass + "," + listOfBodies.get(j).posVect.x + "," + listOfBodies.get(j).posVect.y;
-                    textLine = textLine + "," + listOfBodies.get(j).velVect.x + "," + listOfBodies.get(j).velVect.y;
-
-                    writeFile.write(textLine);
-                    writeFile.newLine();
-                }
-                writeFile.close();
-                out.close();
-
-                fileWritten = true;
-            } catch (FileNotFoundException e) {
-                System.out.println("File Not Found: " + e.getMessage());
-                System.out.println("Creating New File...");
-
-                try {
-                    systemFile = new File(filePath);
-                    systemFile.createNewFile();
-                } catch (IOException err) {
-                    System.out.println("Problem Creating File: " + e.getMessage());
-                }
-
-                i++;
-            } catch (IOException e) {
-                System.out.println("Problem Writing to File: " + e.getMessage());
-            }
-        }
-    }
-
 	
 	public void resize(int width, int height) {
 		//stage.getViewport().update(width, height, true);
