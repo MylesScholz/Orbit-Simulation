@@ -62,14 +62,14 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	// Specifies time used to calculate numerical integration
 
 	static float deltaTime = (float) 0.05;
-	static float deltaPredictionTime = (float) 0.05;
+	static float deltaPredictionTime = (float) 0.5;
 
 	
 	// The max number of iterations that the simulation runs
 	final static int numOfIterations = 100000000;
-	final static int numOfPredictions = 100;
-	final static float drawLimit = 1000;
-	final static float predictedDrawLimit = 100;
+	final static int numOfPredictions = 1000;
+	final static float drawLimit = 10000;
+	final static float predictedDrawLimit = 1000;
 	
 	
 	// 0 = Focus on a particular body, 1 = free movement
