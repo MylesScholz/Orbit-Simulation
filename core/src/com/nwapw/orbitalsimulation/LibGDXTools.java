@@ -345,11 +345,17 @@ public class LibGDXTools {
 		else if (spriteWidth < 1000){
 			zF = 0.5f;
 		}
+		else if (spriteWidth < 5000){
+			zF = 0.25f;
+		}
 		else if (spriteWidth < 10000) {
 			zF = 0.1f;
 		}
+		else if (spriteWidth < 50000) {
+			zF = 0.1f;
+		}
 		else {
-			zF = 0.05f;
+			zF = 0.01f;
 		}
 
 		

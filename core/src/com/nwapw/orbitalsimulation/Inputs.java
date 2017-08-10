@@ -34,23 +34,29 @@ public class Inputs implements InputProcessor {
 		
 		if (keycode == Input.Keys.CONTROL_LEFT) {
 			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
-			RunSimulation.cam.unproject(mousePos); 
+			RunSimulation.cam.unproject(mousePos);
 		    mousePos.scl(1/RunSimulation.zF);
-		    
+		    		   
 		    float closestDist = RunSimulation.listOfBodies.get(0).posVect.dst(mousePos);
+		    //closestDist +=  RunSimulation.listOfBodies.get(0).velVect.len() * (-100f * RunSimulation.zF * RunSimulation.deltaTime * 20);
+		   
+		    
 		    int closestN = 0;
 		   
-		    for (int i = 1; i < RunSimulation.listOfBodies.size()-1; i++){
-		    	if (RunSimulation.listOfBodies.get(i).posVect.dst(mousePos) < closestDist ) {
-		    		//System.out.println(RunSimulation.listOfBodies.get(i).name);
-		    		//System.out.println((RunSimulation.listOfBodies.get(i).posVect.dst(mousePos)));
+		    for (int i = 1; i < RunSimulation.listOfBodies.size(); i++){
+		    	
+		    	float checkClosestDist = RunSimulation.listOfBodies.get(i).posVect.dst(mousePos);
+		    	//checkClosestDist +=  RunSimulation.listOfBodies.get(i).velVect.len() * (-100f * RunSimulation.zF * RunSimulation.deltaTime * 20);
+		    	
+		    	if (checkClosestDist < closestDist ) {
 		    		closestN = i;
-		    		
+		    		closestDist = checkClosestDist;
 		    	}		    	
 	
 		    }
 		    RunSimulation.n = closestN;
-		    
+
+
 		    
 		}
 		
@@ -148,7 +154,7 @@ public class Inputs implements InputProcessor {
 			RunSimulation.deltaTime -= RunSimulation.deltaTime / 10;
 		}
 
-		if(keycode == Input.Keys.L){
+		if(keycode == Input.Keys.Z){
 			if (RunSimulation.zoomLines == false){
 				RunSimulation.zoomLines = true;
 			}
@@ -271,8 +277,8 @@ public class Inputs implements InputProcessor {
 		RunSimulation.zF += zf;
 
 		
-		if (RunSimulation.zF <= 0){
-			RunSimulation.zF = 0.000001f;
+		if (RunSimulation.zF <= 0.00009f){
+			RunSimulation.zF = 0.00009f;
 		}
 		else if (RunSimulation.zF >= 15){
 			RunSimulation.zF = 15f;

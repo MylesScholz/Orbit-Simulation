@@ -552,6 +552,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			    clickLeftPositionX = (int) (mousePos.x / zF);
 				clickLeftPositionY = (int) (mousePos.y / zF);		
 				
+				//ERROR: ARRAY OUT OF BOUNDS
 				focusedBodyOldX = listOfBodies.get(n).posVect.x;
 				focusedBodyOldY = listOfBodies.get(n).posVect.y;
 				
@@ -647,9 +648,6 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 						float velocityX = (unclickLeftPositionX - clickLeftPositionX)*placedBodySpeed/4;
 						float velocityY = (unclickLeftPositionY - clickLeftPositionY)*placedBodySpeed/4;
 						
-						System.out.println(velocityX);
-						System.out.println(velocityY);
-						System.out.println("");
 						Random random = new Random();
 						float randScalar = 1 + (random.nextFloat() - 0.5f)/4;
 						
@@ -863,7 +861,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
             float spriteWidth = renderBody.spriteWidth;
 
-			float spriteX = (float) zF * (renderBody.posVect.x - (spriteWidth / 2));
+            float spriteX = (float) zF * (renderBody.posVect.x - (spriteWidth / 2));
 			float spriteY = (float) zF * (renderBody.posVect.y - (spriteWidth / 2));
 						
 			float frameX = 0;
@@ -908,10 +906,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
         float focusX = 0;
 		float focusY = 0;
 
-		/*
-        focusX = (float) listOfBodies.get(n).posVect.x * zF - zF*(listOfBodies.get(n).spriteWidth / 2);
-        focusY = (float) listOfBodies.get(n).posVect.y * zF - zF*(listOfBodies.get(n).spriteWidth / 2);
-		*/
+		
 		
 		if (n >= listOfBodies.size()) {
 			n -=n;
@@ -935,11 +930,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		}
 		if (cameraPan == false) {
 			
-			focusX = (float) listOfBodies.get(n).posVect.x * zF - (listOfBodies.get(n).spriteWidth / 8)*zF;
-	        focusY = (float) listOfBodies.get(n).posVect.y * zF - (listOfBodies.get(n).spriteWidth / 8)*zF;
-
-			
-	
+			focusX = (float) listOfBodies.get(n).posVect.x * zF + 0/8*listOfBodies.get(n).spriteWidth *zF;
+	        focusY = (float) listOfBodies.get(n).posVect.y * zF + 0/8*listOfBodies.get(n).spriteWidth *zF;
+	        
 			
 			float moveX = (camX - focusX) * 2/3;
 			float moveY = (camY - focusY) * 2/3;
@@ -952,6 +945,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			if (pauseState == false){
 				frameX = camX - 0.05005f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
 				frameY = camY - 0.0500f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);	
+				 
 			}
 			else {
 				frameX = camX;
@@ -1019,10 +1013,14 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		}
 		shapeRenderer.begin(ShapeType.Line);
 		
-		//focusX -= zF*listOfBodies.get(n).spriteWidth/2;
-		//focusY -= zF*listOfBodies.get(n).spriteWidth/2;
-		shapeRenderer.line(new Vector2(focusX - 10, focusY), new Vector2(focusX + 10, focusY));
-		shapeRenderer.line(new Vector2(focusX, focusY - 10), new Vector2(focusX, focusY+10));
+		//focusX += listOfBodies.get(n).spriteWidth*(3/8);
+		//focusY += listOfBodies.get(n).spriteWidth*(3/8);
+		
+		float velX = -0.075f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
+		float velY = -0.075f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);
+		
+		shapeRenderer.line(new Vector2(focusX - 10 + velX, focusY + velY), new Vector2(focusX + 10 + velX, focusY + velY));
+		shapeRenderer.line(new Vector2(focusX + velX, focusY - 10 + velY), new Vector2(focusX + velX, focusY + 10 + velY));
 		
 		shapeRenderer.end();
 		
@@ -1077,6 +1075,10 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
         // Workaround to make side panel items appear above shapeRenderer transparent rectangle
 
+    
+        
+        
+        
 		batch.begin();
 		if(sidePanelState == true) {
 
@@ -1155,6 +1157,48 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		}
 		
 		batch.end();
+	
+		
+		shapeRenderer.begin(ShapeType.Line);
+		shapeRenderer.setProjectionMatrix(cam.combined);
+		
+		float orderOfMag = RunSimulation.zF;
+		float orderOfMagCounter = 0;
+		
+		while (orderOfMag < 1){
+			orderOfMag *= 100;	
+			orderOfMagCounter++;
+		}
+		//System.out.println(orderOfMagCounter);
+		
+		//shapeRenderer.line(new Vector2(100*zF, 200*zF), new Vector2(200*zF, 100*zF));
+		
+		//focusX += 50 * zF * Math.pow(10, orderOfMagCounter);
+		//focusY += 50 * zF * Math.pow(10, orderOfMagCounter);
+		
+		if (sidePanelState == false) {			
+			shapeRenderer.setColor(0.5f, 0.5f, 0.5f, 0.5f);
+		}
+		else {
+			shapeRenderer.setColor(0f, 0f, 0f, 0f);
+		}
+		
+		if (zoomLines){
+		
+		for (int k = 0; k < 3; k++) {
+			float xSpacing = (float) ((k-1) * 300 * zF * Math.pow(10, orderOfMagCounter));
+			float ySpacing = (float) ((k-1) * 300 * zF * Math.pow(10, orderOfMagCounter));
+			shapeRenderer.line(new Vector2(focusX - cam.viewportWidth, focusY + ySpacing), new Vector2(focusX + cam.viewportWidth, focusY + ySpacing));
+			shapeRenderer.line(new Vector2(focusX + xSpacing, focusY - cam.viewportHeight), new Vector2(focusX + xSpacing, focusY + cam.viewportHeight));
+		}
+		
+		}
+		
+		shapeRenderer.end();
+
+		
+		
+		
 		
 		// Set the viewport to the whole screen.
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
