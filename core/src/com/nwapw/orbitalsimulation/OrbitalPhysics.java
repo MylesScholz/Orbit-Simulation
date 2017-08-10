@@ -199,8 +199,7 @@ public class OrbitalPhysics {
     	                        if (listOfBodies.get(j).mass > 2000000) {
     	                        	listOfBodies.get(j).texture = new Texture("blackhole.png");
     	                        }
-    	                    	
-    	                        
+
     							listOfBodies.get(j).velVect.set(sumVel);
     							
     							listOfBodies.get(j).mass += listOfBodies.get(i).mass;

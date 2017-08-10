@@ -472,8 +472,6 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
    			listOfBodies.get(listOfBodies.size() - 1).setPosition(clickLeftPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickLeftPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
    			listOfBodies.get(listOfBodies.size() - 1).setPredictedPosition(clickLeftPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickLeftPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
    			listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity((clickLeftPositionX - focusedBodyOldX) - (currentMousePositionX - listOfBodies.get(n).posVect.x), (clickLeftPositionY - focusedBodyOldY) - (currentMousePositionY - listOfBodies.get(n).posVect.y), 0);			
-   			//listOfBodies.get(listOfBodies.size() - 1).radius = (int) Math.sqrt((listOfBodies.get(listOfBodies.size() - 1).mass * 10) / Math.PI);
-			//listOfBodies.get(listOfBodies.size() - 1).spriteWidth = (int) Math.sqrt((listOfBodies.get(listOfBodies.size() - 1).mass * 10) / Math.PI) * 2;
    			listOfBodies.get(listOfBodies.size() - 1).setPredictedGravity(true);
    			predict(listOfBodies.get(listOfBodies.size() - 1), listOfBodies.get(n));
    		} else if (!Gdx.input.isButtonPressed(0) && newPlanet && !newSun && !newSystem) {
@@ -513,8 +511,6 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
    			listOfBodies.get(listOfBodies.size() - 1).setPosition(clickRightPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickRightPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
    			listOfBodies.get(listOfBodies.size() - 1).setPredictedPosition(clickRightPositionX + listOfBodies.get(n).posVect.x - focusedBodyOldX, clickRightPositionY + listOfBodies.get(n).posVect.y - focusedBodyOldY, 0);
    			listOfBodies.get(listOfBodies.size() - 1).setPredictedVelocity((clickRightPositionX - focusedBodyOldX) - (currentMousePositionX - listOfBodies.get(n).posVect.x), (clickRightPositionY - focusedBodyOldY) - (currentMousePositionY - listOfBodies.get(n).posVect.y), 0);			
-   			//listOfBodies.get(listOfBodies.size() - 1).radius = (int) Math.sqrt((listOfBodies.get(listOfBodies.size() - 1).mass * 10) / Math.PI);
-			//listOfBodies.get(listOfBodies.size() - 1).spriteWidth = (int) Math.sqrt((listOfBodies.get(listOfBodies.size() - 1).mass * 10) / Math.PI) * 2;
    			listOfBodies.get(listOfBodies.size() - 1).setPredictedGravity(true);
 			predict(listOfBodies.get(listOfBodies.size() - 1), listOfBodies.get(n));
    		} else if (!Gdx.input.isButtonPressed(1) && newSun && !newPlanet && !newSystem) {
@@ -617,8 +613,11 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		   		OrbitalPhysics.predictedIterateSimulation(deltaPredictionTime);
 				shapeRenderer.begin(ShapeType.Line);
 				for (int x = 0; x < FTOldX.size(); x++) {
+					float velX = -0.002f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
+            		float velY = -0.002f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);
+            		
 					shapeRenderer.setColor(1, 0, 0, x / (float) FTOldX.size());
-					shapeRenderer.line(FTOldX.get(x)*zF, FTOldY.get(x)*zF, FTNewX.get(x)*zF, FTNewY.get(x)*zF);
+					shapeRenderer.line(FTOldX.get(x) * zF * velX * zF, FTOldY.get(x) * zF * velY * zF, FTNewX.get(x) * zF * velX * zF, FTNewY.get(x) * zF * velY * zF);
 				}
 				shapeRenderer.end();
 				Gdx.gl.glDisable(GL30.GL_BLEND);
@@ -684,20 +683,10 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
         	zF = 1;
         }
         
-
-        
-       // System.out.println(sidePanel.getWidth());
-        
-        
-        
-    
-       // else if (sidePanelState == false && popupTable.getWidth() != 0f){
-       // 	System.out.println("not 0f");
-       // }
-        
-
-        
-        
+        // System.out.println(sidePanel.getWidth());
+        // else if (sidePanelState == false && popupTable.getWidth() != 0f){
+        // 	System.out.println("not 0f");
+        // }
         
 		batch.setProjectionMatrix(cam.combined);
 		shapeRenderer.setProjectionMatrix(cam.combined);
@@ -727,20 +716,24 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				PTNewY.remove(0);
 				PTBody.remove(0);
 			}
+			float velX = -0.002f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
+			float velY = -0.002f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);
+			
 			shapeRenderer.setColor(1, 1, 1, x / (float) PTBody.size());
 			//System.out.println("Line Print");
-			shapeRenderer.line(PTOldX.get(x)*zF, PTOldY.get(x)*zF, PTNewX.get(x)*zF, PTNewY.get(x)*zF); 	
-			// - 0.15f*listOfBodies.get(PTBody.get(x)).velVect.x*zF
+			shapeRenderer.line(PTOldX.get(x) * zF + velX * zF, PTOldY.get(x) * zF + velY * zF, PTNewX.get(x) * zF + velX * zF, PTNewY.get(x) * zF + velY * zF); 	
 		}
 		shapeRenderer.end();	
 		Gdx.gl.glDisable(GL30.GL_BLEND);
 		
 		//Draw comet tails
-
+		boolean starsPresent = false;
         for (int i = 0; i < listOfBodies.size(); i++) {
             if (listOfBodies.get(i).mass == 1) {
                 for (int j = 0; j < listOfBodies.size(); j++) {
                     if (listOfBodies.get(j).mass >= 10000 && listOfBodies.get(i).mostPullingBodyName == listOfBodies.get(j).name) {
+                    	starsPresent = true;
+                    	
                         tailOldX = (listOfBodies.get(i).posVect.x + ((listOfBodies.get(i).posVect.x - listOfBodies.get(j).posVect.x) / listOfBodies.get(i).posVect.dst(listOfBodies.get(j).posVect)));
                         tailOldY = (listOfBodies.get(i).posVect.y + ((listOfBodies.get(i).posVect.y - listOfBodies.get(j).posVect.y) / listOfBodies.get(i).posVect.dst(listOfBodies.get(j).posVect)));
                         tailNewX = (listOfBodies.get(i).posVect.x);
@@ -776,8 +769,16 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				}
 
                 for (int j = 1; j < listOfBodies.get(i).cometTailX.size() - 1; j++) {
-                    shapeRenderer.setColor(0, 1, 1, 1 - (j / (float) listOfBodies.get(i).cometTailX.size()));
-                    shapeRenderer.line(listOfBodies.get(i).cometTailX.get(j) * zF, listOfBodies.get(i).cometTailY.get(j) * zF, listOfBodies.get(i).cometTailX.get(j + 1) * zF, listOfBodies.get(i).cometTailY.get(j + 1) * zF);
+                	float velX = -0.002f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
+            		float velY = -0.002f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);
+            		
+                	shapeRenderer.setColor(0, 1, 1, 1 - (j / (float) listOfBodies.get(i).cometTailX.size()));
+                    shapeRenderer.line(listOfBodies.get(i).cometTailX.get(j) * zF + velX * zF, listOfBodies.get(i).cometTailY.get(j) * zF + velY * zF, listOfBodies.get(i).cometTailX.get(j + 1) * zF + velX * zF, listOfBodies.get(i).cometTailY.get(j + 1) * zF + velY * zF);
+                }
+
+                if (!starsPresent) {
+                	listOfBodies.get(i).cometTailX.clear();
+                	listOfBodies.get(i).cometTailY.clear();
                 }
                 shapeRenderer.end();
                 Gdx.gl.glDisable(GL30.GL_BLEND);
@@ -880,9 +881,6 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			focusX = (float) listOfBodies.get(n).posVect.x * zF - (listOfBodies.get(n).spriteWidth / 8)*zF;
 	        focusY = (float) listOfBodies.get(n).posVect.y * zF - (listOfBodies.get(n).spriteWidth / 8)*zF;
 
-			
-	
-			
 			float moveX = (camX - focusX) * 2/3;
 			float moveY = (camY - focusY) * 2/3;
 			
@@ -963,13 +961,23 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		
 		//focusX -= zF*listOfBodies.get(n).spriteWidth/2;
 		//focusY -= zF*listOfBodies.get(n).spriteWidth/2;
-		shapeRenderer.line(new Vector2(focusX - 10, focusY), new Vector2(focusX + 10, focusY));
-		shapeRenderer.line(new Vector2(focusX, focusY - 10), new Vector2(focusX, focusY+10));
+		if (sidePanelState == true) {
+			shapeRenderer.setColor(0, 0, 0, 1);	
+		} else {
+			shapeRenderer.setColor(1, 1, 1, 1);
+		}
+		
+		//shapeRenderer.line(new Vector2(focusX - 10, focusY), new Vector2(focusX + 10, focusY));
+		//shapeRenderer.line(new Vector2(focusX, focusY - 10), new Vector2(focusX, focusY+10));
+		
+		float velX = -0.075f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
+		float velY = -0.075f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);
+		shapeRenderer.line(new Vector2(focusX - 10 + velX, focusY + velY), new Vector2(focusX + 10 + velX, focusY + velY));
+		shapeRenderer.line(new Vector2(focusX + velX, focusY - 10 + velY), new Vector2(focusX + velX, focusY + 10 + velY));
 		
 		shapeRenderer.end();
 		
         // Workaround to make side panel items appear above shapeRenderer transparent rectangle
-
 		batch.begin();
 		if(sidePanelState == true) {
 
