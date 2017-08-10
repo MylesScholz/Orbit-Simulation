@@ -183,6 +183,7 @@ public class OrbitalBody {
 	
 	void integratePredictedEuler(float deltaTime, int i, OrbitalBody currentBody) {
 		OrbitalPhysics.predictedCowellsFormulation(i, currentBody);
+		
 		currentPos.set(predictedPosVect.x, predictedPosVect.y, predictedPosVect.z);
 		currentVel.set(predictedVelVect.x, predictedVelVect.y, predictedVelVect.z);
 		currentAcc.set(predictedAccVect.x, predictedAccVect.y, predictedAccVect.z);
@@ -194,7 +195,6 @@ public class OrbitalBody {
 		//predictedbackhalfstepVel.set(predictedVelVect);
 		currentVel = currentVel.add(currentAcc.scl(deltaTime));
 		predictedVelVect.set(currentVel);
-		
 		
 		// Integrates Velocity to Position
 		//currentPos = currentPos.add(predictedbackhalfstepVel.scl(deltaTime));

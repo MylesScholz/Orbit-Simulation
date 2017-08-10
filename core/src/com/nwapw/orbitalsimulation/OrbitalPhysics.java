@@ -35,6 +35,7 @@ public class OrbitalPhysics {
 	
 	final static int gravConst = 1000;
 	final static int perturbationCalculationMethod = 0; // 0 = Cowell's Method
+	static int integrationMethod = 0;
 
 	static boolean indexOutOfBounds = false;
 	
@@ -49,11 +50,13 @@ public class OrbitalPhysics {
 				OrbitalBody currentBody = listOfBodies.get(i);
 				listOfBodies.get(i).mostPullingBodyAcc = 0;
 
-				listOfBodies.get(i).integrateEuler(deltaTime, i, currentBody);
-
-				//listOfBodies.get(i).integrateLeapfrogVel(deltaTime);				
-				//cowellsFormulation(i, currentBody);				
-				//listOfBodies.get(i).integrateLeapfrogPos(deltaTime);
+				if (integrationMethod == 0) {
+					listOfBodies.get(i).integrateEuler(deltaTime, i, currentBody);
+				} else if (integrationMethod == 1) {
+					listOfBodies.get(i).integrateLeapfrogVel(deltaTime);
+					cowellsFormulation(i, currentBody);				
+					listOfBodies.get(i).integrateLeapfrogPos(deltaTime);
+				}		
 			}
 		}
 		if (RunSimulation.collisionsOn) {
@@ -67,11 +70,13 @@ public class OrbitalPhysics {
 				OrbitalBody currentBody = listOfBodies.get(i);
 				listOfBodies.get(i).predictedMostPullingBodyAcc = 0;			
 
-				listOfBodies.get(i).integratePredictedEuler(deltaPredictionTime, i, currentBody);
-				
-				//listOfBodies.get(i).integratePredictedLeapfrogVel(deltaPredictionTime);				
-				//predictedCowellsFormulation(i, currentBody);				
-				//listOfBodies.get(i).integratePredictedLeapfrogPos(deltaPredictionTime);
+				if (integrationMethod == 0) {
+					listOfBodies.get(i).integratePredictedEuler(deltaPredictionTime, i, currentBody);
+				} else if (integrationMethod == 1) {
+					listOfBodies.get(i).integratePredictedLeapfrogVel(deltaPredictionTime);
+					predictedCowellsFormulation(i, currentBody);				
+					listOfBodies.get(i).integratePredictedLeapfrogPos(deltaPredictionTime);
+				}
 			}
 		}
 		if (RunSimulation.collisionsOn) {
@@ -188,7 +193,7 @@ public class OrbitalPhysics {
     			for (int j = 0; j < listOfBodies.size(); j++) {
     				if (listOfBodies.get(j).gravity) {
     					if (i != j && checkCollision(listOfBodies.get(i), listOfBodies.get(j))) {
-    						//	System.out.println("Collision!");
+    						//System.out.println("Collision!");
     						
     						if (listOfBodies.get(i).mass < listOfBodies.get(j).mass) {
     							
