@@ -107,7 +107,7 @@ public class LibGDXTools {
 
 		body.setRadius((int) Math.cbrt(((mass * 10) / (4/3) * Math.PI)));
 		body.spriteWidth = (int) Math.cbrt(((1 + (int)(Math.random() * 4)) * 10) / (4/3) * Math.PI) * 2;
-
+		
 		body.posVect.x = posX;
 		body.posVect.y = posY;
 		
