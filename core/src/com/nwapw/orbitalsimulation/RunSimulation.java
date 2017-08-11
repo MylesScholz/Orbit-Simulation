@@ -89,6 +89,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	int placedSunCounter = 0;
 	
 	FPSLogger fpsLogger = new FPSLogger();
+	static String loadFileName = "explosions.txt";
 	
 	// List of currently running bodies in the simulation
 	public static ArrayList<OrbitalBody> listOfBodies = new ArrayList<OrbitalBody>();
@@ -325,7 +326,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
         //If there are no bodies in the system, attempt to load file
         if (listOfBodies.size() == 0) {
-        	loadFile("explosions.txt");
+        	loadFile(loadFileName);
         }
 
         //Sets the zoom factor to the default zoom
@@ -1245,7 +1246,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	
 	public static void saveFile() {
         String filePath = RunSimulation.class.getProtectionDomain().getCodeSource().getLocation().getPath();    //The path of the RunSimulation
-        filePath = filePath.substring(0, filePath.indexOf("/build")) + "/assets/systems/count.txt";    //Navigate to system file
+        filePath = filePath.substring(0, filePath.indexOf("/bin")) + "/assets/systems/count.txt";    //Navigate to system file
         filePath = filePath.replaceAll("%20", " ");
         File systemFile;
         FileWriter out;
@@ -1321,7 +1322,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
 	public static void saveFile(String fileName) {
 		String filePath = RunSimulation.class.getProtectionDomain().getCodeSource().getLocation().getPath();    //The path of the RunSimulation
-		filePath = filePath.substring(0, filePath.indexOf("/build")) + "/assets/systems/" + fileName;    //Navigate to system file
+		filePath = filePath.substring(0, filePath.indexOf("/bin")) + "/assets/systems/" + fileName;    //Navigate to system file
 		filePath = filePath.replaceAll("%20", " ");
 		File systemFile;
 		FileWriter out;
