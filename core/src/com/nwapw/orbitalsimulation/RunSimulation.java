@@ -62,13 +62,15 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	// Specifies time used to calculate numerical integration
 
 	static float deltaTime = (float) 0.05;
-	static float deltaPredictionTime = (float) 0.5;
-
+	static float deltaPredictionTime = (float) 0.05;
+	static float originalDeltaTime = deltaTime;
+	static float originalDeltaPredictionTime = deltaPredictionTime;
+	
 	
 	// The max number of iterations that the simulation runs
-	final static int numOfIterations = 100000000;
+	final static int numOfIterations = 1000000;
 	final static int numOfPredictions = 1000;
-	final static float drawLimit = 10000;
+	final static float drawLimit = 1000;
 	final static float predictedDrawLimit = 1000;
 	
 	
@@ -185,7 +187,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	static boolean collisionsOn = true;
 	static boolean cameraPan = false;
 	static Skin skin;
+	
 	static boolean coolBackground = false;
+	static boolean party = false;
 	
 	static boolean pauseState = false;
 
@@ -600,7 +604,11 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 					float velX = -0.002f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
             		float velY = -0.002f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);
             		
-					shapeRenderer.setColor(1, 0, 0, x / (float) FTOldX.size());
+            		if(party) {
+            			shapeRenderer.setColor(1, (float) Math.random(), (float) Math.random(), x / (float) FTOldX.size());	
+            		} else {
+            			shapeRenderer.setColor(1, 0, 0, x / (float) FTOldX.size());
+            		}
 					shapeRenderer.line(FTOldX.get(x) * zF + velX * zF, FTOldY.get(x) * zF + velY * zF, FTNewX.get(x) * zF + velX * zF, FTNewY.get(x) * zF + velY * zF);
 				}
 				shapeRenderer.end();
@@ -626,6 +634,23 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		}
    	}
    	
+   	public void party () {
+   		if(party) {
+   			for(int i = 0; i < listOfBodies.size(); i++) {
+   				listOfBodies.get(i).setTexture(LibGDXTools.bodyTextureChooser(listOfBodies.get(i).mass));
+   	   			//int j = 11;
+   				if((i % 10) == 0) {
+   					System.out.println((i % 10) == 0);
+   					System.out.println("Random Background");
+   					int j = 1 + (int)(Math.random() * 11); 
+   					String backgroundFileName = "backgrounds/" + j + ".jpg";
+   					RunSimulation.backgroundTexture = new Texture(backgroundFileName);
+   					RunSimulation.backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+   				}
+   			}
+   		}
+   	}
+   	
 	@Override
 	public void render () {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -633,7 +658,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		
 		if (purgeState == true) {
 			for (int i = 0; i < listOfBodies.size(); i++){
-				if (listOfBodies.get(i).accVect.len() < 0.1 && listOfBodies.get(i).mass < 10000){
+				if (listOfBodies.get(i).accVect.len() < 0.1 && listOfBodies.get(i).mass < 10000 && listOfBodies.get(i).gravity){
 					listOfBodies.remove(i);
 				}
 			}			
@@ -708,9 +733,14 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			float velX = -0.002f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
 			float velY = -0.002f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);
 			
-			shapeRenderer.setColor(1, 1, 1, x / (float) PTBody.size());
-			//System.out.println("Line Print");
+			if(party) {
+    			shapeRenderer.setColor(1, (float) Math.random(), (float) Math.random(), x / (float) FTOldX.size());	
+    		} else {
+    			shapeRenderer.setColor(1, 1, 1, x / (float) FTOldX.size());
+    		}
 			shapeRenderer.line(PTOldX.get(x) * zF + velX * zF, PTOldY.get(x) * zF + velY * zF, PTNewX.get(x) * zF + velX * zF, PTNewY.get(x) * zF + velY * zF); 	
+
+			//System.out.println("Line Print");
 		}
 		shapeRenderer.end();	
 		Gdx.gl.glDisable(GL30.GL_BLEND);
@@ -744,7 +774,11 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 					listOfBodies.get(i).cometTailY.remove(listOfBodies.get(i).cometTailY.size() - 1);
                 }
 
-				shapeRenderer.setColor(0, 1, 1, 1);
+                if(party) {
+        			shapeRenderer.setColor(1, (float) Math.random(), (float) Math.random(), 1);	
+        		} else {
+        			shapeRenderer.setColor(0, 1, 1, 1);
+        		}
 				shapeRenderer.line(tailNewX * zF, tailNewY * zF, tailOldX * zF, tailOldY * zF);
 
 				for (int j = 1; j < listOfBodies.get(i).cometTailX.size(); j++) {
@@ -766,7 +800,11 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
                 	float velX = -0.002f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
             		float velY = -0.002f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);
             		
-                	shapeRenderer.setColor(0, 1, 1, 1 - (j / (float) listOfBodies.get(i).cometTailX.size()));
+            		if(party) {
+            			shapeRenderer.setColor(1, (float) Math.random(), (float) Math.random(), 1 - (j / (float) listOfBodies.get(i).cometTailX.size()));	
+            		} else {
+            			shapeRenderer.setColor(0, 1, 1, 1 - (j / (float) listOfBodies.get(i).cometTailX.size()));
+            		}
                     shapeRenderer.line(listOfBodies.get(i).cometTailX.get(j) * zF + velX * zF, listOfBodies.get(i).cometTailY.get(j) * zF + velY * zF, listOfBodies.get(i).cometTailX.get(j + 1) * zF + velX * zF, listOfBodies.get(i).cometTailY.get(j + 1) * zF + velY * zF);
                 }
 
@@ -786,6 +824,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				OrbitalPhysics.iterateSimulation(deltaTime);
 				passError();
 				place();
+				party();
 				if((iterationCounter % dataDivision) == 0) {
 					//fpsLogger.log();
 				}
@@ -829,12 +868,21 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
 			//if (1/(Math.pow(zF, 3)) < spriteWidth) {
 				if (i == n){
+					if (party) {
+						fontFocus.setColor(1, (float) 0.078, (float) 0.576, 1);
+					} else {
+						fontFocus.setColor(1, 1, 1, 1);
+					}
 					fontFocus.draw(batch, renderBody.name, frameX + 0.7f*spriteWidth*zF/2, frameY + 1.25f*spriteWidth*zF/10);
 	
 				}
 				else {
+					if (party) {
+						fontSubtitle.setColor(1, (float) 0.078, (float) 0.576, 1);
+					} else {
+						fontSubtitle.setColor(1, 1, 1, 1);
+					}
 					fontSubtitle.draw(batch, renderBody.name, frameX + 0.7f*spriteWidth*zF/2, frameY + 1.25f*spriteWidth*zF/10);
-	
 				}
 			//}
 			
@@ -935,8 +983,18 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
 		
 		if (sidePanelState == true && pauseState == true){
+			if (party) {
+				fontHeader.setColor(1, (float) 0.078, (float) 0.576, 1);
+			} else {
+				fontHeader.setColor(1, 1, 1, 1);
+			}
 			fontHeader.draw(batch, "PAUSED & SAVED", frameX - 0.97f*cam.viewportWidth/2, frameY + 8.3f*cam.viewportHeight/20);
 		} else if (sidePanelState == false && pauseState == true){
+			if (party) {
+				fontHeader.setColor(1, (float) 0.078, (float) 0.576, 1);
+			} else {
+				fontHeader.setColor(1, 1, 1, 1);
+			}
 			fontHeader.draw(batch, "PAUSED & SAVED", frameX - 1.4f*cam.viewportWidth/20, frameY + 8.3f*cam.viewportHeight/20);
 		}
 				
@@ -979,6 +1037,19 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
         // Workaround to make side panel items appear above shapeRenderer transparent rectangle
 
 		batch.begin();
+		
+		if (party) {
+			fontHeader.setColor(1, (float) 0.078, (float) 0.576, 1);
+			fontSubtitle.setColor(1, (float) 0.078, (float) 0.576, 1);
+			fontText.setColor(1, (float) 0.078, (float) 0.576, 1);
+			fontTitle.setColor(1, (float) 0.078, (float) 0.576, 1);
+		} else {
+			fontHeader.setColor(1, 1, 1, 1);
+			fontSubtitle.setColor(1, 1, 1, 1);
+			fontText.setColor(1, 1, 1, 1);
+			fontTitle.setColor(1, 1, 1, 1);
+		}
+		
 		if(sidePanelState == true) {
 
 			String printNumOfBodies = "# of bodies: " + String.valueOf(listOfBodies.size());
@@ -997,17 +1068,17 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			
 			fontHeader.draw(batch, "CONTROLS", frameX + 2.5f*cam.viewportWidth/12, frameY + 11.1f*cam.viewportHeight/24);			
 			fontSubtitle.draw(batch, LibGDXTools.underlineCalculation("CONTROLS") + "____", frameX + 2.5f*cam.viewportWidth/12,  frameY + 10.85f*cam.viewportHeight/24);
-			fontText.draw(batch, "(SCROLL OR +/-) Zoom", frameX + 2.5f*cam.viewportWidth/12, frameY + 10*cam.viewportHeight/24);
-			fontText.draw(batch, "(LEFT CLICK) Create New Planet", frameX + 2.5f*cam.viewportWidth/12, frameY + 9*cam.viewportHeight/24);
-			fontText.draw(batch, "(RIGHT CLICK) Create New Star", frameX + 2.5f*cam.viewportWidth/12, frameY + 8*cam.viewportHeight/24);			
-			fontText.draw(batch, "(ARROW KEYS) Move Focused Body", frameX + 2.5f*cam.viewportWidth/12, frameY + 7*cam.viewportHeight/24);
-			fontText.draw(batch, "(SPACEBAR) Pause & Save", frameX + 2.5f*cam.viewportWidth/12, frameY + 6*cam.viewportHeight/24);
+			fontText.draw(batch, "(SCROLL OR +/-) Zoom  (Z) Zoom lines", frameX + 2.5f*cam.viewportWidth/12, frameY + 10*cam.viewportHeight/24);
+			fontText.draw(batch, "(LEFT CLICK) Create New Planet (Q) Step method", frameX + 2.5f*cam.viewportWidth/12, frameY + 9*cam.viewportHeight/24);
+			fontText.draw(batch, "(RIGHT CLICK) Create New Star (U) Collisions On/Off", frameX + 2.5f*cam.viewportWidth/12, frameY + 8*cam.viewportHeight/24);			
+			fontText.draw(batch, "(ARROW KEYS) Move Focused Body (I) Reset dT", frameX + 2.5f*cam.viewportWidth/12, frameY + 7*cam.viewportHeight/24);
+			fontText.draw(batch, "(SPACEBAR) Pause & Save  (V) Predictions On/Off", frameX + 2.5f*cam.viewportWidth/12, frameY + 6*cam.viewportHeight/24);
 			fontText.draw(batch, "(CTRL) Focus on body closest to mouse", frameX + 2.5f*cam.viewportWidth/12, frameY + 5*cam.viewportHeight/24);
-			fontText.draw(batch, "(M) Reset Vel  (P) Purge extraneous planets", frameX + 2.5f*cam.viewportWidth/12, frameY + 4*cam.viewportHeight/24);
+			fontText.draw(batch, "(M) Reset Vel  (Y) Purge extraneous planets", frameX + 2.5f*cam.viewportWidth/12, frameY + 4*cam.viewportHeight/24);
 			fontText.draw(batch, "(N) Change Focus (B) Change Focus to Next Star", frameX + 2.5f*cam.viewportWidth/12, frameY + 3*cam.viewportHeight/24);
 			fontText.draw(batch, "(C) Switch Camera Modes  (WASD) Panning", frameX + 2.5f*cam.viewportWidth/12, frameY + 2*cam.viewportHeight/24);
 			fontText.draw(batch, "( , ) Decrease dt  ( . ) Increase dt", frameX + 2.5f*cam.viewportWidth/12, frameY + 1*cam.viewportHeight/24);
-			fontText.draw(batch, "(X) Spawn a Star/Planets System", frameX + 2.5f*cam.viewportWidth/12, frameY + 0*cam.viewportHeight/24);
+			fontText.draw(batch, "(O) Spawn a Star/Planets System", frameX + 2.5f*cam.viewportWidth/12, frameY + 0*cam.viewportHeight/24);
 							
 			
 			
@@ -1094,23 +1165,18 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		}
 		
 		shapeRenderer.end();
-
-		
-		
-		
 		
 		// Set the viewport to the whole screen.
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
+		
 		// Draw anywhere on the screen.
 		//stage.act(0.01f);
 		//stage.draw();
 		
 		// Restore the stage's viewport.
 		//stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
-
 	}
-		
+	
 	public static void saveFile() {
         String filePath = RunSimulation.class.getProtectionDomain().getCodeSource().getLocation().getPath();    //The path of the RunSimulation
         filePath = filePath.substring(0, filePath.indexOf("/bin")) + "/assets/systems/count.txt";    //Navigate to system file
