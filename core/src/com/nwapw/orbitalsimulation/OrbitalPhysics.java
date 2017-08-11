@@ -33,7 +33,7 @@ public class OrbitalPhysics {
 	static Vector3 calculatedAcc = new Vector3();
 	static Vector3 predictedCalculatedAcc = new Vector3();
 	
-	final static int gravConst = 1000;
+	final static int gravConst = 100;
 	final static int perturbationCalculationMethod = 0; // 0 = Cowell's Method
 	static int integrationMethod = 0;
 
