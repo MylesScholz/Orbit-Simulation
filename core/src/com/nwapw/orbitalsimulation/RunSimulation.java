@@ -369,7 +369,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
         }
         //Define variables of data
         String nameStr;
-        float massFlt, posXFlt, posYFlt, velXFlt, velYFlt;
+        float massFlt, radiusFlt, posXFlt, posYFlt, velXFlt, velYFlt, spriteWidthFlt;
 
         //Change working file path to the system file
         filePath = filePath.substring(0, filePath.lastIndexOf("/"));
@@ -387,21 +387,29 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
                     nameStr = textLine.substring(0, textLine.indexOf(","));		//Read name
                     textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
 
-                    massFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));		//Read mass
+                    massFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read mass
                     textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
 
-                    posXFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));		//Read x position
+                    //radiusFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));	//Read radius
+                    //textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+                    
+                    posXFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read x position
                     textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
 
-                    posYFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));		//Read y position
+                    posYFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read y position
                     textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
 
-                    velXFlt = (float) Double.parseDouble(textLine.substring(0, textLine.indexOf(",")));		//Read x velocity
+                    velXFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read x velocity
                     textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
 
-                    velYFlt = (float) Double.parseDouble(textLine.substring(0, textLine.length()));		//Read y velocity
+                    velYFlt = Float.parseFloat(textLine.substring(0, textLine.length()));		//Read y velocity
+                    //velYFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read y velocity
+                    //textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
 
-                    LibGDXTools.bodyCreate(nameStr, massFlt, posXFlt, posYFlt, velXFlt, velYFlt);	//Create body with data from file
+                    //spriteWidthFlt = Float.parseFloat(textLine.substring(0, textLine.length()));	//Read sprite width
+                    
+                    LibGDXTools.bodyCreate(nameStr, massFlt, posXFlt, posYFlt, velXFlt, velYFlt);
+                    //LibGDXTools.bodyCreate(nameStr, massFlt, radiusFlt, posXFlt, posYFlt, velXFlt, velYFlt, spriteWidthFlt);	//Create body with data from file
                 }
                 readFile.close();
                 in.close();
@@ -601,15 +609,15 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
         				n -= n;
         			}
 					
-					float velX = -0.002f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
-            		float velY = -0.002f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);
+					float velX = -0.075f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
+            		float velY = -0.075f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);
             		
             		if(party) {
             			shapeRenderer.setColor(1, (float) Math.random(), (float) Math.random(), x / (float) FTOldX.size());	
             		} else {
             			shapeRenderer.setColor(1, 0, 0, x / (float) FTOldX.size());
             		}
-					shapeRenderer.line(FTOldX.get(x) * zF + velX * zF, FTOldY.get(x) * zF + velY * zF, FTNewX.get(x) * zF + velX * zF, FTNewY.get(x) * zF + velY * zF);
+					shapeRenderer.line(FTOldX.get(x) * zF + velX, FTOldY.get(x) * zF + velY, FTNewX.get(x) * zF + velX, FTNewY.get(x) * zF + velY);
 				}
 				shapeRenderer.end();
 				Gdx.gl.glDisable(GL30.GL_BLEND);
@@ -730,16 +738,15 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				n -= n;
 			}
 			
-			float velX = -0.002f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
-			float velY = -0.002f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);
+			float velX = -0.025f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
+			float velY = -0.025f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);
 			
 			if(party) {
     			shapeRenderer.setColor(1, (float) Math.random(), (float) Math.random(), x / (float) FTOldX.size());	
     		} else {
     			shapeRenderer.setColor(1, 1, 1, x / (float) FTOldX.size());
     		}
-			shapeRenderer.line(PTOldX.get(x) * zF + velX * zF, PTOldY.get(x) * zF + velY * zF, PTNewX.get(x) * zF + velX * zF, PTNewY.get(x) * zF + velY * zF); 	
-
+			shapeRenderer.line(PTOldX.get(x) * zF + velX, PTOldY.get(x) * zF + velY, PTNewX.get(x) * zF + velX, PTNewY.get(x) * zF + velY); 	
 			//System.out.println("Line Print");
 		}
 		shapeRenderer.end();	
@@ -774,12 +781,15 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 					listOfBodies.get(i).cometTailY.remove(listOfBodies.get(i).cometTailY.size() - 1);
                 }
 
+                float velX = -0.025f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
+        		float velY = -0.025f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);
+                
                 if(party) {
         			shapeRenderer.setColor(1, (float) Math.random(), (float) Math.random(), 1);	
         		} else {
         			shapeRenderer.setColor(0, 1, 1, 1);
         		}
-				shapeRenderer.line(tailNewX * zF, tailNewY * zF, tailOldX * zF, tailOldY * zF);
+				shapeRenderer.line(tailNewX * zF + velX, tailNewY * zF + velY, tailOldX * zF + velX, tailOldY * zF + velY);
 
 				for (int j = 1; j < listOfBodies.get(i).cometTailX.size(); j++) {
 					if (j == 1 && j < listOfBodies.get(i).cometTailX.size() - 1) {
@@ -797,15 +807,13 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
         				n -= n;
         			}
                 	
-                	float velX = -0.002f*listOfBodies.get(n).velVect.x*zF*(deltaTime*20);
-            		float velY = -0.002f*listOfBodies.get(n).velVect.y*zF*(deltaTime*20);
             		
             		if(party) {
             			shapeRenderer.setColor(1, (float) Math.random(), (float) Math.random(), 1 - (j / (float) listOfBodies.get(i).cometTailX.size()));	
             		} else {
             			shapeRenderer.setColor(0, 1, 1, 1 - (j / (float) listOfBodies.get(i).cometTailX.size()));
             		}
-                    shapeRenderer.line(listOfBodies.get(i).cometTailX.get(j) * zF + velX * zF, listOfBodies.get(i).cometTailY.get(j) * zF + velY * zF, listOfBodies.get(i).cometTailX.get(j + 1) * zF + velX * zF, listOfBodies.get(i).cometTailY.get(j + 1) * zF + velY * zF);
+                    shapeRenderer.line(listOfBodies.get(i).cometTailX.get(j) * zF + velX, listOfBodies.get(i).cometTailY.get(j) * zF + velY, listOfBodies.get(i).cometTailX.get(j + 1) * zF + velX, listOfBodies.get(i).cometTailY.get(j + 1) * zF + velY);
                 }
 
                 if (!starsPresent) {
@@ -1112,9 +1120,9 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				currentVect.set(Math.round(currentVect.x*100f)/100f, Math.round(currentVect.y*100f)/100f, Math.round(currentVect.z*100f)/100f);
 				printAcc += currentVect;
 			} 
-			fontText.draw(batch, printPos, frameX + 2.5f*cam.viewportWidth/12, frameY - 9*cam.viewportHeight/24);
-			fontText.draw(batch, printVel, frameX + 2.5f*cam.viewportWidth/12, frameY - 10*cam.viewportHeight/24);
-			fontText.draw(batch, printAcc, frameX + 2.5f*cam.viewportWidth/12, frameY - 11*cam.viewportHeight/24);
+			fontText.draw(batch, printPos, (float) (frameX + 2.5f*cam.viewportWidth/12), (float) (frameY - 9*cam.viewportHeight/24));
+			fontText.draw(batch, printVel, (float) (frameX + 2.5f*cam.viewportWidth/12), (float) (frameY - 10*cam.viewportHeight/24));
+			fontText.draw(batch, printAcc, (float) (frameX + 2.5f*cam.viewportWidth/12), (float) (frameY - 11*cam.viewportHeight/24));
 			
 			fontTitle.draw(batch, "ORBITAL SIMULATION", frameX - 0.97f*cam.viewportWidth/2, frameY + 0.93f*cam.viewportHeight/2);	
 			fontText.draw(batch, "(press ESC for FULLSCREEN)", frameX - 0.97f*cam.viewportWidth/2, frameY - 0.92f*cam.viewportHeight/2);	

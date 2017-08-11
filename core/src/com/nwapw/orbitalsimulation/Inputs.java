@@ -158,10 +158,10 @@ public class Inputs implements InputProcessor {
 
 		if (keycode == Input.Keys.PLUS || keycode == Input.Keys.EQUALS) {
 			RunSimulation.zF += 0.1f;
-			if (RunSimulation.zF <= 0.001){
-				RunSimulation.zF = 0.001f;
-			} else if (RunSimulation.zF >= 100){
-				RunSimulation.zF = 100f;
+			if (RunSimulation.zF <= 0.000000000000009){
+				RunSimulation.zF = 0.0000000000000009f;
+			} else if (RunSimulation.zF >= 15){
+				RunSimulation.zF = 15f;
 			}
 			//System.out.println(RunSimulation.zF);
 			return false;
@@ -169,10 +169,10 @@ public class Inputs implements InputProcessor {
 
 		if (keycode == Input.Keys.MINUS) {
 			RunSimulation.zF -= 0.1f;
-			if (RunSimulation.zF <= 0.001){
-				RunSimulation.zF = 0.001f;
-			} else if (RunSimulation.zF >= 100){
-				RunSimulation.zF = 100f;
+			if (RunSimulation.zF <= 0.000000000000009){
+				RunSimulation.zF = 0.0000000000000009f;
+			} else if (RunSimulation.zF >= 15){
+				RunSimulation.zF = 15f;
 			}
 			//System.out.println(RunSimulation.zF);
 			return false;
@@ -307,8 +307,8 @@ public class Inputs implements InputProcessor {
 		
 		RunSimulation.zF += zf;
 		
-		if (RunSimulation.zF <= 0.00009f){
-			RunSimulation.zF = 0.00009f;
+		if (RunSimulation.zF <= 0.000000000000009f){
+			RunSimulation.zF = 0.000000000000009f;
 		}
 		else if (RunSimulation.zF >= 15f){
 			RunSimulation.zF = 15f;
