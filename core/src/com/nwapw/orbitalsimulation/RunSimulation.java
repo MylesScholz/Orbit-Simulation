@@ -436,7 +436,6 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		//Variables for loading files
 		boolean fileLoaded = false;
 		int i = 0;
-		int fileCount = 0;
 
 		//Define variables of data
 		String nameStr;
@@ -1319,6 +1318,54 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
             }
         }
     }
+
+	public static void saveFile(String fileName) {
+		String filePath = RunSimulation.class.getProtectionDomain().getCodeSource().getLocation().getPath();    //The path of the RunSimulation
+		filePath = filePath.substring(0, filePath.indexOf("/build")) + "/assets/systems/" + fileName;    //Navigate to system file
+		filePath = filePath.replaceAll("%20", " ");
+		File systemFile;
+		FileWriter out;
+		BufferedWriter writeFile;
+
+		Boolean fileWritten = false;
+		int i = 0;
+		String textLine = "";
+
+		while (fileWritten == false && i < 2) {
+			try {
+				//Write data to system file
+				systemFile = new File(filePath);
+				out = new FileWriter(systemFile);
+				writeFile = new BufferedWriter(out);
+
+				for (int j = 0; j < listOfBodies.size(); j++) {
+					textLine = listOfBodies.get(j).name + "," + listOfBodies.get(j).mass + "," + listOfBodies.get(j).posVect.x + "," + listOfBodies.get(j).posVect.y;
+					textLine = textLine + "," + listOfBodies.get(j).velVect.x + "," + listOfBodies.get(j).velVect.y;
+
+					writeFile.write(textLine);
+					writeFile.newLine();
+				}
+				writeFile.close();
+				out.close();
+
+				fileWritten = true;
+			} catch (FileNotFoundException e) {
+				System.out.println("File Not Found: " + e.getMessage());
+				System.out.println("Creating New File...");
+
+				try {
+					systemFile = new File(filePath);
+					systemFile.createNewFile();
+				} catch (IOException err) {
+					System.out.println("Problem Creating File: " + e.getMessage());
+				}
+
+				i++;
+			} catch (IOException e) {
+				System.out.println("Problem Writing to File: " + e.getMessage());
+			}
+		}
+	}
 	
 	public void resize(int width, int height) {
 		//stage.getViewport().update(width, height, true);
