@@ -47,8 +47,8 @@ public class Inputs implements InputProcessor {
 		}
 		
 		if (keycode == Input.Keys.I) {
-			RunSimulation.deltaTime = (float) 0.05;
-			RunSimulation.deltaPredictionTime = (float) 0.5;
+			RunSimulation.deltaTime = RunSimulation.originalDeltaTime;
+			RunSimulation.deltaPredictionTime = RunSimulation.originalDeltaPredictionTime;
 		}
 		
 		if (keycode == Input.Keys.C) {
@@ -67,8 +67,6 @@ public class Inputs implements InputProcessor {
 			
 			
 		}
-		
-		
 		
 		if (keycode == Input.Keys.CONTROL_LEFT) {
 			Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(),0);
@@ -93,11 +91,7 @@ public class Inputs implements InputProcessor {
 	
 		    }
 		    RunSimulation.n = closestN;
-
-
-		    
 		}
-		
 		
 		if(keycode == Input.Keys.ESCAPE){
         	if (RunSimulation.sidePanelState == true){
@@ -202,7 +196,7 @@ public class Inputs implements InputProcessor {
 				RunSimulation.zoomLines = false;
 			}
 	    }
-		if(keycode == Input.Keys.P){
+		if(keycode == Input.Keys.Y){
 			if (RunSimulation.purgeState == false){
 				RunSimulation.purgeState = true;
 			}
@@ -233,10 +227,25 @@ public class Inputs implements InputProcessor {
 		        RunSimulation.backgroundTexture = new Texture(backgroundFileName);
 		        RunSimulation.backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 			}
-	
 			}
 	    }
 		
+		if(keycode == Input.Keys.Y) {
+			if(Gdx.input.isKeyPressed(Input.Keys.T)) {
+				if(Gdx.input.isKeyPressed(Input.Keys.R)) {
+					if(Gdx.input.isKeyPressed(Input.Keys.A)) {
+						if(Gdx.input.isKeyPressed(Input.Keys.P)) {
+							if (RunSimulation.party == false){
+								RunSimulation.party = true;
+							}
+							else {
+								RunSimulation.party = false;
+							}
+						}
+					}
+				}
+			}
+		}
 		return false;
 	}
 
@@ -254,9 +263,6 @@ public class Inputs implements InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		
-		
-		
 		return false;
 	}
 
