@@ -61,21 +61,23 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	
 	// Specifies time used to calculate numerical integration
 
-	//static float deltaTime = (float) 0.05;
-	//static float deltaPredictionTime = (float) 0.05;
-	//static float deltaTime = (float) 0.0000005;
-	//static float deltaPredictionTime = (float) 0.0000005;
-	static float deltaTime = (float) 0.00000000001386385; // Real Time
-	static float deltaPredictionTime = (float) 0.00000000001386385; // Real Time
+	static float deltaTime = (float) 0.05;	//Normal
+	static float deltaPredictionTime = (float) 0.05;	//Normal
+
+	//static float deltaTime = (float) 0.0000005;	//Slow
+	//static float deltaPredictionTime = (float) 0.0000005;	//Slow
+
+	//static float deltaTime = (float) 0.00000000001386385; // Real Time
+	//static float deltaPredictionTime = (float) 0.00000000001386385; // Real Time
 	static float originalDeltaTime = deltaTime;
 	static float originalDeltaPredictionTime = deltaPredictionTime;
 	
 	
 	// The max number of iterations that the simulation runs
 	final static int numOfIterations = 1000000000;
-	final static int numOfPredictions = 2000;
-	final static float drawLimit = 20000000;
-	final static float predictedDrawLimit = 2000;
+	final static int numOfPredictions = 1000;
+	final static float drawLimit = 1000;
+	final static float predictedDrawLimit = 1000;
 	
 	// 0 = Focus on a particular body, 1 = free movement
 	static int cameraMode = 0;
@@ -93,7 +95,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	int placedSunCounter = 0;
 	
 	FPSLogger fpsLogger = new FPSLogger();
-	static String loadFileName = "solar system.txt";
+	static String loadFileName = "";
 	
 	// List of currently running bodies in the simulation
 	public static ArrayList<OrbitalBody> listOfBodies = new ArrayList<OrbitalBody>();
@@ -330,7 +332,11 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
         //If there are no bodies in the system, attempt to load file
         if (listOfBodies.size() == 0) {
-        	loadFile(loadFileName);
+        	if (loadFileName != "") {
+				loadFile(loadFileName);
+			} else {
+        		loadFile();
+			}
         }
 
         //Sets the zoom factor to the default zoom
@@ -378,52 +384,55 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
         filePath = filePath.substring(0, filePath.lastIndexOf("/"));
         filePath = filePath + "/system" + fileCount + ".txt";
 
-        while (fileLoaded == false && i < 2) {
-            try {
-            	//Initialize file readers
-                systemFile = new File(filePath);
-                in = new FileReader(systemFile);
-                readFile = new BufferedReader(in);
+		try {
+			//Initialize file readers
+			systemFile = new File(filePath);
+			in = new FileReader(systemFile);
+			readFile = new BufferedReader(in);
 
-                //Loop through the file line by line
-                while ((textLine = readFile.readLine()) != null) {
-                    nameStr = textLine.substring(0, textLine.indexOf(","));		//Read name
-                    textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+			//Loop through the file line by line
+			while ((textLine = readFile.readLine()) != null) {
+				nameStr = textLine.substring(0, textLine.indexOf(","));		//Read name
+				textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
 
-                    massFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read mass
-                    textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+				massFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read mass
+				textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
 
-                    posXFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read x position
-                    textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+				posXFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read x position
+				textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
 
-                    posYFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read y position
-                    textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+				posYFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read y position
+				textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
 
-                    velXFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read x velocity
-                    textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+				velXFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read x velocity
+				textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
 
-                    velYFlt = Float.parseFloat(textLine.substring(0, textLine.length()));		//Read y velocity
-                    
-                    LibGDXTools.bodyCreate(nameStr, massFlt, posXFlt, posYFlt, velXFlt, velYFlt);
-                }
-                readFile.close();
-                in.close();
+				velYFlt = Float.parseFloat(textLine.substring(0, textLine.length()));		//Read y velocity
 
-                fileLoaded = true;
-            } catch (FileNotFoundException e) {
-				//Catch file not found exception
-                System.out.println("File Not Found: " + e.getMessage());
-                System.out.println("Loading Default File...");
+				LibGDXTools.bodyCreate(nameStr, massFlt, posXFlt, posYFlt, velXFlt, velYFlt);
+			}
+			readFile.close();
+			in.close();
 
-                //Change file path to default file and loop again
-                filePath = filePath.substring(0, filePath.lastIndexOf("/"));
-                filePath = filePath + "/default.txt";
-                i++;
-            } catch (IOException e) {
-				//Catch IO exception
-                System.out.println("Problem Reading File: " + e.getMessage());
-            }
-        }
+			fileLoaded = true;
+		} catch (FileNotFoundException e) {
+			//Catch file not found exception
+			System.out.println("File Not Found: " + e.getMessage());
+			System.out.println("Creating Default File...");
+
+			try {
+				systemFile = new File(filePath);
+				systemFile.createNewFile();
+				loadFile("default.txt");
+				filePath = filePath.substring(filePath.lastIndexOf("/"));
+				saveFile(filePath);
+			} catch (IOException err) {
+				System.out.println("Problem Creating File: " + e.getMessage());
+			}
+		} catch (IOException e) {
+			//Catch IO exception
+			System.out.println("Problem Reading File: " + e.getMessage());
+		}
     }
 
 	public void loadFile(String fileName) {
@@ -446,78 +455,81 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 		String nameStr;
 		float massFlt, radiusFlt, posXFlt, posYFlt, velXFlt, velYFlt, spriteWidthFlt;
 
-		while (fileLoaded == false && i < 2) {
-			try {
-				//Initialize file readers
-				systemFile = new File(filePath);
-				in = new FileReader(systemFile);
-				readFile = new BufferedReader(in);
-				
-				//Loop through the file line by line
-				while ((textLine = readFile.readLine()) != null) {
-					if(fileName == "solar system.txt") {
-	                    nameStr = textLine.substring(0, textLine.indexOf(","));		//Read name
-	                    textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+		try {
+			//Initialize file readers
+			systemFile = new File(filePath);
+			in = new FileReader(systemFile);
+			readFile = new BufferedReader(in);
 
-	                    massFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read mass
-	                    textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+			//Loop through the file line by line
+			while ((textLine = readFile.readLine()) != null) {
+				if(fileName == "solar system.txt") {
+					nameStr = textLine.substring(0, textLine.indexOf(","));		//Read name
+					textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
 
-	                    radiusFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));	//Read radius
-	                    textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+					massFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read mass
+					textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
 
-	                    posXFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read x position
-	                    textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+					radiusFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));	//Read radius
+					textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
 
-	                    posYFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read y position
-	                    textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+					posXFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read x position
+					textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
 
-	                    velXFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read x velocity
-	                    textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+					posYFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read y position
+					textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
 
-	                    velYFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read x velocity
-						textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
-						
-	                    spriteWidthFlt = Float.parseFloat(textLine.substring(0, textLine.length()));	//Read sprite width
-	                    
-	                    LibGDXTools.bodyCreate(nameStr, massFlt, radiusFlt, posXFlt, posYFlt, velXFlt, velYFlt, spriteWidthFlt);	//Create body with data from file
-					} else {
-						nameStr = textLine.substring(0, textLine.indexOf(","));		//Read name
-						textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
-						
-						massFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read mass
-						textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
-						
-						posXFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read x position
-						textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
-						
-						posYFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read y position
-						textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
-						
-						velXFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read x velocity
-						textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
-						
-						velYFlt = Float.parseFloat(textLine.substring(0, textLine.length()));		//Read y velocity
-						
-						LibGDXTools.bodyCreate(nameStr, massFlt, posXFlt, posYFlt, velXFlt, velYFlt);	//Create body with data from file
-					}
+					velXFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read x velocity
+					textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+
+					velYFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read x velocity
+					textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+
+					spriteWidthFlt = Float.parseFloat(textLine.substring(0, textLine.length()));	//Read sprite width
+
+					LibGDXTools.bodyCreate(nameStr, massFlt, radiusFlt, posXFlt, posYFlt, velXFlt, velYFlt, spriteWidthFlt);	//Create body with data from file
+				} else {
+					nameStr = textLine.substring(0, textLine.indexOf(","));		//Read name
+					textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+
+					massFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read mass
+					textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+
+					posXFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read x position
+					textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+
+					posYFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read y position
+					textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+
+					velXFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read x velocity
+					textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+
+					velYFlt = Float.parseFloat(textLine.substring(0, textLine.length()));		//Read y velocity
+
+					LibGDXTools.bodyCreate(nameStr, massFlt, posXFlt, posYFlt, velXFlt, velYFlt);	//Create body with data from file
 				}
-				readFile.close();
-				in.close();
-
-				fileLoaded = true;
-			} catch (FileNotFoundException e) {
-				//Catch file not found exception
-				System.out.println("File Not Found: " + e.getMessage());
-				System.out.println("Loading Default File...");
-
-				//Change file path to default file and loop again
-				filePath = filePath.substring(0, filePath.lastIndexOf("/"));
-				filePath = filePath + "/default.txt";
-				i++;
-			} catch (IOException e) {
-				//Catch IO exception
-				System.out.println("Problem Reading File: " + e.getMessage());
 			}
+			readFile.close();
+			in.close();
+
+			fileLoaded = true;
+		} catch (FileNotFoundException e) {
+			//Catch file not found exception
+			System.out.println("File Not Found: " + e.getMessage());
+			System.out.println("Creating Default File...");
+
+			try {
+				systemFile = new File(filePath);
+				systemFile.createNewFile();
+				loadFile("default.txt");
+				filePath = filePath.substring(filePath.lastIndexOf("/"));
+				saveFile(filePath);
+			} catch (IOException err) {
+				System.out.println("Problem Creating File: " + e.getMessage());
+			}
+		} catch (IOException e) {
+			//Catch IO exception
+			System.out.println("Problem Reading File: " + e.getMessage());
 		}
 	}
 
@@ -738,8 +750,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
    				listOfBodies.get(i).setTexture(LibGDXTools.bodyTextureChooser(listOfBodies.get(i).mass));
    	   			//int j = 11;
    				if((i % 10) == 0) {
-   					System.out.println((i % 10) == 0);
-   					System.out.println("Random Background");
+   					//System.out.println((i % 10) == 0);
+   					//System.out.println("Random Background");
    					int j = 1 + (int)(Math.random() * 11); 
    					String backgroundFileName = "backgrounds/" + j + ".jpg";
    					RunSimulation.backgroundTexture = new Texture(backgroundFileName);
@@ -1277,7 +1289,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	
 	public static void saveFile() {
         String filePath = RunSimulation.class.getProtectionDomain().getCodeSource().getLocation().getPath();    //The path of the RunSimulation
-        filePath = filePath.substring(0, filePath.indexOf("/bin")) + "/assets/systems/count.txt";    //Navigate to system file
+        filePath = filePath.substring(0, filePath.indexOf("/build")) + "/assets/systems/count.txt";    //Navigate to system file
         filePath = filePath.replaceAll("%20", " ");
         File systemFile;
         FileWriter out;
@@ -1353,7 +1365,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
 	public static void saveFile(String fileName) {
 		String filePath = RunSimulation.class.getProtectionDomain().getCodeSource().getLocation().getPath();    //The path of the RunSimulation
-		filePath = filePath.substring(0, filePath.indexOf("/bin")) + "/assets/systems/" + fileName;    //Navigate to system file
+		filePath = filePath.substring(0, filePath.indexOf("/build")) + "/assets/systems/" + fileName;    //Navigate to system file
 		filePath = filePath.replaceAll("%20", " ");
 		File systemFile;
 		FileWriter out;

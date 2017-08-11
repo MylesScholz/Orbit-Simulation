@@ -146,7 +146,11 @@ public class Inputs implements InputProcessor {
 	    }
 	
 		if(keycode == Input.Keys.SPACE) {
-		    RunSimulation.saveFile(RunSimulation.loadFileName);
+			if (RunSimulation.loadFileName != "") {
+				RunSimulation.saveFile(RunSimulation.loadFileName);
+			} else {
+				RunSimulation.saveFile();
+			}
 			if (RunSimulation.pauseState == false){
 				RunSimulation.pauseState = true;
 			}
