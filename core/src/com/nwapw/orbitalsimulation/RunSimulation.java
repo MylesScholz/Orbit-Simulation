@@ -325,7 +325,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
         //If there are no bodies in the system, attempt to load file
         if (listOfBodies.size() == 0) {
-            loadFile();
+        	loadFile("explosions.txt");
         }
 
         //Sets the zoom factor to the default zoom
