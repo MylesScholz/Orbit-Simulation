@@ -63,6 +63,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
 	static float deltaTime = (float) 0.05;
 	static float deltaPredictionTime = (float) 0.05;
+	//static float deltaTime = (float) 0.0000005;
+	//static float deltaPredictionTime = (float) 0.0000005;
 	static float originalDeltaTime = deltaTime;
 	static float originalDeltaPredictionTime = deltaPredictionTime;
 	
@@ -1109,15 +1111,15 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 				Vector3 currentVect = new Vector3();
 				
 				currentVect.set(listOfBodies.get(n).posVect);
-				currentVect.set(Math.round(currentVect.x*100f)/100f, Math.round(currentVect.y*100f)/100f, Math.round(currentVect.z*100f)/100f);
+				//currentVect.set(Math.round(currentVect.x*100f)/100f, Math.round(currentVect.y*100f)/100f, Math.round(currentVect.z*100f)/100f);
 				printPos += currentVect;
 
 				currentVect.set(listOfBodies.get(n).velVect);
-				currentVect.set(Math.round(currentVect.x*100f)/100f, Math.round(currentVect.y*100f)/100f, Math.round(currentVect.z*100f)/100f);
+				//currentVect.set(Math.round(currentVect.x*100f)/100f, Math.round(currentVect.y*100f)/100f, Math.round(currentVect.z*100f)/100f);
 				printVel += currentVect;
 
 				currentVect.set(listOfBodies.get(n).accVect);
-				currentVect.set(Math.round(currentVect.x*100f)/100f, Math.round(currentVect.y*100f)/100f, Math.round(currentVect.z*100f)/100f);
+				currentVect.set( (float) Math.round(currentVect.x*100f)/100f, (float) Math.round(currentVect.y*100f)/100f, (float) Math.round(currentVect.z*100f)/100f);
 				printAcc += currentVect;
 			} 
 			fontText.draw(batch, printPos, (float) (frameX + 2.5f*cam.viewportWidth/12), (float) (frameY - 9*cam.viewportHeight/24));
