@@ -211,7 +211,7 @@ public class Inputs implements InputProcessor {
 			}
 	    }
 		if(keycode == Input.Keys.J){
-			if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
+			if (Gdx.input.isKeyPressed(Input.Keys.H)){
 			
 			if (RunSimulation.coolBackground == true){
 				RunSimulation.coolBackground = false;
