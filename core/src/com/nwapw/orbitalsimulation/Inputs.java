@@ -146,7 +146,7 @@ public class Inputs implements InputProcessor {
 	    }
 	
 		if(keycode == Input.Keys.SPACE) {
-		    RunSimulation.saveFile();
+		    RunSimulation.saveFile(RunSimulation.loadFileName);
 			if (RunSimulation.pauseState == false){
 				RunSimulation.pauseState = true;
 			}
@@ -196,7 +196,7 @@ public class Inputs implements InputProcessor {
 				RunSimulation.zoomLines = false;
 			}
 	    }
-		if(keycode == Input.Keys.Y){
+		if(keycode == Input.Keys.T){
 			if (RunSimulation.purgeState == false){
 				RunSimulation.purgeState = true;
 			}
@@ -205,7 +205,7 @@ public class Inputs implements InputProcessor {
 			}
 	    }
 		if(keycode == Input.Keys.J){
-			if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
+			if (Gdx.input.isKeyPressed(Input.Keys.H)){
 			
 			if (RunSimulation.coolBackground == true){
 				RunSimulation.coolBackground = false;

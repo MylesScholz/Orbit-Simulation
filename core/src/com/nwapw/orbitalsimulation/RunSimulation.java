@@ -61,20 +61,21 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	
 	// Specifies time used to calculate numerical integration
 
-	static float deltaTime = (float) 0.05;
-	static float deltaPredictionTime = (float) 0.05;
+	//static float deltaTime = (float) 0.05;
+	//static float deltaPredictionTime = (float) 0.05;
 	//static float deltaTime = (float) 0.0000005;
 	//static float deltaPredictionTime = (float) 0.0000005;
+	static float deltaTime = (float) 0.00000000001386385; // Real Time
+	static float deltaPredictionTime = (float) 0.00000000001386385; // Real Time
 	static float originalDeltaTime = deltaTime;
 	static float originalDeltaPredictionTime = deltaPredictionTime;
 	
 	
 	// The max number of iterations that the simulation runs
-	final static int numOfIterations = 1000000;
-	final static int numOfPredictions = 1000;
-	final static float drawLimit = 1000;
-	final static float predictedDrawLimit = 1000;
-	
+	final static int numOfIterations = 1000000000;
+	final static int numOfPredictions = 2000;
+	final static float drawLimit = 20000000;
+	final static float predictedDrawLimit = 2000;
 	
 	// 0 = Focus on a particular body, 1 = free movement
 	static int cameraMode = 0;
@@ -92,6 +93,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 	int placedSunCounter = 0;
 	
 	FPSLogger fpsLogger = new FPSLogger();
+	static String loadFileName = "solar system.txt";
 	
 	// List of currently running bodies in the simulation
 	public static ArrayList<OrbitalBody> listOfBodies = new ArrayList<OrbitalBody>();
@@ -328,13 +330,12 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 
         //If there are no bodies in the system, attempt to load file
         if (listOfBodies.size() == 0) {
-            loadFile();
+        	loadFile(loadFileName);
         }
 
         //Sets the zoom factor to the default zoom
         zF = LibGDXTools.calculateDefaultZoom(listOfBodies.get(n).spriteWidth);
 	}
-
 
     public void loadFile() {
 		//Gets file path of current file
@@ -392,9 +393,6 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
                     massFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read mass
                     textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
 
-                    //radiusFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));	//Read radius
-                    //textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
-                    
                     posXFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read x position
                     textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
 
@@ -405,13 +403,8 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
                     textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
 
                     velYFlt = Float.parseFloat(textLine.substring(0, textLine.length()));		//Read y velocity
-                    //velYFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read y velocity
-                    //textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
-
-                    //spriteWidthFlt = Float.parseFloat(textLine.substring(0, textLine.length()));	//Read sprite width
                     
                     LibGDXTools.bodyCreate(nameStr, massFlt, posXFlt, posYFlt, velXFlt, velYFlt);
-                    //LibGDXTools.bodyCreate(nameStr, massFlt, radiusFlt, posXFlt, posYFlt, velXFlt, velYFlt, spriteWidthFlt);	//Create body with data from file
                 }
                 readFile.close();
                 in.close();
@@ -432,6 +425,101 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
             }
         }
     }
+
+	public void loadFile(String fileName) {
+		//Gets file path of current file
+		String filePath = this.getClass().getClassLoader().getResource("").getPath();   //The path of the running file
+		filePath = filePath.substring(0, filePath.indexOf("/desktop")) + "/core/assets/systems/" + fileName;    //Navigate to system file
+		filePath = filePath.replaceAll("%20", " ");    //Remove space placeholder in file path
+
+		//Define file readers
+		File systemFile;
+		FileReader in;
+		BufferedReader readFile;
+		String textLine;
+
+		//Variables for loading files
+		boolean fileLoaded = false;
+		int i = 0;
+
+		//Define variables of data
+		String nameStr;
+		float massFlt, radiusFlt, posXFlt, posYFlt, velXFlt, velYFlt, spriteWidthFlt;
+
+		while (fileLoaded == false && i < 2) {
+			try {
+				//Initialize file readers
+				systemFile = new File(filePath);
+				in = new FileReader(systemFile);
+				readFile = new BufferedReader(in);
+				
+				//Loop through the file line by line
+				while ((textLine = readFile.readLine()) != null) {
+					if(fileName == "solar system.txt") {
+	                    nameStr = textLine.substring(0, textLine.indexOf(","));		//Read name
+	                    textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+
+	                    massFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read mass
+	                    textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+
+	                    radiusFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));	//Read radius
+	                    textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+
+	                    posXFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read x position
+	                    textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+
+	                    posYFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read y position
+	                    textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+
+	                    velXFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read x velocity
+	                    textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+
+	                    velYFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read x velocity
+						textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+						
+	                    spriteWidthFlt = Float.parseFloat(textLine.substring(0, textLine.length()));	//Read sprite width
+	                    
+	                    LibGDXTools.bodyCreate(nameStr, massFlt, radiusFlt, posXFlt, posYFlt, velXFlt, velYFlt, spriteWidthFlt);	//Create body with data from file
+					} else {
+						nameStr = textLine.substring(0, textLine.indexOf(","));		//Read name
+						textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+						
+						massFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read mass
+						textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+						
+						posXFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read x position
+						textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+						
+						posYFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read y position
+						textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+						
+						velXFlt = Float.parseFloat(textLine.substring(0, textLine.indexOf(",")));		//Read x velocity
+						textLine = textLine.substring(textLine.indexOf(",") + 1);	//Cut string to remove name
+						
+						velYFlt = Float.parseFloat(textLine.substring(0, textLine.length()));		//Read y velocity
+						
+						LibGDXTools.bodyCreate(nameStr, massFlt, posXFlt, posYFlt, velXFlt, velYFlt);	//Create body with data from file
+					}
+				}
+				readFile.close();
+				in.close();
+
+				fileLoaded = true;
+			} catch (FileNotFoundException e) {
+				//Catch file not found exception
+				System.out.println("File Not Found: " + e.getMessage());
+				System.out.println("Loading Default File...");
+
+				//Change file path to default file and loop again
+				filePath = filePath.substring(0, filePath.lastIndexOf("/"));
+				filePath = filePath + "/default.txt";
+				i++;
+			} catch (IOException e) {
+				//Catch IO exception
+				System.out.println("Problem Reading File: " + e.getMessage());
+			}
+		}
+	}
 
    	public void place() {
    		if (Gdx.input.isButtonPressed(0) && !newPlanet && !newSun && !newSystem) {
@@ -1084,7 +1172,7 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
 			fontText.draw(batch, "(ARROW KEYS) Move Focused Body (I) Reset dT", frameX + 2.5f*cam.viewportWidth/12, frameY + 7*cam.viewportHeight/24);
 			fontText.draw(batch, "(SPACEBAR) Pause & Save  (V) Predictions On/Off", frameX + 2.5f*cam.viewportWidth/12, frameY + 6*cam.viewportHeight/24);
 			fontText.draw(batch, "(CTRL) Focus on body closest to mouse", frameX + 2.5f*cam.viewportWidth/12, frameY + 5*cam.viewportHeight/24);
-			fontText.draw(batch, "(M) Reset Vel  (Y) Purge extraneous planets", frameX + 2.5f*cam.viewportWidth/12, frameY + 4*cam.viewportHeight/24);
+			fontText.draw(batch, "(M) Reset Vel  (T) Purge extraneous planets", frameX + 2.5f*cam.viewportWidth/12, frameY + 4*cam.viewportHeight/24);
 			fontText.draw(batch, "(N) Change Focus (B) Change Focus to Next Star", frameX + 2.5f*cam.viewportWidth/12, frameY + 3*cam.viewportHeight/24);
 			fontText.draw(batch, "(C) Switch Camera Modes  (WASD) Panning", frameX + 2.5f*cam.viewportWidth/12, frameY + 2*cam.viewportHeight/24);
 			fontText.draw(batch, "( , ) Decrease dt  ( . ) Increase dt", frameX + 2.5f*cam.viewportWidth/12, frameY + 1*cam.viewportHeight/24);
@@ -1262,6 +1350,54 @@ public class RunSimulation extends ApplicationAdapter implements ApplicationList
             }
         }
     }
+
+	public static void saveFile(String fileName) {
+		String filePath = RunSimulation.class.getProtectionDomain().getCodeSource().getLocation().getPath();    //The path of the RunSimulation
+		filePath = filePath.substring(0, filePath.indexOf("/bin")) + "/assets/systems/" + fileName;    //Navigate to system file
+		filePath = filePath.replaceAll("%20", " ");
+		File systemFile;
+		FileWriter out;
+		BufferedWriter writeFile;
+
+		Boolean fileWritten = false;
+		int i = 0;
+		String textLine = "";
+
+		while (fileWritten == false && i < 2) {
+			try {
+				//Write data to system file
+				systemFile = new File(filePath);
+				out = new FileWriter(systemFile);
+				writeFile = new BufferedWriter(out);
+
+				for (int j = 0; j < listOfBodies.size(); j++) {
+					textLine = listOfBodies.get(j).name + "," + listOfBodies.get(j).mass + "," + listOfBodies.get(j).posVect.x + "," + listOfBodies.get(j).posVect.y;
+					textLine = textLine + "," + listOfBodies.get(j).velVect.x + "," + listOfBodies.get(j).velVect.y;
+
+					writeFile.write(textLine);
+					writeFile.newLine();
+				}
+				writeFile.close();
+				out.close();
+
+				fileWritten = true;
+			} catch (FileNotFoundException e) {
+				System.out.println("File Not Found: " + e.getMessage());
+				System.out.println("Creating New File...");
+
+				try {
+					systemFile = new File(filePath);
+					systemFile.createNewFile();
+				} catch (IOException err) {
+					System.out.println("Problem Creating File: " + e.getMessage());
+				}
+
+				i++;
+			} catch (IOException e) {
+				System.out.println("Problem Writing to File: " + e.getMessage());
+			}
+		}
+	}
 	
 	public void resize(int width, int height) {
 		//stage.getViewport().update(width, height, true);
